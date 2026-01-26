@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XREZZKY STORE | Digital Game Services</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{
+  --primary:#007bff;
+  --gradient:linear-gradient(135deg,#00c6ff,#0072ff);
+  --dark1:#1f1f1f;
+  --dark2:#3a3a3a;
+  --soft:#f9fafb;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto;}
+body{
+  background:linear-gradient(135deg,#e0eafc,#cfdef3);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  padding:20px;
+}
+.container{
+  max-width:480px;
+  width:100%;
+  background:#fff;
+  border-radius:26px;
+  padding:26px;
+  box-shadow:0 20px 50px rgba(0,0,0,.12);
+  animation:fade .6s ease;
+}
+@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1}}
+@keyframes zoom{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+h1{text-align:center;margin-bottom:10px;}
+.desc{text-align:center;font-size:14px;color:#555;margin-bottom:20px;}
+.info-board{
+  background:var(--soft);
+  border-left:5px solid var(--primary);
+  padding:14px;
+  border-radius:14px;
+  font-size:13px;
+}
+.btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:14px;
+  border-radius:14px;
+  text-decoration:none;
+  color:#fff;
+  font-weight:600;
+  margin-top:10px;
+  transition:.25s;
+}
+.btn-wa{background:linear-gradient(135deg,var(--dark1),var(--dark2));}
+.btn-info{background:var(--gradient);}
+.btn:hover{transform:translateY(-2px);opacity:.95;}
+.section-title{margin:26px 0 12px;font-size:15px;color:#444;}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.grid-item{
+  background:#fff;
+  border:1px solid #eee;
+  border-radius:18px;
+  padding:14px;
+  text-align:center;
+  font-size:13px;
+  font-weight:600;
+  color:#000;
+  cursor:pointer;
+  transition:.25s;
+}
+.grid-item i{font-size:22px;margin-bottom:6px;}
+.grid-item:hover{transform:translateY(-3px);}
+.services{display:grid;gap:18px;}
+.service{border:1px solid #eee;border-radius:20px;padding:12px;}
+.service h3{font-size:15px;margin:10px 0;}
+.photos{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.photos img{width:100%;height:auto;border-radius:12px;cursor:pointer;display:block;}
+.service button{width:100%;margin-top:10px;background:var(--primary);color:#fff;border:none;padding:12px;border-radius:12px;font-weight:600;cursor:pointer;}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);justify-content:center;align-items:center;z-index:999;}
+.modal-box{max-width:95%;max-height:95%;padding:20px;background:#fff;border-radius:16px;position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+.modal-box img{width:auto;max-width:100%;height:auto;max-height:100%;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.3);display:block;}
+.modal-title{text-align:center;font-weight:600;margin-bottom:10px;}
+.close{position:absolute;top:15px;right:20px;font-size:18px;color:#333;cursor:pointer;font-weight:bold;}
+.choice{display:block;margin:10px 0;padding:12px;border-radius:12px;color:#fff;text-decoration:none;text-align:center;font-weight:600;}
+.bg-wa{background:#25D366;}
+.bg-grup{background:var(--primary);}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>XREZZKY STORE</h1>
+<p class="desc">Layanan digital game aman & terpercaya</p>
+
+<div class="info-board">
+📌 Ready joki & gift all game<br>
+⚡ Proses cepat & aman<br>
+💬 Fast respon admin
+</div>
+
+<a href="https://wa.me/6288293064112" class="btn btn-wa" target="_blank">
+<i class="fab fa-whatsapp"></i> Kontak Admin
+</a>
+
+<a href="https://link-info-update.com" class="btn btn-info" target="_blank">
+<i class="fas fa-bullhorn"></i> Info & Update
+</a>
+
+<div class="section-title">Platform & Komunitas</div>
+<div class="grid">
+  <div class="grid-item" onclick="openGroup()">
+    <i class="fab fa-whatsapp" style="color:#25D366"></i> Komunitas & Grup
+  </div>
+  <a href="https://instagram.com/xrezzkystore" class="grid-item" target="_blank">
+    <i class="fab fa-instagram" style="color:#E1306C"></i> Instagram
+  </a>
+  <a href="https://www.tiktok.com/@xrezzky.store" class="grid-item" target="_blank">
+    <i class="fab fa-tiktok" style="color:#000"></i> TikTok
+  </a>
+  <a href="https://discord.gg/xDfZJHb2yK" class="grid-item" target="_blank">
+    <i class="fab fa-discord" style="color:#5865F2"></i> Discord
+  </a>
+</div>
+
+<div class="section-title">Layanan Kami</div>
+<div class="service fade-up show delay-1">
+  <h3>Jasa Joki & Gift Dead Rails</h3>
+  <p>Status: <b>READY</b></p>
+  <p>Update: 12 Januari 2026 • 19:40 WIB</p>
+
+  <div class="photos">
+    <img src="https://i.imgur.com/2LvDMJt.jpeg" onclick="openImg(this,'12 Jan 2026 • 18:20 WIB')">
+    <img src="https://i.imgur.com/2LvDMJt.jpeg" onclick="openImg(this,'12 Jan 2026 • 18:45 WIB')">
+  </div>
+</div>
+
+</div>
+
+<!-- MODAL FOTO -->
+<div id="imgModal" class="modal" onclick="if(event.target===this)closeImg()">
+  <div class="modal-box">
+    <img id="modalImg">
+    <div id="modalInfo" class="modal-info"></div>
+  </div>
+</div>
+
+<!-- MODAL GROUP -->
+<div id="groupModal" class="modal" onclick="if(event.target===this) closeGroup()">
+  <div class="modal-box">
+    <div class="modal-title">Pilih Platform / Grup</div>
+    <a href="https://chat.whatsapp.com/JPhQHMBp5qKIjMmmTxbWXt" class="choice bg-wa" target="_blank">Komunitas</a>
+    <a href="https://chat.whatsapp.com/LnLWKCcc6l9CDXq0ybF01J" class="choice bg-grup" target="_blank">Grup Jual Beli</a>
+  </div>
+</div>
+
+<script>
+const WA = "6288293064112";
+const imgModal = document.getElementById("imgModal");
+const imgModal=document.getElementById("imgModal");
+const modalImg=document.getElementById("modalImg");
+const modalInfo=document.getElementById("modalInfo");
+const groupModal=document.getElementById("groupModal");
+
+function openImg(el,info){
+  modalImg.src=el.src;
+  modalInfo.innerText="📸 Upload: "+info;
+  imgModal.style.display="flex";
+}
+function closeImg(){imgModal.style.display="none"}
+
+function openGroup(){groupModal.style.display="flex"}
+function closeGroup(){groupModal.style.display="none"}
+  
+function openImg(src){ modalImg.src=src; imgModal.style.display="flex"; }
+function closeImg(){ imgModal.style.display="none"; }
+
+function openGroup(){ groupModal.style.display="flex"; }
+function closeGroup(){ groupModal.style.display="none"; }
+
+function pesan(btn){
+  const text = encodeURIComponent(btn.dataset.pesan);
+  window.open(`https://wa.me/${WA}?text=${text}`,"_blank");
+}
+</script>
+
+</body>
+  </html>
