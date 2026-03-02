@@ -1,190 +1,2328 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XREZZKY STORE | Digital Game Services</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<style>
-:root{
-  --primary:#007bff;
-  --gradient:linear-gradient(135deg,#00c6ff,#0072ff);
-  --dark1:#1f1f1f;
-  --dark2:#3a3a3a;
-  --soft:#f9fafb;
-}
-*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto;}
-body{
-  background:linear-gradient(135deg,#e0eafc,#cfdef3);
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  padding:20px;
-}
-.container{
-  max-width:480px;
-  width:100%;
-  background:#fff;
-  border-radius:26px;
-  padding:26px;
-  box-shadow:0 20px 50px rgba(0,0,0,.12);
-  animation:fade .6s ease;
-}
-@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1}}
-@keyframes zoom{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
-h1{text-align:center;margin-bottom:10px;}
-.desc{text-align:center;font-size:14px;color:#555;margin-bottom:20px;}
-.info-board{
-  background:var(--soft);
-  border-left:5px solid var(--primary);
-  padding:14px;
-  border-radius:14px;
-  font-size:13px;
-}
-.btn{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  padding:14px;
-  border-radius:14px;
-  text-decoration:none;
-  color:#fff;
-  font-weight:600;
-  margin-top:10px;
-  transition:.25s;
-}
-.btn-wa{background:linear-gradient(135deg,var(--dark1),var(--dark2));}
-.btn-info{background:var(--gradient);}
-.btn:hover{transform:translateY(-2px);opacity:.95;}
-.section-title{margin:26px 0 12px;font-size:15px;color:#444;}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
-.grid-item{
-  background:#fff;
-  border:1px solid #eee;
-  border-radius:18px;
-  padding:14px;
-  text-align:center;
-  font-size:13px;
-  font-weight:600;
-  color:#000;
-  cursor:pointer;
-  transition:.25s;
-}
-.grid-item i{font-size:22px;margin-bottom:6px;}
-.grid-item:hover{transform:translateY(-3px);}
-.services{display:grid;gap:18px;}
-.service{border:1px solid #eee;border-radius:20px;padding:12px;}
-.service h3{font-size:15px;margin:10px 0;}
-.photos{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
-.photos img{width:100%;height:auto;border-radius:12px;cursor:pointer;display:block;}
-.service button{width:100%;margin-top:10px;background:var(--primary);color:#fff;border:none;padding:12px;border-radius:12px;font-weight:600;cursor:pointer;}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);justify-content:center;align-items:center;z-index:999;}
-.modal-box{max-width:95%;max-height:95%;padding:20px;background:#fff;border-radius:16px;position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;}
-.modal-box img{width:auto;max-width:100%;height:auto;max-height:100%;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.3);display:block;}
-.modal-title{text-align:center;font-weight:600;margin-bottom:10px;}
-.close{position:absolute;top:15px;right:20px;font-size:18px;color:#333;cursor:pointer;font-weight:bold;}
-.choice{display:block;margin:10px 0;padding:12px;border-radius:12px;color:#fff;text-decoration:none;text-align:center;font-weight:600;}
-.bg-wa{background:#25D366;}
-.bg-grup{background:var(--primary);}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XREZZKY STORE | Premium Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: white; transition: background 0.3s; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .hidden { display: none; }
+        .tab-active { border-bottom: 2px solid #3b82f6; color: #3b82f6; }
+        input[type="range"] { accent-color: #3b82f6; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+        
+        .animate-fade { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        #initial-loading {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.6s ease;
+        }
+
+        .loader-box {
+            text-align: center;
+            width: 300px;
+        }
+
+        #loading-text {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #loading-bar {
+            width: 0%;
+            height: 100%;
+            background: #22c55e;
+            transition: width 0.3s ease;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .product-card:hover { transform: translateY(-5px); transition: all 0.3s; }
+
+        .blur-in {
+            animation: blurIn .5s ease forwards;
+        }
+
+        @keyframes blurIn {
+            from { opacity:0; filter: blur(10px); }
+            to { opacity:1; filter: blur(0); }
+        }
+        
+        /* SELLER BADGE */
+        .seller-badge {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 8px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        /* QR CODE */
+        .qr-container {
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        
+        /* PRIVACY BADGE */
+        .privacy-badge {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 8px;
+            font-weight: bold;
+        }
+    </style>
 </head>
-<body>
-
-<div class="container">
-<h1>XREZZKY STORE</h1>
-<p class="desc">Layanan digital game aman & terpercaya</p>
-
-<div class="info-board">
-📌 Ready joki & gift all game<br>
-⚡ Proses cepat & aman<br>
-💬 Fast respon admin
-</div>
-
-<a href="https://wa.me/6288293064112" class="btn btn-wa" target="_blank">
-<i class="fab fa-whatsapp"></i> Kontak Admin
-</a>
-
-<a href="https://link-info-update.com" class="btn btn-info" target="_blank">
-<i class="fas fa-bullhorn"></i> Info & Update
-</a>
-
-<div class="section-title">Platform & Komunitas</div>
-<div class="grid">
-  <div class="grid-item" onclick="openGroup()">
-    <i class="fab fa-whatsapp" style="color:#25D366"></i> Komunitas & Grup
-  </div>
-  <a href="https://instagram.com/xrezzkystore" class="grid-item" target="_blank">
-    <i class="fab fa-instagram" style="color:#E1306C"></i> Instagram
-  </a>
-  <a href="https://www.tiktok.com/@xrezzky.store" class="grid-item" target="_blank">
-    <i class="fab fa-tiktok" style="color:#000"></i> TikTok
-  </a>
-  <a href="https://discord.gg/xDfZJHb2yK" class="grid-item" target="_blank">
-    <i class="fab fa-discord" style="color:#5865F2"></i> Discord
-  </a>
-</div>
-
-<div class="section-title">Layanan Kami</div>
-<div class="service fade-up show delay-1">
-  <h3>Jasa Joki & Gift Dead Rails</h3>
-  <p>Status: <b>READY</b></p>
-  <p>Update: 12 Januari 2026 • 19:40 WIB</p>
-
-  <div class="photos">
-    <img src="https://i.imgur.com/2LvDMJt.jpeg" onclick="openImg(this,'12 Jan 2026 • 18:20 WIB')">
-    <img src="https://i.imgur.com/2LvDMJt.jpeg" onclick="openImg(this,'12 Jan 2026 • 18:45 WIB')">
-  </div>
-</div>
-
-</div>
-
-<!-- MODAL FOTO -->
-<div id="imgModal" class="modal" onclick="if(event.target===this)closeImg()">
-  <div class="modal-box">
-    <img id="modalImg">
-    <div id="modalInfo" class="modal-info"></div>
-  </div>
-</div>
-
-<!-- MODAL GROUP -->
-<div id="groupModal" class="modal" onclick="if(event.target===this) closeGroup()">
-  <div class="modal-box">
-    <div class="modal-title">Pilih Platform / Grup</div>
-    <a href="https://chat.whatsapp.com/JPhQHMBp5qKIjMmmTxbWXt" class="choice bg-wa" target="_blank">Komunitas</a>
-    <a href="https://chat.whatsapp.com/LnLWKCcc6l9CDXq0ybF01J" class="choice bg-grup" target="_blank">Grup Jual Beli</a>
-  </div>
-</div>
-
-<script>
-const WA = "6288293064112";
-const imgModal = document.getElementById("imgModal");
-const imgModal=document.getElementById("imgModal");
-const modalImg=document.getElementById("modalImg");
-const modalInfo=document.getElementById("modalInfo");
-const groupModal=document.getElementById("groupModal");
-
-function openImg(el,info){
-  modalImg.src=el.src;
-  modalInfo.innerText="📸 Upload: "+info;
-  imgModal.style.display="flex";
-}
-function closeImg(){imgModal.style.display="none"}
-
-function openGroup(){groupModal.style.display="flex"}
-function closeGroup(){groupModal.style.display="none"}
+<body class="pb-24">
   
-function openImg(src){ modalImg.src=src; imgModal.style.display="flex"; }
-function closeImg(){ imgModal.style.display="none"; }
+  <!-- MODAL SELLER PRODUCT (TAMBAH/EDIT) -->
+<div id="modal-seller-product" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/95">
+    <div class="glass p-6 rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+        <h3 id="seller-product-title" class="text-xl font-bold mb-4 text-blue-400">TAMBAH PRODUK</h3>
+        <input type="text" id="seller-p-name" placeholder="Nama Produk" class="w-full p-3 mb-3 bg-slate-800 rounded">
+        <input type="number" id="seller-p-price" placeholder="Harga" class="w-full p-3 mb-3 bg-slate-800 rounded">
+        <textarea id="seller-p-desc" placeholder="Deskripsi" class="w-full p-3 mb-3 bg-slate-800 rounded h-24"></textarea>
+        <input type="number" id="seller-p-stock" placeholder="Stok" class="w-full p-3 mb-3 bg-slate-800 rounded">
+        <p class="text-[10px] text-blue-400 font-bold mb-2">Gambar Produk (Max 5)</p>
+        <div id="seller-image-container" class="space-y-2 mb-4"></div>
+        <div class="flex gap-2">
+            <button onclick="saveSellerProduct()" id="btn-save-seller-prod" class="flex-1 bg-green-600 py-3 rounded-xl font-bold">SIMPAN</button>
+            <button onclick="closeSellerProductModal()" class="flex-1 bg-gray-600 py-3 rounded-xl font-bold">BATAL</button>
+        </div>
+    </div>
+</div>
+  
+<!-- PRO LOADING SCREEN -->
+<div id="initial-loading" class="fixed inset-0 bg-gradient-to-br from-black via-slate-900 to-black flex flex-col items-center justify-center z-[9999] transition-all duration-700">
+    <div class="text-4xl font-extrabold text-blue-500 mb-6 animate-pulse scale-110 transition-all duration-500">
+        XREZZKY STORE
+    </div>
+    <div class="w-56 h-2 bg-slate-800 rounded-full overflow-hidden">
+        <div id="loading-bar" class="h-full bg-blue-500 w-0 transition-all duration-300"></div>
+    </div>
+    <p id="loading-text" class="text-gray-400 text-xs mt-4 opacity-80">
+        Menyiapkan Marketplace...
+    </p>
+</div>
 
-function openGroup(){ groupModal.style.display="flex"; }
-function closeGroup(){ groupModal.style.display="none"; }
+<!-- IMAGE MODAL -->
+<div id="imageModal" class="fixed inset-0 bg-black/95 hidden flex items-center justify-center z-[200] animate-fade" onclick="handleModalBgClick(event)">
+    <button onclick="closeImageModal()" class="absolute top-6 right-6 text-white text-3xl z-50"><i class="fa fa-times"></i></button>
+    <button onclick="prevImage()" class="absolute left-4 text-white text-4xl p-4"><i class="fa fa-chevron-left"></i></button>
+    <img id="modalImage" class="max-h-[85vh] max-w-[90vw] object-contain select-none">
+    <button onclick="nextImage()" class="absolute right-4 text-white text-4xl p-4"><i class="fa fa-chevron-right"></i></button>
+    <div id="imageCounter" class="absolute bottom-10 text-white font-bold bg-black/50 px-4 py-2 rounded-full"></div>
+</div>
 
-function pesan(btn){
-  const text = encodeURIComponent(btn.dataset.pesan);
-  window.open(`https://wa.me/${WA}?text=${text}`,"_blank");
+<!-- QR PAYMENT MODAL -->
+<div id="modal-payment" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-6 bg-black/95 animate-fade">
+    <div class="glass p-8 rounded-3xl max-w-md w-full border border-green-500/30 text-center">
+        <i class="fas fa-check-circle text-green-500 text-5xl mb-4"></i>
+        <h3 class="text-xl font-bold mb-2">SCAN QR UNTUK BAYAR</h3>
+        <p id="payment-amount" class="text-blue-400 font-bold text-2xl mb-4">Rp 0</p>
+        
+        <div class="qr-container mb-4">
+            <img id="qr-image" src="" class="w-48 h-48 mx-auto">
+        </div>
+        
+        <p class="text-xs text-gray-400 mb-2">Scan dengan QRIS / OVO / DANA / GoPay</p>
+        <p id="payment-expiry" class="text-[10px] text-red-400 mb-4">Berlaku 30 menit</p>
+        
+        <button onclick="closeModal('modal-payment')" class="w-full bg-blue-600 py-3 rounded-xl font-bold">TUTUP</button>
+    </div>
+</div>
+
+<!-- VISI MISI MODAL -->
+<div id="modal-visi" class="hidden fixed inset-0 z-[150] flex items-center justify-center bg-black/90 p-6 animate-fade">
+    <div class="glass p-8 rounded-3xl max-w-lg w-full border border-purple-500/30 relative">
+        <button onclick="closeModal('modal-visi')" class="absolute top-4 right-4 text-gray-400">✕</button>
+        <h2 class="text-xl font-bold text-purple-400 mb-6 text-center">Visi & Misi XREZZKY STORE</h2>
+        <div class="space-y-4 text-sm text-gray-300">
+            <div class="visi-item opacity-0">
+                <h3 class="font-bold text-white mb-1">🎯 Visi</h3>
+                <p>Menjadi toko digital terpercaya yang menghadirkan produk berkualitas dengan sistem cepat, aman, dan transparan.</p>
+            </div>
+            <div class="visi-item opacity-0">
+                <h3 class="font-bold text-white mb-1">🚀 Misi</h3>
+                <ul class="list-disc ml-5 space-y-1">
+                    <li>Pelayanan cepat & responsif.</li>
+                    <li>Harga kompetitif & kualitas terbaik.</li>
+                    <li>Transaksi aman & transparan.</li>
+                    <li>Terus upgrade fitur marketplace.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div id="modal-forgot" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/95 animate-fade">
+    <div class="glass p-6 rounded-3xl max-w-md w-full">
+        <h3 class="text-xl font-bold mb-4 text-blue-400">Lupa Password</h3>
+        <p class="text-xs text-gray-400 mb-4">Masukkan email Anda, kami akan kirim link reset password</p>
+        
+        <input type="email" id="forgot-email" placeholder="Email Anda" class="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 outline-none mb-4">
+        
+        <button onclick="sendResetPassword()" class="w-full bg-blue-600 py-4 rounded-xl font-bold hover:bg-blue-700 transition">KIRIM LINK RESET</button>
+        <button onclick="closeModal('modal-forgot')" class="w-full mt-2 text-gray-500 text-xs">Tutup</button>
+    </div>
+</div>
+
+<!-- LOADER -->
+<div id="loader" class="fixed inset-0 flex items-center justify-center bg-slate-900 z-[999]">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-500"></div>
+</div>
+
+<!-- BANNED PAGE -->
+<div id="page-banned" class="hidden fixed inset-0 bg-red-950 flex items-center justify-center z-[1000] p-8 text-center">
+    <div>
+        <i class="fa fa-hand-paper text-6xl text-red-500 mb-4"></i>
+        <h1 class="text-3xl font-bold mb-2">AKUN DIBLOKIR</h1>
+        <p id="ban-reason" class="text-red-300 mb-6 text-sm"></p>
+    </div>
+</div>
+
+<!-- AUTH PAGE -->
+<section id="page-auth" class="hidden min-h-screen flex items-center justify-center p-6 animate-fade">
+    <div class="glass p-8 rounded-3xl w-full max-w-md">
+        <h2 id="auth-title" class="text-3xl font-bold mb-6 text-center text-blue-500">XREZZKY STORE</h2>
+        
+        <!-- PILIHAN LOGIN/REGISTER -->
+        <div id="auth-choice" class="text-center mb-6">
+            <div class="flex gap-2 mb-4">
+                <button onclick="setAuthMode('login')" id="auth-login-btn" class="flex-1 py-3 rounded-xl bg-blue-600 font-bold">LOGIN</button>
+                <button onclick="setAuthMode('register')" id="auth-register-btn" class="flex-1 py-3 rounded-xl bg-slate-700 font-bold">REGISTER</button>
+            </div>
+        </div>
+        
+        <!-- FORM LOGIN (DEFAULT) -->
+        <div id="login-form" class="space-y-4">
+            <input type="email" id="login-email" placeholder="Email" class="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 outline-none">
+            <input type="password" id="login-pass" placeholder="Password" class="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 outline-none">
+            <button onclick="handleLogin()" class="w-full bg-blue-600 py-4 rounded-xl font-bold hover:bg-blue-700 transition">LOGIN</button>
+            
+            <div class="flex justify-between items-center text-xs mt-2">
+                <p onclick="showForgotModal()" class="text-blue-400 cursor-pointer italic">Lupa Password?</p>
+            </div>
+        </div>
+        
+        <!-- FORM REGISTER (HIDDEN DEFAULT) -->
+        <div id="register-form" class="hidden space-y-4">
+            <!-- PILIHAN ROLE -->
+            <div class="flex gap-2 mb-2">
+                <button type="button" onclick="setRole('buyer')" id="role-buyer-btn" class="flex-1 py-3 rounded-xl bg-green-600 font-bold text-sm">BUYER</button>
+                <button type="button" onclick="setRole('seller')" id="role-seller-btn" class="flex-1 py-3 rounded-xl bg-slate-700 font-bold text-sm">SELLER</button>
+            </div>
+            
+            <!-- FORM DASAR (UNTUK SEMUA) -->
+            <input type="text" id="reg-username" placeholder="Username" class="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 outline-none">
+            <input type="email" id="reg-email" placeholder="Email" class="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 outline-none">
+            <input type="password" id="reg-pass" placeholder="Password (min 6 karakter)" class="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 outline-none">
+            
+            <!-- FORM KHUSUS SELLER (HIDDEN DEFAULT) -->
+            <div id="seller-fields" class="hidden space-y-3 border-t border-slate-700 pt-4 mt-2">
+                <p class="text-xs text-yellow-400 font-bold mb-2">DATA SELLER (WAJIB DIISI)</p>
+                
+                <input type="text" id="seller-id-card" placeholder="Nomor KTP (16 digit)" class="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 outline-none text-sm">
+                <input type="text" id="seller-store-name" placeholder="Nama Toko" class="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 outline-none text-sm">
+                
+                <!-- NOMOR WAJIB -->
+                <p class="text-xs text-blue-400 font-bold mt-2 mb-1">KONTAK (WAJIB)</p>
+                <input type="text" id="seller-wa" placeholder="Nomor WhatsApp (contoh: 628123456789)" class="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 outline-none text-sm">
+                
+                <!-- E-WALLET Wajib -->
+                <p class="text-xs text-green-400 font-bold mt-2 mb-1">E-WALLET (WAJIB - Untuk Pembayaran)</p>
+                <select id="seller-ewallet" class="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 outline-none text-sm mb-2">
+                    <option value="DANA">DANA</option>
+                    <option value="OVO">OVO</option>
+                    <option value="GOPAY">GoPay</option>
+                    <option value="SHOPEEPAY">ShopeePay</option>
+                    <option value="LINKAJA">LinkAja</option>
+                </select>
+                <input type="text" id="seller-ewallet-number" placeholder="Nomor E-Wallet" class="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 outline-none text-sm mb-2">
+                <input type="text" id="seller-ewallet-name" placeholder="Nama Pemilik E-Wallet" class="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 outline-none text-sm">
+                
+                <!-- REKENING OPSIONAL -->
+                <p class="text-xs text-gray-400 font-bold mt-3 mb-1">REKENING BANK (OPSIONAL)</p>
+                <div class="grid grid-cols-3 gap-2">
+                    <select id="seller-bank" class="p-3 rounded-xl bg-slate-800 border border-slate-700 outline-none text-sm">
+                        <option value="">Pilih Bank</option>
+                        <option value="BCA">BCA</option>
+                        <option value="MANDIRI">Mandiri</option>
+                        <option value="BRI">BRI</option>
+                        <option value="BNI">BNI</option>
+                        <option value="CIMB">CIMB</option>
+                    </select>
+                    <input type="text" id="seller-account-number" placeholder="No Rekening" class="col-span-2 p-3 rounded-xl bg-slate-800 border border-slate-700 outline-none text-sm">
+                </div>
+                <input type="text" id="seller-account-name" placeholder="Nama Pemilik Rekening (opsional)" class="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 outline-none text-sm">
+                
+                <!-- NOMOR HP OPSIONAL -->
+                <p class="text-xs text-gray-400 font-bold mt-3 mb-1">NOMOR HP (OPSIONAL)</p>
+                <input type="text" id="seller-phone" placeholder="Nomor HP (contoh: 08123456789)" class="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 outline-none text-sm">
+                
+                <p class="text-[8px] text-red-400 mt-2"><i class="fas fa-lock mr-1"></i> Data pribadi Anda AMAN dan hanya bisa dilihat oleh ADMIN.</p>
+            </div>
+            
+            <!-- CEKLIS PERSETUJUAN -->
+            <div class="flex items-start gap-2 mt-4">
+                <input type="checkbox" id="agree-terms" class="mt-1 accent-blue-600">
+                <label for="agree-terms" class="text-[10px] text-gray-400">
+                    Saya menyetujui <span class="text-blue-400 cursor-pointer" onclick="showTerms()">Syarat & Ketentuan</span> dan 
+                    <span class="text-blue-400 cursor-pointer" onclick="showPrivacy()">Kebijakan Privasi</span>.
+                </label>
+            </div>
+            
+            <button onclick="handleRegister()" class="w-full bg-green-600 py-4 rounded-xl font-bold hover:bg-green-700 transition">DAFTAR SEKARANG</button>
+        </div>
+        
+        <!-- LINK GANTI MODE -->
+        <p onclick="switchToRegister()" id="switch-to-register" class="text-center text-xs text-blue-400 cursor-pointer italic mt-4">Belum punya akun? Daftar</p>
+        <p onclick="switchToLogin()" id="switch-to-login" class="hidden text-center text-xs text-blue-400 cursor-pointer italic mt-4">Sudah punya akun? Login</p>
+    </div>
+</section>
+
+<!-- MODAL SYARAT & KETENTUAN -->
+<div id="modal-terms" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/95 animate-fade">
+    <div class="glass p-6 rounded-3xl max-w-lg w-full max-h-[80vh] overflow-y-auto">
+        <h3 class="text-xl font-bold mb-4 text-blue-400">Syarat & Ketentuan</h3>
+        <div class="text-xs text-gray-300 space-y-3">
+            <p>1. Dengan mendaftar sebagai SELLER, Anda menyatakan bahwa data yang diberikan adalah benar dan sah.</p>
+            <p>2. XREZZKY STORE berhak melakukan verifikasi data dan menolak pendaftaran tanpa pemberitahuan.</p>
+            <p>3. Seller wajib menyediakan produk yang tidak melanggar hukum Indonesia.</p>
+            <p>4. Penarikan saldo hanya dapat dilakukan setelah pesanan selesai dan dana masuk ke platform.</p>
+            <p>5. Komisi platform sebesar 10% dari setiap transaksi.</p>
+            <p>6. Seller dilarang melakukan tindakan penipuan, spam, atau merugikan pembeli.</p>
+            <p>7. Pelanggaran akan mengakibatkan pemblokiran akun permanen dan saldo hangus.</p>
+            <p>8. Data pribadi seller (KTP, WA, E-WALLET) hanya dapat diakses oleh ADMIN.</p>
+        </div>
+        <button onclick="closeModal('modal-terms')" class="w-full mt-4 bg-blue-600 py-3 rounded-xl font-bold">TUTUP</button>
+    </div>
+</div>
+
+<!-- MODAL PRIVASI -->
+<div id="modal-privacy" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/95 animate-fade">
+    <div class="glass p-6 rounded-3xl max-w-lg w-full">
+        <h3 class="text-xl font-bold mb-4 text-blue-400">Kebijakan Privasi</h3>
+        <div class="text-xs text-gray-300 space-y-3">
+            <p>Data pribadi Anda (KTP, WA, E-WALLET) hanya digunakan untuk verifikasi dan keperluan transaksi.</p>
+            <p>Kami tidak akan membagikan data Anda kepada pihak ketiga tanpa persetujuan.</p>
+            <p>Data disimpan dengan aman di database terenkripsi.</p>
+            <p>Hanya ADMIN yang memiliki akses ke data sensitif seller.</p>
+            <p>Anda dapat meminta penghapusan data dengan menghubungi admin.</p>
+        </div>
+        <button onclick="closeModal('modal-privacy')" class="w-full mt-4 bg-blue-600 py-3 rounded-xl font-bold">TUTUP</button>
+    </div>
+</div>
+
+<!-- MARKETPLACE PAGE -->
+<section id="page-marketplace" class="hidden min-h-screen p-4 animate-fade">
+    <header class="flex justify-between items-center mb-6 py-4">
+        <div onclick="showPage('page-profile')" class="flex items-center gap-3 cursor-pointer">
+            <img id="user-avatar" src="https://ui-avatars.com/api/?name=Guest&background=3b82f6&color=fff" class="w-10 h-10 rounded-full border-2 border-blue-500">
+            <p id="user-name-display" class="font-bold text-sm truncate w-24">Guest</p>
+        </div>
+        <button onclick="showCart()" class="relative p-3 bg-slate-800 rounded-full">
+            <i class="fa fa-shopping-basket"></i>
+            <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-[8px] px-1.5 rounded-full font-bold">0</span>
+        </button>
+    </header>
+
+    <div class="mb-6">
+        <h2 class="font-bold text-lg text-blue-400">Selamat Datang di XREZZKY STORE</h2>
+        <p class="text-xs text-gray-400 mt-1">Marketplace premium cepat & terpercaya</p>
+    </div>
+
+    <div class="mb-6">
+        <input type="text" id="search-input" onkeyup="searchProduct(this.value)" placeholder="Cari produk impianmu..." class="w-full p-4 rounded-2xl bg-slate-800 border border-slate-700 outline-none text-sm">
+    </div>
+
+    <div id="search-empty" class="hidden text-center py-10 opacity-50">
+        <i class="fa fa-search text-4xl mb-3"></i>
+        <p>Yah, yang kamu cari tidak ada</p>
+    </div>
+
+    <main id="product-list" class="grid grid-cols-2 md:grid-cols-4 gap-4"></main>
+</section>
+
+<!-- PROFILE PAGE -->
+<section id="page-profile" class="hidden min-h-screen p-6 animate-fade">
+    <div class="flex items-center gap-4 mb-8">
+        <button onclick="showPage('page-marketplace')"><i class="fa fa-arrow-left"></i></button>
+        <h1 class="text-xl font-bold">Profil & Riwayat</h1>
+    </div>
+    <div id="profile-content"></div>
+    
+    <!-- SELLER DASHBOARD (AKAN MUNCUL JIKA USER ADALAH SELLER) -->
+    <div id="seller-dashboard" class="hidden glass p-6 rounded-3xl mt-4">
+        <h3 class="font-bold text-blue-400 mb-3 flex items-center gap-2">
+            <i class="fas fa-store"></i> DASHBOARD TOKO
+        </h3>
+        <div class="grid grid-cols-2 gap-3 mb-4">
+            <div class="bg-slate-800 p-4 rounded-xl">
+                <p class="text-[8px] text-gray-400">Saldo Tersedia</p>
+                <p id="seller-balance" class="text-xl font-bold text-green-400">Rp 0</p>
+            </div>
+            <div class="bg-slate-800 p-4 rounded-xl">
+                <p class="text-[8px] text-gray-400">Pending</p>
+                <p id="seller-pending" class="text-xl font-bold text-yellow-400">Rp 0</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3 mb-4">
+            <div class="bg-slate-800 p-4 rounded-xl">
+                <p class="text-[8px] text-gray-400">Total Penjualan</p>
+                <p id="seller-total-sales" class="text-lg font-bold">0</p>
+            </div>
+            <div class="bg-slate-800 p-4 rounded-xl">
+                <p class="text-[8px] text-gray-400">Rating</p>
+                <p id="seller-rating" class="text-lg font-bold text-yellow-400">0.0</p>
+            </div>
+        </div>
+        <button onclick="requestWithdraw()" class="w-full bg-blue-600 py-3 rounded-xl text-sm font-bold mb-2">
+            TARIK SALDO
+        </button>
+    </div>
+    
+    <div class="glass p-6 rounded-3xl mt-6">
+        <h3 class="font-bold mb-4">Pesanan Saya</h3>
+        <div id="user-history" class="space-y-4"></div>
+    </div>
+    
+    <!-- DI DALAM SELLER DASHBOARD, TAMBAHKAN INI -->
+<div class="mt-4">
+    <h4 class="font-bold text-sm mb-2 text-blue-400">PRODUK SAYA</h4>
+    <div id="seller-products-list" class="space-y-2 max-h-60 overflow-y-auto mb-3"></div>
+    <div class="flex gap-2">
+        <button onclick="showAddProductForm()" class="flex-1 bg-green-600 py-2 rounded-lg text-xs font-bold">
+            <i class="fas fa-plus mr-1"></i> TAMBAH PRODUK
+        </button>
+        <button onclick="refreshSellerProducts()" class="bg-blue-600/20 text-blue-400 px-3 py-2 rounded-lg text-xs">
+            <i class="fas fa-sync-alt"></i>
+        </button>
+    </div>
+</div>
+    
+    
+</section>
+
+<!-- ADMIN PAGE -->
+<section id="page-admin" class="hidden min-h-screen p-6 animate-fade">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-blue-500">Admin Panel (Owner)</h1>
+        <button onclick="showPage('page-marketplace')" class="text-xs bg-slate-700 px-3 py-1.5 rounded-lg">Back</button>
+    </div>
+    
+    <!-- STATS CARD -->
+    <div class="grid grid-cols-4 gap-3 mb-6">
+        <div class="glass p-4 rounded-xl">
+            <p class="text-[8px] text-gray-400">Total User</p>
+            <p class="text-2xl font-bold" id="stat-total-users">0</p>
+        </div>
+        <div class="glass p-4 rounded-xl">
+            <p class="text-[8px] text-gray-400">Total Seller</p>
+            <p class="text-2xl font-bold" id="stat-total-sellers">0</p>
+        </div>
+        <div class="glass p-4 rounded-xl">
+            <p class="text-[8px] text-gray-400">Pending Verify</p>
+            <p class="text-2xl font-bold" id="stat-pending-verify">0</p>
+        </div>
+        <div class="glass p-4 rounded-xl">
+            <p class="text-[8px] text-gray-400">Total Order</p>
+            <p class="text-2xl font-bold" id="stat-total-orders">0</p>
+        </div>
+    </div>
+    
+    <div class="flex border-b border-slate-800 mb-4 text-[10px] font-bold overflow-x-auto">
+        <button onclick="switchAdminTab('pending')" id="tab-pending" class="flex-1 py-3 tab-active">KONFIRMASI</button>
+        <button onclick="switchAdminTab('process')" id="tab-process" class="flex-1 py-3">PROSES</button>
+        <button onclick="switchAdminTab('done')" id="tab-done" class="flex-1 py-3">SELESAI</button>
+        <button onclick="switchAdminTab('reject')" id="tab-reject" class="flex-1 py-3">DITOLAK</button>
+        <button onclick="switchAdminTab('upload')" id="tab-upload" class="flex-1 py-3">STOK/UPLOAD</button>
+        <button onclick="switchAdminTab('sellers')" id="tab-sellers" class="flex-1 py-3">DATA SELLER</button>
+        <button onclick="switchAdminTab('buyers')" id="tab-buyers" class="flex-1 py-3">DATA BUYER</button>
+        <button onclick="switchAdminTab('withdrawals')" id="tab-withdrawals" class="flex-1 py-3">PENARIKAN</button>
+        <button onclick="switchAdminTab('payments')" id="tab-payments" class="flex-1 py-3">PAYMENT</button>
+    </div>
+
+    <div id="admin-pending" class="admin-tab"></div>
+    <div id="admin-process" class="admin-tab hidden"></div>
+    <div id="admin-done" class="admin-tab hidden"></div>
+    <div id="admin-reject" class="admin-tab hidden"></div>
+    
+    <!-- SELLER DATA TAB (PRIVAT - HANYA ADMIN) -->
+    <div id="admin-sellers" class="admin-tab hidden">
+        <h3 class="font-bold mb-3 text-yellow-400">VERIFIKASI SELLER BARU</h3>
+        <div id="seller-verification-list" class="space-y-3 mb-6"></div>
+        
+        <h3 class="font-bold mb-3 text-blue-400">SEMUA SELLER (DATA PRIVAT)</h3>
+        <div id="seller-active-list" class="space-y-3"></div>
+    </div>
+    
+    <!-- BUYER DATA TAB -->
+    <div id="admin-buyers" class="admin-tab hidden">
+        <h3 class="font-bold mb-3 text-green-400">DATA SEMUA BUYER</h3>
+        <div id="buyers-list" class="space-y-3"></div>
+    </div>
+    
+    <!-- WITHDRAWALS TAB -->
+    <div id="admin-withdrawals" class="admin-tab hidden">
+        <h3 class="font-bold mb-3 text-green-400">PENARIKAN SALDO</h3>
+        <div id="withdrawals-list" class="space-y-3"></div>
+    </div>
+    
+    <!-- PAYMENTS TAB -->
+    <div id="admin-payments" class="admin-tab hidden">
+        <h3 class="font-bold mb-3 text-blue-400">RIWAYAT PEMBAYARAN</h3>
+        <div id="payments-list" class="space-y-3"></div>
+    </div>
+    
+    <div id="admin-upload" class="admin-tab hidden glass p-6 rounded-2xl">
+        <div id="edit-indicator" class="hidden bg-yellow-600/20 text-yellow-400 p-3 rounded-xl text-xs font-bold mb-4 text-center">✏️ SEDANG EDIT PRODUK</div>
+        <h3 class="font-bold mb-3">Form Produk</h3>
+        
+        <div id="seller-select-container" class="mb-3">
+            <select id="product-seller" class="w-full p-3 bg-slate-800 rounded border border-slate-700 text-sm">
+                <option value="">Pilih Seller</option>
+            </select>
+        </div>
+        
+        <input type="text" id="p-name" placeholder="Nama Produk" class="w-full p-3 mb-3 bg-slate-800 rounded border border-slate-700 text-sm">
+        <input type="number" id="p-price" placeholder="Harga" class="w-full p-3 mb-3 bg-slate-800 rounded border border-slate-700 text-sm">
+        <textarea id="p-desc" placeholder="Deskripsi" class="w-full p-3 mb-3 bg-slate-800 rounded border border-slate-700 text-sm h-24"></textarea>
+        <input type="number" id="p-stock" placeholder="Stok" class="w-full p-3 mb-3 bg-slate-800 rounded border border-slate-700 text-sm">
+        
+        <p class="text-[10px] text-blue-400 font-bold mb-2 uppercase tracking-widest">Gambar Produk (Max 20)</p>
+        <div id="image-input-container" class="space-y-2 mb-4"></div>
+        
+        <button onclick="saveProduct()" id="btn-save-prod" class="w-full bg-green-600 py-3 rounded-xl font-bold">Upload Produk</button>
+        <button id="cancel-edit-btn" onclick="cancelEdit()" class="hidden w-full bg-gray-600 py-3 rounded-xl font-bold mt-2">BATAL EDIT</button>
+    </div>
+</section>
+
+<!-- PRODUCT DETAIL MODAL -->
+<div id="modal-detail" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 animate-fade">
+    <div class="bg-slate-900 w-full max-w-lg rounded-3xl overflow-hidden relative border border-slate-800 max-h-[90vh] overflow-y-auto">
+        <div class="relative">
+                        <img id="m-img" src="" class="w-full h-64 object-contain bg-slate-900 cursor-pointer">
+            <div id="m-badge-out" class="absolute top-4 right-4 bg-red-600 text-white text-[10px] font-bold px-3 py-1 rounded-full hidden">STOK HABIS</div>
+            <div id="m-seller-badge" class="absolute top-4 left-4 seller-badge hidden">Seller</div>
+        </div>
+        <div id="m-thumbs" class="flex gap-2 p-3 overflow-x-auto bg-slate-800/50"></div>
+        <div class="p-6">
+            <div class="flex justify-between items-start mb-2">
+                <h2 id="m-title" class="text-xl font-bold"></h2>
+                <p id="m-price" class="text-blue-500 font-bold text-lg"></p>
+            </div>
+            <div class="flex items-center gap-2 mb-4">
+                <div id="m-rating-stars" class="text-yellow-400 text-sm"></div>
+                <span id="m-rating-text" class="text-xs text-gray-400"></span>
+            </div>
+            <p id="m-desc" class="text-gray-400 text-xs mb-6"></p>
+            
+            <div class="mb-6">
+                <h4 class="text-xs font-bold mb-3 text-blue-400 uppercase tracking-widest">Ulasan Pembeli</h4>
+                <div id="m-reviews" class="space-y-3"></div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 sticky bottom-0 bg-slate-900 py-2">
+                <button id="btn-buy-now" class="bg-green-600 py-4 rounded-2xl font-bold text-xs disabled:opacity-50 disabled:grayscale">BELI SEKARANG</button>
+                <button id="btn-add-cart" class="bg-blue-600 py-4 rounded-2xl font-bold text-xs disabled:opacity-50 disabled:grayscale">+ KERANJANG</button>
+            </div>
+            <button onclick="closeModal('modal-detail')" class="w-full mt-4 text-gray-500 text-[10px] uppercase">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<!-- CART MODAL -->
+<div id="modal-cart" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 animate-fade">
+    <div class="bg-slate-900 w-full max-w-md rounded-3xl p-6 border border-slate-700">
+        <h2 class="text-xl font-bold mb-4 text-blue-500">Keranjang Belanja</h2>
+        <div id="cart-items" class="space-y-4 max-h-80 overflow-y-auto mb-6"></div>
+        <div class="flex justify-between items-center mb-6 pt-4 border-t border-slate-800">
+            <p class="text-sm">Total Estimasi:</p>
+            <p id="cart-total" class="font-bold text-blue-400 text-lg">Rp 0</p>
+        </div>
+        <button onclick="checkoutCart()" class="w-full bg-green-600 py-4 rounded-2xl font-bold shadow-lg shadow-green-900/20">CHECKOUT</button>
+        <button onclick="closeModal('modal-cart')" class="w-full mt-2 text-gray-500 text-xs">Kembali Belanja</button>
+    </div>
+</div>
+
+<!-- REVIEW MODAL -->
+<div id="modal-review" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-6 bg-black/90">
+    <div class="glass p-6 rounded-3xl w-full max-w-sm border border-blue-500/30 text-center">
+        <h3 class="text-lg font-bold mb-4">Beri Penilaian</h3>
+        <p id="review-product-name" class="text-blue-400 text-sm mb-4 font-bold"></p>
+        <div class="mb-4">
+            <p id="star-value" class="text-yellow-400 font-bold text-xl mb-1">5 ★</p>
+            <input type="range" id="star-range" min="1" max="5" value="5" class="w-full" oninput="document.getElementById('star-value').innerText = this.value + ' ★'">
+        </div>
+        <textarea id="review-text" placeholder="Tulis ulasan singkat..." class="w-full p-4 bg-slate-800 rounded-xl mb-4 text-sm outline-none border border-slate-700 h-24"></textarea>
+        <button id="btn-submit-review" class="w-full bg-blue-600 py-3 rounded-xl font-bold">Kirim Ulasan</button>
+        <button onclick="closeModal('modal-review')" class="mt-3 text-gray-500 text-xs">Batal</button>
+    </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="fixed bottom-0 left-0 right-0 glass h-16 flex justify-around items-center z-50 border-t border-slate-800">
+    <button onclick="showPage('page-marketplace')" class="text-gray-400 hover:text-blue-500 transition"><i class="fa fa-home text-xl"></i></button>
+    <button onclick="showPage('page-profile')" class="text-gray-400 hover:text-blue-500 transition"><i class="fa fa-receipt text-xl"></i></button>
+    <button id="nav-admin" onclick="showPage('page-admin')" class="hidden text-gray-400 hover:text-blue-500 transition"><i class="fa fa-shield-alt text-xl"></i></button>
+</nav>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, updatePassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getDatabase, ref, set, get, onValue, push, remove, update, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyA75bdcfawOi957by8y_4-l4sJCCo6pF88",
+        authDomain: "xrezzkystore-marketplace-83bc0.firebaseapp.com",
+        databaseURL: "https://xrezzkystore-marketplace-83bc0-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "xrezzkystore-marketplace-83bc0",
+        storageBucket: "xrezzkystore-marketplace-83bc0.appspot.com",
+        messagingSenderId: "604900856944",
+        appId: "1:604900856944:web:c48c973da45214c68a10b5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    let globalProducts = [];
+    let globalSellers = [];
+    let userCart = {};
+    let currentImages = [];
+    let currentIndex = 0;
+    let sellerEditId = null;
+    let currentEditId = null;
+    const MAX_IMAGES = 20;
+    const PLATFORM_COMMISSION = 0.1; // 10% untuk platform
+
+    // ==================== AUTH UI STATE ====================
+    let currentRole = 'buyer'; // buyer atau seller
+    let currentAuthMode = 'login'; // login atau register
+
+    window.setAuthMode = (mode) => {
+        currentAuthMode = mode;
+        if (mode === 'login') {
+            document.getElementById('login-form').classList.remove('hidden');
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('auth-login-btn').classList.add('bg-blue-600');
+            document.getElementById('auth-login-btn').classList.remove('bg-slate-700');
+            document.getElementById('auth-register-btn').classList.add('bg-slate-700');
+            document.getElementById('auth-register-btn').classList.remove('bg-blue-600');
+            document.getElementById('switch-to-register').classList.remove('hidden');
+            document.getElementById('switch-to-login').classList.add('hidden');
+        } else {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.remove('hidden');
+            document.getElementById('auth-login-btn').classList.add('bg-slate-700');
+            document.getElementById('auth-login-btn').classList.remove('bg-blue-600');
+            document.getElementById('auth-register-btn').classList.add('bg-blue-600');
+            document.getElementById('auth-register-btn').classList.remove('bg-slate-700');
+            document.getElementById('switch-to-register').classList.add('hidden');
+            document.getElementById('switch-to-login').classList.remove('hidden');
+        }
+    };
+
+    window.setRole = (role) => {
+        currentRole = role;
+        
+        if (role === 'seller') {
+            document.getElementById('role-seller-btn').classList.add('bg-green-600');
+            document.getElementById('role-seller-btn').classList.remove('bg-slate-700');
+            document.getElementById('role-buyer-btn').classList.add('bg-slate-700');
+            document.getElementById('role-buyer-btn').classList.remove('bg-green-600');
+            document.getElementById('seller-fields').classList.remove('hidden');
+        } else {
+            document.getElementById('role-buyer-btn').classList.add('bg-green-600');
+            document.getElementById('role-buyer-btn').classList.remove('bg-slate-700');
+            document.getElementById('role-seller-btn').classList.add('bg-slate-700');
+            document.getElementById('role-seller-btn').classList.remove('bg-green-600');
+            document.getElementById('seller-fields').classList.add('hidden');
+        }
+    };
+
+    window.switchToRegister = () => {
+        setAuthMode('register');
+    };
+
+    window.switchToLogin = () => {
+        setAuthMode('login');
+    };
+
+    window.showTerms = () => {
+        document.getElementById('modal-terms').classList.remove('hidden');
+    };
+
+    window.showPrivacy = () => {
+        document.getElementById('modal-privacy').classList.remove('hidden');
+    };
+
+    window.showForgotModal = () => {
+        document.getElementById('modal-forgot').classList.remove('hidden');
+    };
+
+    // ==================== AUTH LOGIC ====================
+    onAuthStateChanged(auth, async (user) => {
+        document.getElementById('loader').classList.add('hidden');
+        const profileBox = document.getElementById('profile-content');
+
+        if (!user) {
+            profileBox.innerHTML = `
+                <div class="glass p-6 rounded-3xl text-center">
+                    <p class="mb-4">Belum Login</p>
+                    <button onclick="showPage('page-auth')" class="bg-blue-600 px-6 py-2 rounded-xl font-bold">Login / Daftar</button>
+                </div>`;
+            document.getElementById('nav-admin').classList.add('hidden');
+            document.getElementById('seller-dashboard').classList.add('hidden');
+            showPage('page-marketplace');
+            listenProducts();
+            return;
+        }
+
+        const s = await get(ref(db, `users/${user.uid}`));
+        const data = s.val() || {};
+
+        if (data?.banned) {
+            document.getElementById('page-banned').classList.remove('hidden');
+            document.getElementById('ban-reason').innerText = data.banReason;
+            return;
+        }
+
+        const username = data?.username || user.email.split('@')[0];
+        document.getElementById('user-name-display').innerText = username;
+        document.getElementById('user-avatar').src = `https://ui-avatars.com/api/?name=${username}&background=3b82f6&color=fff`;
+
+        // Cek role user
+        if (data?.role === 'admin') {
+            document.getElementById('nav-admin').classList.remove('hidden');
+            listenAdminOrders();
+            loadSellersForSelect();
+            loadAdminStats();
+        } else {
+            document.getElementById('nav-admin').classList.add('hidden');
+        }
+
+        // Cek apakah user adalah seller (status active)
+        const sellerSnap = await get(ref(db, `sellers/${user.uid}`));
+        const sellerData = sellerSnap.val();
+
+        // Cek apakah user pending seller
+        const pendingSnap = await get(ref(db, `verificationRequests/${user.uid}`));
+        const pendingData = pendingSnap.val();
+
+        profileBox.innerHTML = `
+            <div class="glass p-6 rounded-3xl text-center mb-4">
+                <img src="https://ui-avatars.com/api/?name=${username}&background=3b82f6&color=fff" class="w-20 h-20 rounded-full mx-auto border-4 border-blue-500 mb-3">
+                <h2 class="text-xl font-bold">${username}</h2>
+                <p class="text-xs text-gray-400 mb-4">${user.email}</p>
+                
+                ${sellerData ? `
+                <div class="bg-green-600/20 text-green-400 py-2 rounded-lg mb-3 text-xs font-bold">
+                    <i class="fas fa-store mr-1"></i> SELLER: ${sellerData.storeName}
+                </div>` : ''}
+                
+                ${pendingData ? `
+                <div class="bg-yellow-600/20 text-yellow-400 py-2 rounded-lg mb-3 text-xs font-bold">
+                    <i class="fas fa-clock mr-1"></i> VERIFIKASI SELLER PENDING
+                </div>` : ''}
+                
+                <div class="space-y-2">
+                    <button onclick="changeUsername()" class="w-full bg-blue-600/20 text-blue-400 py-2 rounded-lg font-bold">Ganti Username</button>
+                    <button onclick="changePasswordCustom()" class="w-full bg-green-600/20 text-green-400 py-2 rounded-lg font-bold">Ganti Password</button>
+                    <button onclick="signOutUser()" class="w-full bg-red-600/20 text-red-400 py-2 rounded-lg font-bold">Logout</button>
+                </div>
+            </div>
+            <div class="glass p-4 rounded-3xl text-center">
+                <button onclick="openVisiModal()" class="w-full bg-purple-600/20 text-purple-400 py-2 rounded-lg font-bold">Lihat Visi & Misi</button>
+            </div>
+        `;
+
+        // Tampilkan seller dashboard jika seller aktif
+        if (sellerData && sellerData.status === 'active') {
+            document.getElementById('seller-dashboard').classList.remove('hidden');
+            
+            document.getElementById('seller-balance').innerText = 'Rp ' + (sellerData.balance || 0).toLocaleString();
+            document.getElementById('seller-pending').innerText = 'Rp ' + (sellerData.pendingWithdraw || 0).toLocaleString();
+            document.getElementById('seller-total-sales').innerText = sellerData.totalSales || 0;
+            document.getElementById('seller-rating').innerText = (sellerData.rating || 0).toFixed(1);
+        } else {
+            document.getElementById('seller-dashboard').classList.add('hidden');
+        }
+        
+        refreshSellerProducts();
+        listenProducts();
+        listenCart(user.uid);
+        listenUserHistory(user.uid);
+    });
+
+    // ==================== HANDLE LOGIN ====================
+    window.handleLogin = async () => {
+        const email = document.getElementById('login-email').value;
+        const pass = document.getElementById('login-pass').value;
+        
+        if (!email || !pass) {
+            return alert("Email dan password harus diisi!");
+        }
+        
+        try {
+            await signInWithEmailAndPassword(auth, email, pass);
+        } catch (e) { 
+            alert(e.message); 
+        }
+    };
+
+    // ==================== HANDLE REGISTER ====================
+    window.handleRegister = async () => {
+        // Validasi dasar
+        const username = document.getElementById('reg-username').value;
+        const email = document.getElementById('reg-email').value;
+        const pass = document.getElementById('reg-pass').value;
+        const agreeTerms = document.getElementById('agree-terms').checked;
+        
+        if (!username || !email || !pass) {
+            return alert("Username, email, dan password harus diisi!");
+        }
+        
+        if (pass.length < 6) {
+            return alert("Password minimal 6 karakter!");
+        }
+        
+        if (!agreeTerms) {
+            return alert("Anda harus menyetujui Syarat & Ketentuan!");
+        }
+        
+        // Validasi seller
+        if (currentRole === 'seller') {
+            const idCard = document.getElementById('seller-id-card').value;
+            const storeName = document.getElementById('seller-store-name').value;
+            const wa = document.getElementById('seller-wa').value;
+            const ewallet = document.getElementById('seller-ewallet').value;
+            const ewalletNumber = document.getElementById('seller-ewallet-number').value;
+            const ewalletName = document.getElementById('seller-ewallet-name').value;
+            
+            if (!idCard || !storeName || !wa || !ewalletNumber || !ewalletName) {
+                return alert("KTP, Nama Toko, WA, dan E-Wallet wajib diisi!");
+            }
+            
+            if (idCard.length < 16) {
+                return alert("Nomor KTP minimal 16 digit!");
+            }
+            
+            if (wa.length < 10 || !wa.startsWith('62')) {
+                return alert("Nomor WA harus dimulai dengan 62 (contoh: 628123456789)");
+            }
+        }
+        
+        try {
+            // Buat user di Firebase Auth
+            const res = await createUserWithEmailAndPassword(auth, email, pass);
+            const userId = res.user.uid;
+            
+            // Data dasar user
+            const userData = {
+                username: username,
+                email: email,
+                role: currentRole === 'seller' ? 'pending_seller' : 'user',
+                banned: false,
+                createdAt: Date.now(),
+                agreeTerms: true
+            };
+            
+            // Simpan user ke database
+            await set(ref(db, `users/${userId}`), userData);
+            
+            // Jika seller, buat verification request
+            if (currentRole === 'seller') {
+                const idCard = document.getElementById('seller-id-card').value;
+                const storeName = document.getElementById('seller-store-name').value;
+                const wa = document.getElementById('seller-wa').value;
+                const ewallet = document.getElementById('seller-ewallet').value;
+                const ewalletNumber = document.getElementById('seller-ewallet-number').value;
+                const ewalletName = document.getElementById('seller-ewallet-name').value;
+                
+                // Data bank (opsional)
+                const bank = document.getElementById('seller-bank').value;
+                const accountNumber = document.getElementById('seller-account-number').value;
+                const accountName = document.getElementById('seller-account-name').value;
+                const phone = document.getElementById('seller-phone').value;
+                
+                const bankAccount = {
+                    ewallet: {
+                        type: ewallet,
+                        number: ewalletNumber,
+                        name: ewalletName
+                    }
+                };
+                
+                if (bank && accountNumber) {
+                    bankAccount.bank = {
+                        name: bank,
+                        number: accountNumber,
+                        accountName: accountName || username
+                    };
+                }
+                
+                if (phone) {
+                    bankAccount.phone = phone;
+                }
+                
+                await set(ref(db, `verificationRequests/${userId}`), {
+                    userId: userId,
+                    userEmail: email,
+                    username: username,
+                    wa: wa,
+                    storeName: storeName,
+                    idCard: idCard,
+                    bankAccount: bankAccount,
+                    status: "pending",
+                    submittedAt: Date.now()
+                });
+                
+                alert("Pendaftaran berhasil! Data seller Anda akan diverifikasi admin maksimal 1x24 jam.");
+            } else {
+                alert("Pendaftaran berhasil! Selamat berbelanja.");
+            }
+            
+            // Reset form
+            document.getElementById('reg-username').value = '';
+            document.getElementById('reg-email').value = '';
+            document.getElementById('reg-pass').value = '';
+            
+        } catch (e) { 
+            alert(e.message); 
+        }
+    };
+
+    // ==================== FORGOT PASSWORD ====================
+    window.sendResetPassword = async () => {
+        const email = document.getElementById('forgot-email').value;
+        
+        if (!email) {
+            return alert("Masukkan email Anda!");
+        }
+        
+        try {
+            await sendPasswordResetEmail(auth, email);
+            alert("Link reset password telah dikirim ke email Anda!");
+            closeModal('modal-forgot');
+        } catch (e) {
+            alert(e.message);
+        }
+    };
+
+    // ==================== SELLER VERIFICATION (ADMIN) ====================
+    window.approveSeller = async (requestId, userId) => {
+        const request = (await get(ref(db, `verificationRequests/${requestId}`))).val();
+        
+        // Buat seller profile
+        await set(ref(db, `sellers/${userId}`), {
+            userId: userId,
+            userEmail: request.userEmail,
+            username: request.username,
+            storeName: request.storeName,
+            wa: request.wa,
+            idCard: request.idCard,
+            bankAccount: request.bankAccount,
+            status: "active",
+            balance: 0,
+            pendingWithdraw: 0,
+            totalWithdrawn: 0,
+            totalSales: 0,
+            totalRevenue: 0,
+            rating: 5.0,
+            reviewCount: 0,
+            joinedAt: Date.now(),
+            approvedAt: Date.now(),
+            approvedBy: auth.currentUser.uid
+        });
+        
+        // Update user role
+        await update(ref(db, `users/${userId}`), { role: 'seller' });
+        
+        // Update status request
+        await update(ref(db, `verificationRequests/${requestId}`), {
+            status: "approved",
+            processedAt: Date.now(),
+            processedBy: auth.currentUser.uid
+        });
+        
+        alert("Seller berhasil diverifikasi!");
+        loadAdminStats();
+    };
+
+    window.rejectSeller = async (requestId) => {
+        const reason = prompt("Alasan penolakan:");
+        if (!reason) return;
+        
+        await update(ref(db, `verificationRequests/${requestId}`), {
+            status: "rejected",
+            rejectReason: reason,
+            processedAt: Date.now(),
+            processedBy: auth.currentUser.uid
+        });
+        
+        alert("Seller ditolak!");
+    };
+
+    window.banSeller = async (sellerId) => {
+        if (!confirm("Yakin ban seller ini?")) return;
+        
+        await update(ref(db, `sellers/${sellerId}`), {
+            status: "banned",
+            bannedAt: Date.now(),
+            bannedBy: auth.currentUser.uid
+        });
+        
+        await update(ref(db, `users/${sellerId}`), { 
+            role: 'banned_seller',
+            banned: true,
+            banReason: 'Diblokir oleh admin'
+        });
+        
+        alert("Seller dibanned!");
+        loadAdminStats();
+    };
+
+    window.banUser = async (userId) => {
+        if (!confirm("Yakin ban user ini?")) return;
+        
+        await update(ref(db, `users/${userId}`), { 
+            banned: true,
+            banReason: 'Diblokir oleh admin',
+            bannedAt: Date.now(),
+            bannedBy: auth.currentUser.uid
+        });
+        
+        alert("User dibanned!");
+        loadAdminStats();
+    };
+
+    window.unbanUser = async (userId) => {
+        if (!confirm("Yakin unban user ini?")) return;
+        
+        await update(ref(db, `users/${userId}`), { 
+            banned: false,
+            banReason: null
+        });
+        
+        alert("User diunban!");
+        loadAdminStats();
+    };
+
+    // ==================== WITHDRAWAL ====================
+    window.requestWithdraw = async () => {
+        const user = auth.currentUser;
+        const sellerSnap = await get(ref(db, `sellers/${user.uid}`));
+        const seller = sellerSnap.val();
+        
+        if (!seller) return alert("Anda bukan seller!");
+        if (seller.status !== "active") return alert("Akun seller tidak aktif!");
+        
+        const amount = parseInt(prompt("Jumlah penarikan (min Rp 50.000):"));
+        if (!amount || amount < 50000) return alert("Minimal Rp 50.000");
+        
+        if (amount > seller.balance) return alert("Saldo tidak cukup!");
+        
+        await push(ref(db, "withdrawals"), {
+            sellerId: user.uid,
+            sellerName: seller.storeName,
+            amount,
+            bankAccount: seller.bankAccount,
+            status: "pending",
+            requestedAt: Date.now()
+        });
+        
+        // Kurangi saldo sementara (pending)
+        await update(ref(db, `sellers/${user.uid}`), {
+            balance: (seller.balance || 0) - amount,
+            pendingWithdraw: (seller.pendingWithdraw || 0) + amount
+        });
+        
+        alert("Permintaan penarikan terkirim! Admin akan memproses.");
+    };
+
+    window.processWithdraw = async (withdrawId, action) => {
+        const withdraw = (await get(ref(db, `withdrawals/${withdrawId}`))).val();
+        
+        if (action === "approve") {
+            await update(ref(db, `withdrawals/${withdrawId}`), {
+                status: "processed",
+                processedAt: Date.now(),
+                processedBy: auth.currentUser.uid
+            });
+            
+            await update(ref(db, `sellers/${withdraw.sellerId}`), {
+                pendingWithdraw: increment(-withdraw.amount),
+                totalWithdrawn: increment(withdraw.amount)
+            });
+            
+            alert("Penarikan disetujui!");
+            
+        } else if (action === "reject") {
+            const reason = prompt("Alasan penolakan:");
+            if (!reason) return;
+            
+            const seller = (await get(ref(db, `sellers/${withdraw.sellerId}`))).val();
+            
+            await update(ref(db, `sellers/${withdraw.sellerId}`), {
+                balance: (seller.balance || 0) + withdraw.amount,
+                pendingWithdraw: (seller.pendingWithdraw || 0) - withdraw.amount
+            });
+            
+            await update(ref(db, `withdrawals/${withdrawId}`), {
+                status: "rejected",
+                rejectReason: reason,
+                processedAt: Date.now(),
+                processedBy: auth.currentUser.uid
+            });
+            
+            alert("Penarikan ditolak!");
+        }
+    };
+
+    // ==================== LOAD ADMIN STATS ====================
+    async function loadAdminStats() {
+        const usersSnap = await get(ref(db, 'users'));
+        const sellersSnap = await get(ref(db, 'sellers'));
+        const pendingSnap = await get(ref(db, 'verificationRequests'));
+        const ordersSnap = await get(ref(db, 'orders'));
+        
+        let totalUsers = 0;
+        let totalSellers = 0;
+        let pendingVerify = 0;
+        
+        usersSnap.forEach(() => totalUsers++);
+        sellersSnap.forEach(() => totalSellers++);
+        
+        pendingSnap.forEach(child => {
+            if (child.val().status === 'pending') pendingVerify++;
+        });
+        
+        document.getElementById('stat-total-users').innerText = totalUsers;
+        document.getElementById('stat-total-sellers').innerText = totalSellers;
+        document.getElementById('stat-pending-verify').innerText = pendingVerify;
+        document.getElementById('stat-total-orders').innerText = ordersSnap.size || 0;
+    }
+
+    // ==================== RENDER FUNCTIONS FOR ADMIN ====================
+    function renderSellerVerification() {
+        onValue(ref(db, 'verificationRequests'), (snap) => {
+            const list = document.getElementById('seller-verification-list');
+            if (!list) return;
+            list.innerHTML = "";
+            
+            snap.forEach(child => {
+                const req = child.val();
+                if (req.status === "pending") {
+                    const bankInfo = req.bankAccount?.ewallet ? 
+                        `<p class="text-[10px] mt-1">E-Wallet: ${req.bankAccount.ewallet.type} - ${req.bankAccount.ewallet.number} (${req.bankAccount.ewallet.name})</p>` : '';
+                    
+                    list.innerHTML += `
+                    <div class="glass p-4 rounded-2xl border border-yellow-500/30">
+                        <div class="flex justify-between">
+                            <p class="font-bold text-yellow-400">${req.storeName}</p>
+                            <span class="text-[8px] bg-yellow-600/20 px-2 py-1 rounded">PENDING</span>
+                        </div>
+                        <p class="text-[10px] text-gray-400">${req.username} (${req.userEmail})</p>
+                        <p class="text-[10px] mt-1">WA: ${req.wa || '-'}</p>
+                        <p class="text-[10px]">KTP: ${req.idCard}</p>
+                        ${bankInfo}
+                        ${req.bankAccount?.bank ? `<p class="text-[10px]">Bank: ${req.bankAccount.bank.name} - ${req.bankAccount.bank.number}</p>` : ''}
+                        <p class="text-[8px] text-gray-500 mt-1">${new Date(req.submittedAt).toLocaleString()}</p>
+                        <div class="flex gap-2 mt-3">
+                            <button onclick="approveSeller('${child.key}', '${req.userId}')" class="flex-1 bg-green-600 py-2 rounded-lg text-xs font-bold">SETUJUI</button>
+                            <button onclick="rejectSeller('${child.key}')" class="flex-1 bg-red-600 py-2 rounded-lg text-xs font-bold">TOLAK</button>
+                        </div>
+                    </div>`;
+                }
+            });
+        });
+    }
+
+    function renderActiveSellers() {
+        onValue(ref(db, 'sellers'), (snap) => {
+            const list = document.getElementById('seller-active-list');
+            if (!list) return;
+            list.innerHTML = "";
+            
+            snap.forEach(child => {
+                const seller = child.val();
+                const ewalletInfo = seller.bankAccount?.ewallet ? 
+                    `<p class="text-[8px] text-gray-400 mt-1">E-Wallet: ${seller.bankAccount.ewallet.type} - ${seller.bankAccount.ewallet.number}</p>` : '';
+                
+                list.innerHTML += `
+                <div class="glass p-4 rounded-2xl border border-slate-700">
+                    <div class="flex justify-between">
+                        <p class="font-bold text-blue-400">${seller.storeName}</p>
+                        <span class="text-[8px] bg-${seller.status === 'active' ? 'green' : 'red'}-600/20 text-${seller.status === 'active' ? 'green' : 'red'}-400 px-2 py-1 rounded">${seller.status}</span>
+                    </div>
+                    <p class="text-[10px] text-gray-400">${seller.username} (${seller.userEmail})</p>
+                    <p class="text-[10px] text-gray-400 mt-1">WA: ${seller.wa || '-'}</p>
+                    <p class="text-[8px] text-red-400 mt-1"><i class="fas fa-lock mr-1"></i> DATA PRIVAT:</p>
+                    <p class="text-[8px] text-gray-400">KTP: ${seller.idCard}</p>
+                    ${ewalletInfo}
+                    ${seller.bankAccount?.bank ? `<p class="text-[8px] text-gray-400">Bank: ${seller.bankAccount.bank.name} - ${seller.bankAccount.bank.number}</p>` : ''}
+                    <div class="grid grid-cols-3 gap-2 mt-2 text-center">
+                        <div>
+                            <p class="text-[8px] text-gray-500">Saldo</p>
+                            <p class="text-xs font-bold">Rp ${(seller.balance || 0).toLocaleString()}</p>
+                        </div>
+                        <div>
+                            <p class="text-[8px] text-gray-500">Penjualan</p>
+                            <p class="text-xs font-bold">${seller.totalSales || 0}</p>
+                        </div>
+                        <div>
+                            <p class="text-[8px] text-gray-500">Rating</p>
+                            <p class="text-xs font-bold text-yellow-400">${(seller.rating || 0).toFixed(1)}</p>
+                        </div>
+                    </div>
+                    ${seller.status === "active" ? `
+                    <button onclick="banSeller('${child.key}')" class="w-full mt-3 bg-red-600/20 text-red-400 py-2 rounded-lg text-xs font-bold">
+                        BAN SELLER
+                    </button>` : ''}
+                </div>`;
+            });
+        });
+    }
+
+    function renderBuyers() {
+        onValue(ref(db, 'users'), (snap) => {
+            const list = document.getElementById('buyers-list');
+            if (!list) return;
+            list.innerHTML = "";
+            
+            snap.forEach(child => {
+                const user = child.val();
+                if (user.role !== 'admin' && user.role !== 'seller' && !user.role?.includes('seller')) {
+                    list.innerHTML += `
+                    <div class="glass p-4 rounded-2xl border border-slate-700">
+                        <div class="flex justify-between">
+                            <p class="font-bold text-blue-400">${user.username || 'No name'}</p>
+                            ${user.banned ? 
+                                '<span class="text-[8px] bg-red-600/20 text-red-400 px-2 py-1 rounded">BANNED</span>' : 
+                                '<span class="text-[8px] bg-green-600/20 text-green-400 px-2 py-1 rounded">ACTIVE</span>'}
+                        </div>
+                        <p class="text-[10px] text-gray-400">${user.email}</p>
+                        <p class="text-[8px] text-gray-500 mt-1">Bergabung: ${new Date(user.createdAt).toLocaleDateString()}</p>
+                        ${!user.banned ? `
+                        <button onclick="banUser('${child.key}')" class="w-full mt-3 bg-red-600/20 text-red-400 py-2 rounded-lg text-xs font-bold">
+                            BAN USER
+                        </button>` : `
+                        <button onclick="unbanUser('${child.key}')" class="w-full mt-3 bg-green-600/20 text-green-400 py-2 rounded-lg text-xs font-bold">
+                            UNBAN USER
+                        </button>`}
+                    </div>`;
+                }
+            });
+        });
+    }
+
+    function renderWithdrawals() {
+        onValue(ref(db, 'withdrawals'), (snap) => {
+            const list = document.getElementById('withdrawals-list');
+            if (!list) return;
+            list.innerHTML = "";
+            
+            snap.forEach(child => {
+                const w = child.val();
+                let statusColor = "text-yellow-400";
+                if (w.status === "processed") statusColor = "text-green-400";
+                if (w.status === "rejected") statusColor = "text-red-400";
+                
+                const paymentInfo = w.bankAccount?.ewallet ? 
+                    `<p class="text-[8px] text-gray-400">E-Wallet: ${w.bankAccount.ewallet.type} - ${w.bankAccount.ewallet.number}</p>` :
+                    `<p class="text-[8px] text-gray-400">Bank: ${w.bankAccount?.bank?.name} - ${w.bankAccount?.bank?.number}</p>`;
+                
+                list.innerHTML += `
+                <div class="glass p-4 rounded-2xl border border-slate-700">
+                    <div class="flex justify-between">
+                        <p class="font-bold">${w.sellerName}</p>
+                        <span class="text-[8px] ${statusColor} px-2 py-1 rounded">${w.status.toUpperCase()}</span>
+                    </div>
+                    <p class="text-blue-400 font-bold text-lg my-1">Rp ${w.amount.toLocaleString()}</p>
+                    ${paymentInfo}
+                    <p class="text-[8px] text-gray-500 mt-1">${new Date(w.requestedAt).toLocaleString()}</p>
+                    
+                                        ${w.status === "pending" ? `
+                    <div class="flex gap-2 mt-3">
+                        <button onclick="processWithdraw('${child.key}', 'approve')" class="flex-1 bg-green-600 py-2 rounded-lg text-xs font-bold">PROSES</button>
+                        <button onclick="processWithdraw('${child.key}', 'reject')" class="flex-1 bg-red-600 py-2 rounded-lg text-xs font-bold">TOLAK</button>
+                    </div>` : ''}
+                    
+                    ${w.status === "processed" ? `<p class="text-[8px] text-green-400 mt-2">Diproses: ${new Date(w.processedAt).toLocaleString()}</p>` : ''}
+                    ${w.rejectReason ? `<p class="text-[8px] text-red-400 mt-2">Alasan: ${w.rejectReason}</p>` : ''}
+                </div>`;
+            });
+        });
+    }
+
+    function renderPayments() {
+        onValue(ref(db, 'payments'), (snap) => {
+            const list = document.getElementById('payments-list');
+            if (!list) return;
+            list.innerHTML = "";
+            
+            snap.forEach(child => {
+                const p = child.val();
+                let statusColor = "text-yellow-400";
+                if (p.status === "paid") statusColor = "text-green-400";
+                if (p.status === "expired") statusColor = "text-red-400";
+                if (p.status === "failed") statusColor = "text-red-400";
+                
+                list.innerHTML += `
+                <div class="glass p-4 rounded-2xl border border-slate-700">
+                    <div class="flex justify-between">
+                        <p class="font-bold text-blue-400">Payment #${child.key.slice(0,6)}</p>
+                        <span class="text-[8px] ${statusColor} px-2 py-1 rounded">${p.status.toUpperCase()}</span>
+                    </div>
+                    <p class="text-lg font-bold mt-1">Rp ${p.amount.toLocaleString()}</p>
+                    <p class="text-[8px] text-gray-400">Pembeli: ${p.buyerName}</p>
+                    <p class="text-[8px] text-gray-400">Metode: ${p.method}</p>
+                    <p class="text-[8px] text-gray-500">Dibuat: ${new Date(p.createdAt).toLocaleString()}</p>
+                    ${p.paidAt ? `<p class="text-[8px] text-green-400">Dibayar: ${new Date(p.paidAt).toLocaleString()}</p>` : ''}
+                    ${p.expiresAt ? `<p class="text-[8px] text-red-400">Exp: ${new Date(p.expiresAt).toLocaleString()}</p>` : ''}
+                </div>`;
+            });
+        });
+    }
+
+    // ==================== PRODUCT LOGIC ====================
+    function listenProducts() {
+        onValue(ref(db, 'products'), async (snap) => {
+            const list = document.getElementById('product-list');
+            list.innerHTML = ""; 
+            globalProducts = [];
+            
+            const sellersSnap = await get(ref(db, 'sellers'));
+            const sellers = {};
+            sellersSnap.forEach(s => {
+                const seller = s.val();
+                if (seller.status === "active") {
+                    sellers[s.key] = seller;
+                }
+            });
+            globalSellers = sellers;
+            
+            snap.forEach(child => {
+                const p = child.val(); 
+                p.id = child.key;
+                
+                if (p.sellerId && sellers[p.sellerId]) {
+                    p.sellerName = sellers[p.sellerId].storeName;
+                }
+                
+                globalProducts.push(p);
+                renderProductCard(p);
+            });
+        });
+    }
+
+    function renderProductCard(p) {
+        const list = document.getElementById('product-list');
+        const isAdmin = !document.getElementById('nav-admin').classList.contains('hidden');
+        const displayImg = (p.images && p.images.length > 0) ? p.images[0] : 'https://via.placeholder.com/300';
+        const isOut = (p.stock || 0) <= 0;
+
+        list.innerHTML += `
+            <div class="glass rounded-2xl overflow-hidden p-2 flex flex-col product-card relative animate-fade" data-name="${p.name.toLowerCase()}">
+                ${isAdmin ? `
+                <div class="absolute top-2 right-2 flex gap-1 z-10">
+                    <button onclick="editProductFull('${p.id}')" class="bg-yellow-600 text-[8px] p-1.5 rounded-lg"><i class="fa fa-edit"></i></button>
+                    <button onclick="deleteProduct('${p.id}')" class="bg-red-600 text-[8px] p-1.5 rounded-lg"><i class="fa fa-trash"></i></button>
+                </div>` : ''}
+                
+                ${p.sellerName ? `
+                <div class="absolute top-2 left-2 z-10">
+                    <span class="seller-badge"><i class="fas fa-store mr-1"></i>${p.sellerName}</span>
+                </div>` : ''}
+                
+                <div class="relative">
+                    <img src="${displayImg}" class="w-full h-36 object-contain bg-slate-900 rounded-xl mb-2 cursor-pointer p-2" onclick="viewDetail('${p.id}')">
+                    ${isOut ? `<div class="absolute inset-0 bg-black/60 flex items-center justify-center rounded-xl"><span class="text-[8px] bg-red-600 px-2 py-0.5 rounded font-bold">HABIS</span></div>` : ''}
+                </div>
+
+                <div class="px-1">
+                    <p class="text-[11px] font-bold truncate">${p.name}</p>
+                    <p class="text-blue-400 font-bold text-xs mt-1">Rp ${Number(p.price).toLocaleString()}</p>
+                    <div class="flex justify-between items-center mt-2">
+                        <span class="text-[9px] text-gray-500">Stok: ${p.stock || 0}</span>
+                        <button onclick="viewDetail('${p.id}')" class="text-[9px] bg-slate-800 px-2 py-1 rounded text-blue-400">Detail</button>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    window.viewDetail = (id) => {
+        const p = globalProducts.find(x => x.id === id);
+        if (!p) return;
+
+        const images = p.images || ['https://via.placeholder.com/300'];
+        document.getElementById('m-img').src = images[0];
+        document.getElementById('m-img').onclick = () => openImageModal(images, 0);
+
+        const thumbContainer = document.getElementById("m-thumbs");
+        thumbContainer.innerHTML = "";
+        images.forEach((img, idx) => {
+            thumbContainer.innerHTML += `<img src="${img}" class="w-14 h-14 object-contain bg-slate-900 rounded-lg cursor-pointer border border-slate-700" onclick="updateDetailMainImg('${img}', ${idx})">`;
+        });
+
+        document.getElementById('m-title').innerText = p.name;
+        document.getElementById('m-price').innerText = "Rp " + Number(p.price).toLocaleString();
+        document.getElementById('m-desc').innerText = p.description || "Tidak ada deskripsi.";
+        
+        if (p.sellerName) {
+            document.getElementById('m-seller-badge').classList.remove('hidden');
+            document.getElementById('m-seller-badge').innerText = p.sellerName;
+        } else {
+            document.getElementById('m-seller-badge').classList.add('hidden');
+        }
+        
+        const isOut = (p.stock || 0) <= 0;
+        document.getElementById('m-badge-out').classList.toggle('hidden', !isOut);
+        document.getElementById('btn-buy-now').disabled = isOut;
+        document.getElementById('btn-add-cart').disabled = isOut;
+
+        const reviews = p.reviews ? Object.values(p.reviews) : [];
+        const avg = reviews.length ? (reviews.reduce((a, b) => a + Number(b.stars), 0) / reviews.length).toFixed(1) : 0;
+        
+        document.getElementById('m-rating-stars').innerHTML = '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg));
+        document.getElementById('m-rating-text').innerText = `(${avg}) • ${reviews.length} Ulasan`;
+
+        const revCont = document.getElementById('m-reviews');
+        revCont.innerHTML = reviews.length ? "" : `<p class="text-[10px] text-gray-600 italic">Belum ada ulasan untuk produk ini.</p>`;
+        reviews.sort((a,b) => b.time - a.time).forEach(r => {
+            revCont.innerHTML += `
+                <div class="bg-slate-800/40 p-3 rounded-xl border border-slate-700">
+                    <div class="flex justify-between items-center mb-1">
+                        <div>
+                            <span class="font-bold text-[10px] text-blue-400">${r.user}</span>
+                            <p class="text-[8px] text-gray-500">${r.email || '-'}</p>
+                        </div>
+                        <span class="text-yellow-500 text-[10px]">${'★'.repeat(r.stars)}</span>
+                    </div>
+                    <p class="text-[10px] text-gray-300">${r.text}</p>
+                </div>`;
+        });
+
+        window.currentViewId = id;
+        document.getElementById('btn-buy-now').onclick = () => instantBuy(id);
+        document.getElementById('btn-add-cart').onclick = () => addToCart(id);
+        document.getElementById('modal-detail').classList.remove('hidden');
+    };
+
+    // ==================== CART & ORDER LOGIC ====================
+    window.addToCart = async (id) => {
+        const user = auth.currentUser;
+        if (!user) return alert("Silahkan login terlebih dahulu!");
+
+        const p = globalProducts.find(x => x.id === id);
+        if (p.stock <= 0) return alert("Stok habis!");
+
+        await update(ref(db, `carts/${user.uid}/${id}`), {
+            name: p.name,
+            price: p.price,
+            img: p.images[0],
+            qty: (userCart[id]?.qty || 0) + 1,
+            maxStock: p.stock,
+            sellerId: p.sellerId || "admin"
+        });
+        alert("Berhasil ditambah ke keranjang!");
+    };
+
+    function listenCart(uid) {
+        onValue(ref(db, `carts/${uid}`), (snap) => {
+            const cont = document.getElementById('cart-items');
+            const totalEl = document.getElementById('cart-total');
+            const countEl = document.getElementById('cart-count');
+            cont.innerHTML = ""; userCart = {};
+            let total = 0, count = 0;
+
+            if (!snap.exists()) {
+                totalEl.innerText = "Rp 0"; countEl.innerText = "0";
+                cont.innerHTML = `<p class="text-center text-gray-500 py-10">Keranjang kosong</p>`;
+                return;
+            }
+
+            snap.forEach(child => {
+                const item = child.val();
+                userCart[child.key] = item;
+                total += item.price * item.qty;
+                count += item.qty;
+                cont.innerHTML += `
+                    <div class="flex items-center gap-4 bg-slate-800 p-3 rounded-2xl">
+                        <img src="${item.img}" class="w-16 h-16 rounded-xl object-cover">
+                        <div class="flex-1">
+                            <p class="font-bold text-sm truncate">${item.name}</p>
+                            <p class="text-blue-400 text-xs font-bold">Rp ${item.price.toLocaleString()}</p>
+                            <div class="flex items-center gap-3 mt-2">
+                                <button onclick="updateCartQty('${child.key}', -1)" class="bg-slate-700 w-6 h-6 rounded-lg">-</button>
+                                <span class="text-xs font-bold">${item.qty}</span>
+                                <button onclick="updateCartQty('${child.key}', 1)" class="bg-blue-600 w-6 h-6 rounded-lg">+</button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+            totalEl.innerText = "Rp " + total.toLocaleString();
+            countEl.innerText = count;
+        });
+    }
+
+    window.updateCartQty = async (id, change) => {
+        const item = userCart[id];
+        const newQty = item.qty + change;
+        if (newQty <= 0) return remove(ref(db, `carts/${auth.currentUser.uid}/${id}`));
+        if (newQty > item.maxStock) return alert("Stok tidak mencukupi!");
+        await update(ref(db, `carts/${auth.currentUser.uid}/${id}`), { qty: newQty });
+    };
+
+    window.checkOrderLimit = async (uid) => {
+        const snap = await get(ref(db, 'orders'));
+        let active = 0;
+        snap.forEach(c => {
+            const o = c.val();
+            if (o.userId === uid && (o.status === "Pending" || o.status === "Diproses")) active++;
+        });
+        if (active >= 5) {
+            alert("Kamu memiliki 5 order aktif. Selesaikan transaksi sebelumnya!");
+            return false;
+        }
+        return true;
+    };
+
+    window.checkoutCart = async () => {
+        const user = auth.currentUser;
+        if (!user) return showPage('page-auth');
+        if (!Object.keys(userCart).length) return alert("Keranjang kosong!");
+        if (!(await checkOrderLimit(user.uid))) return;
+
+        let total = 0;
+        const itemsToOrder = {};
+        const sellerAmounts = {};
+
+        for (const id in userCart) {
+            const item = userCart[id];
+            const product = globalProducts.find(p => p.id === id);
+            if (!product) continue;
+            
+            const sellerId = product.sellerId || "admin";
+            const price = item.price * item.qty;
+            const commission = price * PLATFORM_COMMISSION;
+            const sellerGets = price - commission;
+            
+            itemsToOrder[id] = { 
+                name: item.name, 
+                price: item.price, 
+                qty: item.qty, 
+                pid: id,
+                sellerId: sellerId
+            };
+            
+            total += price;
+            
+            if (!sellerAmounts[sellerId]) sellerAmounts[sellerId] = 0;
+            sellerAmounts[sellerId] += sellerGets;
+        }
+        
+        sellerAmounts["platform"] = total * PLATFORM_COMMISSION;
+
+        for (const id in userCart) {
+            const fresh = (await get(ref(db, `products/${id}`))).val();
+            if (fresh.stock < userCart[id].qty) {
+                return alert(`Stok ${userCart[id].name} tidak cukup!`);
+            }
+        }
+
+        for (const id in userCart) {
+            await update(ref(db, `products/${id}`), { 
+                stock: increment(-userCart[id].qty) 
+            });
+        }
+
+        const orderRef = push(ref(db, "orders"));
+        await set(orderRef, {
+            userId: user.uid,
+            username: document.getElementById('user-name-display').innerText,
+            email: user.email,
+            items: itemsToOrder,
+            status: "Pending",
+            total: total,
+            sellerAmounts: sellerAmounts,
+            createdAt: Date.now()
+        });
+
+        await remove(ref(db, `carts/${user.uid}`));
+        await showPaymentModal(orderRef.key, total, sellerAmounts);
+        
+        closeModal('modal-cart');
+    };
+
+    window.instantBuy = async (id) => {
+        const user = auth.currentUser;
+        if (!user) return showPage('page-auth');
+        if (!(await checkOrderLimit(user.uid))) return;
+
+        const p = globalProducts.find(x => x.id === id);
+        const fresh = (await get(ref(db, `products/${id}`))).val();
+        if (!fresh || fresh.stock <= 0) return alert("Stok habis!");
+
+        const sellerId = p.sellerId || "admin";
+        const price = p.price;
+        const commission = price * PLATFORM_COMMISSION;
+        const sellerGets = price - commission;
+        
+        const sellerAmounts = {};
+        sellerAmounts[sellerId] = sellerGets;
+        sellerAmounts["platform"] = commission;
+
+        await update(ref(db, `products/${id}`), { stock: fresh.stock - 1 });
+        
+        const orderRef = push(ref(db, "orders"));
+        await set(orderRef, {
+            userId: user.uid,
+            username: document.getElementById('user-name-display').innerText,
+            email: user.email,
+            items: { [id]: { name: p.name, price: p.price, qty: 1, pid: id, sellerId: sellerId } },
+            status: "Pending",
+            total: price,
+            sellerAmounts: sellerAmounts,
+            createdAt: Date.now()
+        });
+
+        await showPaymentModal(orderRef.key, price, sellerAmounts);
+        closeModal('modal-detail');
+    };
+
+    // ==================== PAYMENT QR ====================
+    window.generatePaymentQR = async (orderId, amount, sellers) => {
+        const qrData = `xrezzky://pay/${orderId}/${amount}`;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrData)}`;
+        
+        const paymentId = push(ref(db, "payments")).key;
+        
+        await set(ref(db, `payments/${paymentId}`), {
+            orderId,
+            amount,
+            qrCode: qrUrl,
+            qrString: qrData,
+            status: "pending",
+            method: "qris",
+            expiresAt: Date.now() + 30 * 60 * 1000,
+            sellers: sellers,
+            buyerId: auth.currentUser?.uid || "guest",
+            buyerName: document.getElementById('user-name-display').innerText,
+            createdAt: Date.now()
+        });
+        
+        return { paymentId, qrUrl };
+    };
+
+    window.showPaymentModal = async (orderId, amount, sellers) => {
+        const { qrUrl } = await generatePaymentQR(orderId, amount, sellers);
+        
+        document.getElementById('qr-image').src = qrUrl;
+        document.getElementById('payment-amount').innerText = 'Rp ' + amount.toLocaleString();
+        
+        const expiryTime = Date.now() + 30 * 60 * 1000;
+        const expiryDate = new Date(expiryTime);
+        document.getElementById('payment-expiry').innerText = `Berlaku sampai ${expiryDate.toLocaleTimeString()}`;
+        
+        document.getElementById('modal-payment').classList.remove('hidden');
+        
+        setTimeout(() => {
+            checkPayment(paymentId);
+        }, 5000);
+    };
+
+    window.checkPayment = async (paymentId) => {
+        const payment = (await get(ref(db, `payments/${paymentId}`))).val();
+        
+        if (!payment) return null;
+        
+        if (payment.status === "pending" && Date.now() > payment.expiresAt) {
+            await update(ref(db, `payments/${paymentId}`), { status: "expired" });
+            return { status: "expired" };
+        }
+        
+        return payment;
+    };
+
+    window.processPaidPayment = async (paymentId) => {
+        const payment = (await get(ref(db, `payments/${paymentId}`))).val();
+        
+        if (payment.status !== "pending") return;
+        
+        await update(ref(db, `payments/${paymentId}`), {
+            status: "paid",
+            paidAt: Date.now()
+        });
+        
+        await update(ref(db, `orders/${payment.orderId}`), {
+            status: "Diproses",
+            paymentId: paymentId,
+            paidAt: Date.now()
+        });
+        
+        for (const [sellerId, amount] of Object.entries(payment.sellers)) {
+            if (sellerId !== "platform") {
+                const sellerRef = ref(db, `sellers/${sellerId}`);
+                const seller = (await get(sellerRef)).val();
+                
+                await update(sellerRef, {
+                    balance: (seller.balance || 0) + amount,
+                    totalSales: (seller.totalSales || 0) + 1,
+                    totalRevenue: (seller.totalRevenue || 0) + amount
+                });
+            }
+        }
+        
+        alert("Pembayaran berhasil diproses!");
+    };
+
+    // ==================== ADMIN ORDER LISTENER ====================
+    function listenAdminOrders() {
+        onValue(ref(db, 'orders'), (snap) => {
+            const tabs = ['pending', 'process', 'done', 'reject'];
+            tabs.forEach(t => {
+                const el = document.getElementById('admin-' + t);
+                if (el) el.innerHTML = "";
+            });
+            
+            snap.forEach(c => {
+                const o = c.val(); 
+                const id = c.key;
+                const items = Object.values(o.items || {}).map(i => `${i.name} (${i.qty}x)`).join(", ");
+                const total = o.total || Object.values(o.items || {}).reduce((a, i) => a + (i.price * i.qty), 0);
+                
+                const card = `<div class="glass p-4 rounded-2xl mb-3 text-[10px] border border-slate-700">
+                    <div class="flex justify-between">
+                        <p class="font-bold text-blue-400">${o.username}</p>
+                        ${o.paymentId ? '<span class="text-[8px] bg-green-600/20 text-green-400 px-2 py-1 rounded">PAID</span>' : ''}
+                    </div>
+                    <p class="text-gray-400 text-[8px]">${o.email}</p>
+                    <p class="my-2">${items}</p>
+                    <p class="text-blue-400 font-bold">Rp ${total.toLocaleString()}</p>
+                    <p class="text-gray-500 text-[8px]">${new Date(o.createdAt).toLocaleString()}</p>
+                    ${o.rejectReason ? `<p class="text-red-400 mt-1">Alasan: ${o.rejectReason}</p>` : ''}
+                    
+                    ${o.paymentId ? `
+                    <div class="mt-2 p-2 bg-slate-800 rounded-lg">
+                        <p class="text-[8px] text-gray-400">Payment ID: ${o.paymentId}</p>
+                        ${o.paidAt ? `<p class="text-[8px] text-green-400">Lunas: ${new Date(o.paidAt).toLocaleString()}</p>` : ''}
+                    </div>` : ''}
+                    
+                    <div class="flex gap-2 mt-3">
+                        ${o.status === "Pending" ? `<button onclick="updateStat('${id}','Diproses')" class="bg-blue-600 px-3 py-1 rounded font-bold">PROSES</button>` : ''}
+                        ${o.status === "Diproses" ? `<button onclick="updateStat('${id}','Selesai')" class="bg-green-600 px-3 py-1 rounded font-bold">SELESAI</button>` : ''}
+                        ${(o.status === "Pending" || o.status === "Diproses") ? `<button onclick="rejectOrder('${id}')" class="bg-red-600 px-3 py-1 rounded font-bold">REJECT</button>` : ''}
+                        <button onclick="delOrder('${id}')" class="text-gray-500 ml-auto"><i class="fa fa-trash"></i></button>
+                    </div>
+                </div>`;
+                
+                if (o.status === "Pending") document.getElementById('admin-pending').innerHTML += card;
+                else if (o.status === "Diproses") document.getElementById('admin-process').innerHTML += card;
+                else if (o.status === "Selesai") document.getElementById('admin-done').innerHTML += card;
+                else if (o.status === "Ditolak") document.getElementById('admin-reject').innerHTML += card;
+            });
+        });
+    }
+
+    // ==================== USER HISTORY ====================
+    function listenUserHistory(uid) {
+        onValue(ref(db, 'orders'), (snap) => {
+            const cont = document.getElementById('user-history');
+            cont.innerHTML = "";
+
+            snap.forEach(c => {
+                const o = c.val();
+                if (o.userId === uid) {
+                    const items = Object.values(o.items || {});
+                    const total = o.total || items.reduce((a,b)=>a + (b.price * b.qty),0);
+
+                    const detailText =
+`INVOICE XREZZKY STORE
+========================
+Nama   : ${o.username}
+Email  : ${o.email}
+Tanggal: ${new Date(o.createdAt).toLocaleString()}
+
+Detail Pesanan:
+${items.map(i=>`- ${i.name}
+  Qty   : ${i.qty}
+  Harga : Rp ${i.price.toLocaleString()}
+  Subtotal : Rp ${(i.price*i.qty).toLocaleString()}
+`).join("\n")}
+
+TOTAL : Rp ${total.toLocaleString()}
+Status: ${o.status}
+Payment: ${o.paidAt ? 'Lunas' : 'Menunggu'}
+========================`;
+
+                    cont.innerHTML += `
+                    <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700 text-[10px] animate-fade">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-500">${new Date(o.createdAt).toLocaleDateString()}</span>
+                            <span class="font-bold ${
+                                o.status === 'Selesai' ? 'text-green-500' :
+                                o.status === 'Ditolak' ? 'text-red-500' :
+                                'text-yellow-500'
+                            }">${o.status.toUpperCase()}</span>
+                        </div>
+
+                        <p class="font-bold text-sm mb-2">${items.map(i => i.name).join(", ")}</p>
+                        
+                        ${o.paidAt ? `
+                        <div class="bg-green-600/20 text-green-400 p-2 rounded-lg mb-2 text-[8px]">
+                            <i class="fas fa-check-circle mr-1"></i> Pembayaran lunas ${new Date(o.paidAt).toLocaleString()}
+                        </div>` : ''}
+                        
+                        <p class="text-gray-400 text-[9px] mb-2">Total: Rp ${total.toLocaleString()}</p>
+
+                        <div class="flex gap-2">
+                            <button onclick="copyInvoice(\`${detailText}\`)"
+                                class="flex-1 bg-blue-600/20 text-blue-400 py-2 rounded-lg font-bold">
+                                COPY DETAIL
+                            </button>
+
+                            ${o.status === 'Selesai' && !o.isRated ?
+                            `<button onclick="openReviewModal('${c.key}', '${items[0].pid}', '${items[0].name}')"
+                                class="flex-1 bg-green-600/20 text-green-400 py-2 rounded-lg font-bold">
+                                BERI NILAI
+                            </button>` : ''}
+                        </div>
+                    </div>`;
+                }
+            });
+        });
+    }
+
+    window.openReviewModal = (oid, pid, pname) => {
+        document.getElementById('review-product-name').innerText = pname;
+        document.getElementById('modal-review').classList.remove('hidden');
+        document.getElementById('btn-submit-review').onclick = () => submitReview(oid, pid);
+    };
+
+    window.submitReview = async (oid, pid) => {
+        const stars = document.getElementById('star-range').value;
+        const text = document.getElementById('review-text').value;
+        const user = auth.currentUser;
+
+        if(!text) return alert("Ulasan tidak boleh kosong!");
+
+        await push(ref(db, `products/${pid}/reviews`), {
+            user: document.getElementById('user-name-display').innerText,
+            email: user.email,
+            stars,
+            text,
+            time: Date.now()
+        });
+
+        await update(ref(db, `orders/${oid}`), { isRated: true });
+
+        closeModal('modal-review');
+        alert("Terima kasih atas ulasannya!");
+    };
+
+    // ==================== UTILITY FUNCTIONS ====================
+    window.updateStat = async (id, stat) => {
+        await update(ref(db, `orders/${id}`), { status: stat });
+    };
+
+    window.rejectOrder = async (id) => {
+        const reason = prompt("Alasan penolakan:");
+        if (!reason) return;
+        const o = (await get(ref(db, `orders/${id}`))).val();
+        for (const pid in o.items) {
+            const p = (await get(ref(db, `products/${pid}`))).val();
+            await update(ref(db, `products/${pid}`), { stock: (p.stock || 0) + o.items[pid].qty });
+        }
+        await update(ref(db, `orders/${id}`), { status: "Ditolak", rejectReason: reason });
+    };
+
+    window.delOrder = async (id) => {
+        if (confirm("Hapus permanen?")) await remove(ref(db, `orders/${id}`));
+    };
+
+    window.deleteProduct = async (id) => {
+        if (confirm("Hapus produk ini?")) await remove(ref(db, `products/${id}`));
+    };
+
+    window.changeUsername = async () => {
+        const n = prompt("Username baru:");
+        if (n) await update(ref(db, `users/${auth.currentUser.uid}`), { username: n });
+    };
+
+    window.changePasswordCustom = async () => {
+        const p = prompt("Password baru:");
+        if (p) {
+            try { await updatePassword(auth.currentUser, p); alert("Password diganti!"); }
+            catch (e) { alert("Login ulang diperlukan."); }
+        }
+    };
+
+    window.signOutUser = () => signOut(auth);
+
+    window.openVisiModal = () => {
+        document.getElementById('modal-visi').classList.remove('hidden');
+        document.querySelectorAll('.visi-item').forEach((it, i) => {
+            it.style.animation = `fadeUp 0.5s ease forwards ${i * 0.2}s`;
+        });
+    };
+
+    window.copyInvoice = (text) => {
+        navigator.clipboard.writeText(text).then(()=>{
+            alert("Detail transaksi berhasil dicopy!");
+        }).catch(()=>{
+            alert("Gagal copy!");
+        });
+    };
+
+    window.updateDetailMainImg = (src, idx) => {
+        const img = document.getElementById('m-img');
+        img.src = src;
+        img.onclick = () => {
+            const p = globalProducts.find(x => x.id === window.currentViewId);
+            openImageModal(p.images, idx);
+        };
+    };
+
+    // ==================== IMAGE MODAL LOGIC ====================
+    window.openImageModal = (images, index = 0) => {
+        currentImages = images;
+        currentIndex = index;
+        updateModalImage();
+        document.getElementById("imageModal").classList.remove("hidden");
+    };
+
+    window.closeImageModal = () => document.getElementById("imageModal").classList.add("hidden");
+
+    window.nextImage = () => {
+        currentIndex = (currentIndex + 1) % currentImages.length;
+        updateModalImage();
+    };
+
+    window.prevImage = () => {
+        currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
+        updateModalImage();
+    };
+
+    function updateModalImage() {
+        const img = document.getElementById("modalImage");
+        const counter = document.getElementById("imageCounter");
+        img.src = currentImages[currentIndex];
+        counter.innerText = `${currentIndex + 1} / ${currentImages.length}`;
+    }
+
+    window.handleModalBgClick = (e) => {
+        if (e.target.id === "imageModal") closeImageModal();
+    };
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === "Escape") closeImageModal();
+        if (!document.getElementById("imageModal").classList.contains("hidden")) {
+            if (e.key === "ArrowRight") nextImage();
+            if (e.key === "ArrowLeft") prevImage();
+        }
+    });
+
+    // ==================== UI UTILS ====================
+    window.showPage = (id) => {
+        document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+        window.scrollTo(0,0);
+        
+        if (id === 'page-admin') {
+            renderSellerVerification();
+            renderActiveSellers();
+            renderBuyers();
+            renderWithdrawals();
+            renderPayments();
+            loadSellersForSelect();
+            loadAdminStats();
+        }
+    };
+    
+    window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
+    window.showCart = () => document.getElementById('modal-cart').classList.remove('hidden');
+    
+    window.switchAdminTab = (t) => {
+        document.querySelectorAll('.admin-tab').forEach(x => x.classList.add('hidden'));
+        document.getElementById('admin-' + t).classList.remove('hidden');
+        document.querySelectorAll('[id^="tab-"]').forEach(x => x.classList.remove('tab-active'));
+        document.getElementById('tab-' + t).classList.add('tab-active');
+    };
+    
+    window.searchProduct = (v) => {
+        const q = v.toLowerCase();
+        let found = false;
+        document.querySelectorAll('.product-card').forEach(c => {
+            const match = c.getAttribute('data-name').includes(q);
+            c.classList.toggle('hidden', !match);
+            if (match) found = true;
+        });
+        document.getElementById('search-empty').classList.toggle('hidden', found);
+    };
+
+    // ==================== ADMIN PRODUCT ====================
+    window.saveProduct = async () => {
+        const btn = document.getElementById('btn-save-prod');
+        const name = document.getElementById("p-name").value;
+        const price = Number(document.getElementById("p-price").value);
+        const desc = document.getElementById("p-desc").value;
+        const stock = Number(document.getElementById("p-stock").value);
+        const urls = getAllImages();
+        const sellerSelect = document.getElementById('product-seller');
+        const sellerId = sellerSelect ? sellerSelect.value : null;
+
+        if (!name || !price || urls.length === 0) return alert("Lengkapi data produk!");
+
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa fa-spinner animate-spin"></i> Saving...`;
+
+        const data = { 
+            name, 
+            price, 
+            description: desc, 
+            stock, 
+            images: urls, 
+            sellerId: sellerId || "admin",
+            updatedAt: Date.now() 
+        };
+
+        if (window.currentEditId) {
+            await update(ref(db, `products/${window.currentEditId}`), data);
+            alert("Produk diupdate!");
+        } else {
+            await push(ref(db, "products"), { ...data, createdAt: Date.now() });
+            alert("Produk ditambahkan!");
+        }
+
+        cancelEdit();
+        btn.disabled = false;
+        btn.innerText = "Upload Produk";
+    };
+
+    window.editProductFull = async (id) => {
+        const p = globalProducts.find(x => x.id === id);
+        if (!p) return;
+        window.currentEditId = id;
+        document.getElementById('p-name').value = p.name;
+        document.getElementById('p-price').value = p.price;
+        document.getElementById('p-desc').value = p.description || "";
+        document.getElementById('p-stock').value = p.stock || 0;
+        
+        const sellerSelect = document.getElementById('product-seller');
+        if (sellerSelect && p.sellerId) {
+            sellerSelect.value = p.sellerId;
+        }
+        
+        const cont = document.getElementById("image-input-container");
+        cont.innerHTML = "";
+        if (p.images) p.images.forEach(url => createImageInput(url));
+        createImageInput();
+
+        document.getElementById('edit-indicator').classList.remove('hidden');
+        document.getElementById('cancel-edit-btn').classList.remove('hidden');
+        document.getElementById('btn-save-prod').innerText = "Update Produk";
+        switchAdminTab('upload');
+    };
+
+    window.cancelEdit = () => {
+        window.currentEditId = null;
+        document.getElementById("p-name").value = "";
+        document.getElementById("p-price").value = "";
+        document.getElementById("p-desc").value = "";
+        document.getElementById("p-stock").value = "";
+        document.getElementById("image-input-container").innerHTML = "";
+        createImageInput();
+                document.getElementById('edit-indicator').classList.add('hidden');
+        document.getElementById('cancel-edit-btn').classList.add('hidden');
+        document.getElementById('btn-save-prod').innerText = "Upload Produk";
+    };
+
+    async function loadSellersForSelect() {
+        const snap = await get(ref(db, 'sellers'));
+        const select = document.getElementById('product-seller');
+        if (!select) return;
+        
+        select.innerHTML = '<option value="">Pilih Seller</option>';
+        select.innerHTML += '<option value="admin">Admin (Platform)</option>';
+        
+        snap.forEach(child => {
+            const seller = child.val();
+            if (seller.status === "active") {
+                select.innerHTML += `<option value="${child.key}">${seller.storeName}</option>`;
+            }
+        });
+    }
+
+    // ==================== IMAGE INPUT ====================
+    function createImageInput(val = "") {
+        const cont = document.getElementById("image-input-container");
+        if (!cont) return;
+        if (cont.querySelectorAll("input").length >= MAX_IMAGES) return;
+
+        const wrap = document.createElement("div");
+        wrap.className = "flex gap-2 items-center animate-fade";
+        const input = document.createElement("input");
+        input.type = "text"; input.placeholder = "URL Gambar..."; input.value = val;
+        input.className = "flex-1 p-2 bg-slate-800 border border-slate-700 rounded-lg text-[10px]";
+        
+        const prev = document.createElement("img");
+        prev.className = `w-10 h-10 object-contain bg-slate-900 rounded ${val ? '' : 'hidden'}`;
+        if (val) prev.src = val;
+
+        input.onchange = async () => {
+            const url = input.value.trim();
+            if (!url) return;
+            const img = new Image();
+            img.onload = () => {
+                prev.src = url + "?t=" + Date.now();
+                prev.classList.remove("hidden");
+                const inputs = cont.querySelectorAll("input");
+                if (input === inputs[inputs.length - 1]) createImageInput();
+            };
+            img.onerror = () => { alert("URL Gambar tidak valid!"); input.value = ""; prev.classList.add("hidden"); };
+            img.src = url;
+        };
+        wrap.append(input, prev);
+        cont.appendChild(wrap);
+    }
+
+    function getAllImages() {
+        return Array.from(document.querySelectorAll("#image-input-container input")).map(i => i.value.trim()).filter(v => v !== "");
+    }
+
+    // ==================== INIT ====================
+    createImageInput();
+
+    // =========================
+    // SMART LOADING SYSTEM
+    // =========================
+    const loader = document.getElementById("initial-loading");
+    const bar = document.getElementById("loading-bar");
+    const textLoading = document.getElementById("loading-text");
+
+    let progress = 0;
+    let firebaseReady = false;
+    let minimumTimePassed = false;
+
+    const loadingMessages = [
+        "Menyiapkan Marketplace...",
+        "Menghubungkan Server...",
+        "Mengambil Produk...",
+        "Memuat Data Seller...",
+        "Menampilkan Marketplace...",
+        "Hampir Selesai..."
+    ];
+
+    let msgIndex = 0;
+
+    const interval = setInterval(() => {
+        progress += Math.random() * 7;
+        if (progress > 90) progress = 90;
+        bar.style.width = progress + "%";
+        msgIndex = (msgIndex + 1) % loadingMessages.length;
+        textLoading.innerText = loadingMessages[msgIndex];
+    }, 400);
+
+    setTimeout(() => {
+        minimumTimePassed = true;
+        tryFinishLoading();
+    }, 2500);
+
+    onValue(ref(db, "products"), () => {
+        firebaseReady = true;
+        tryFinishLoading();
+    }, { onlyOnce: true });
+
+    function tryFinishLoading() {
+        if (firebaseReady && minimumTimePassed) {
+            clearInterval(interval);
+            bar.style.width = "100%";
+            textLoading.innerText = "Marketplace Siap 🚀";
+
+            setTimeout(() => {
+                loader.style.opacity = "0";
+                setTimeout(() => {
+                    loader.remove();
+                    document.getElementById("page-marketplace").classList.remove("hidden");
+                }, 600);
+            }, 500);
+        }
+    }
+
+    // Set default auth mode
+    setAuthMode('login');
+    setRole('buyer');
+    
+    
+    
+    // ==================== SELLER PRODUCT FUNCTIONS ====================
+window.showAddProductForm = () => {
+    sellerEditId = null;
+    document.getElementById('seller-product-title').innerText = 'TAMBAH PRODUK';
+    document.getElementById('seller-p-name').value = '';
+    document.getElementById('seller-p-price').value = '';
+    document.getElementById('seller-p-desc').value = '';
+    document.getElementById('seller-p-stock').value = '';
+    document.getElementById('seller-image-container').innerHTML = '';
+    createSellerImageInput();
+    document.getElementById('modal-seller-product').classList.remove('hidden');
+};
+
+window.closeSellerProductModal = () => {
+    document.getElementById('modal-seller-product').classList.add('hidden');
+};
+
+window.editSellerProduct = (productId) => {
+    const product = globalProducts.find(p => p.id === productId);
+    if (!product) return;
+    sellerEditId = productId;
+    document.getElementById('seller-product-title').innerText = 'EDIT PRODUK';
+    document.getElementById('seller-p-name').value = product.name;
+    document.getElementById('seller-p-price').value = product.price;
+    document.getElementById('seller-p-desc').value = product.description || '';
+    document.getElementById('seller-p-stock').value = product.stock || 0;
+    
+    const container = document.getElementById('seller-image-container');
+    container.innerHTML = '';
+    if (product.images) product.images.forEach(url => createSellerImageInput(url));
+    createSellerImageInput();
+    document.getElementById('modal-seller-product').classList.remove('hidden');
+};
+
+window.saveSellerProduct = async () => {
+    const name = document.getElementById('seller-p-name').value;
+    const price = Number(document.getElementById('seller-p-price').value);
+    const desc = document.getElementById('seller-p-desc').value;
+    const stock = Number(document.getElementById('seller-p-stock').value);
+    const urls = getAllSellerImages();
+    const user = auth.currentUser;
+    
+    if (!name || !price || urls.length === 0) return alert("Lengkapi data produk!");
+    
+    const btn = document.getElementById('btn-save-seller-prod');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa fa-spinner animate-spin"></i> Menyimpan...';
+    
+    const data = {
+        name, price, description: desc, stock,
+        images: urls,
+        sellerId: user.uid,
+        sellerName: document.getElementById('user-name-display').innerText,
+        updatedAt: Date.now()
+    };
+    
+    try {
+        if (sellerEditId) {
+            await update(ref(db, `products/${sellerEditId}`), data);
+            alert("Produk berhasil diupdate!");
+        } else {
+            await push(ref(db, "products"), { ...data, createdAt: Date.now() });
+            alert("Produk berhasil ditambahkan!");
+        }
+        closeSellerProductModal();
+        refreshSellerProducts();
+    } catch (e) {
+        alert("Gagal: " + e.message);
+    }
+    
+    btn.disabled = false;
+    btn.innerHTML = 'SIMPAN';
+};
+
+window.deleteSellerProduct = async (productId) => {
+    if (!confirm("Yakin hapus produk ini?")) return;
+    await remove(ref(db, `products/${productId}`));
+    alert("Produk dihapus!");
+    refreshSellerProducts();
+};
+
+window.refreshSellerProducts = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+    const snap = await get(ref(db, 'products'));
+    const list = document.getElementById('seller-products-list');
+    if (!list) return;
+    list.innerHTML = '';
+    snap.forEach(child => {
+        const p = child.val();
+        if (p.sellerId === user.uid) {
+            list.innerHTML += `
+                <div class="bg-slate-800 p-2 rounded-lg flex justify-between items-center">
+                    <div class="flex-1">
+                        <p class="text-xs font-bold truncate">${p.name}</p>
+                        <p class="text-[8px] text-gray-400">Stok: ${p.stock || 0} | Rp ${(p.price || 0).toLocaleString()}</p>
+                    </div>
+                    <div class="flex gap-1">
+                        <button onclick="editSellerProduct('${child.key}')" class="bg-yellow-600 text-[8px] p-1.5 rounded"><i class="fa fa-edit"></i></button>
+                        <button onclick="deleteSellerProduct('${child.key}')" class="bg-red-600 text-[8px] p-1.5 rounded"><i class="fa fa-trash"></i></button>
+                    </div>
+                </div>
+            `;
+        }
+    });
+    if (list.innerHTML === '') {
+        list.innerHTML = '<p class="text-[10px] text-gray-500 text-center py-2">Belum ada produk</p>';
+    }
+};
+
+function createSellerImageInput(val = "") {
+    const cont = document.getElementById("seller-image-container");
+    if (!cont || cont.querySelectorAll("input").length >= 5) return;
+    const wrap = document.createElement("div");
+    wrap.className = "flex gap-2 items-center";
+    const input = document.createElement("input");
+    input.type = "text"; input.placeholder = "URL Gambar..."; input.value = val;
+    input.className = "flex-1 p-2 bg-slate-800 border border-slate-700 rounded-lg text-[10px]";
+    const prev = document.createElement("img");
+    prev.className = `w-8 h-8 object-contain bg-slate-900 rounded ${val ? '' : 'hidden'}`;
+    if (val) prev.src = val;
+    input.onchange = () => {
+        const url = input.value.trim();
+        if (!url) return;
+        const img = new Image();
+        img.onload = () => { prev.src = url; prev.classList.remove("hidden"); };
+        img.onerror = () => { alert("URL tidak valid!"); input.value = ""; };
+        img.src = url;
+    };
+    wrap.append(input, prev);
+    cont.appendChild(wrap);
 }
-</script>
 
+function getAllSellerImages() {
+    return Array.from(document.querySelectorAll("#seller-image-container input")).map(i => i.value.trim()).filter(v => v !== "");
+}
+
+</script>
 </body>
   </html>
