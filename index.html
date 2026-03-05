@@ -27,13 +27,68 @@
         .whatsapp-float:hover { transform: scale(1.1); background: #128C7E; }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
         .modal-content { background: white; border-radius: 12px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; margin: 20px; padding: 24px; }
-        .loading { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(0,0,0,0.1); border-radius: 50%; border-top-color: #09f; animation: spin 1s ease-in-out infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
         .toast {
             position: fixed; bottom: 20px; right: 20px; background: #333; color: white;
             padding: 12px 24px; border-radius: 8px; z-index: 2000; animation: slideInRight 0.3s;
         }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .status-badge {
+            display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+        }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-menunggu-pembayaran { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
+        .status-proses { background: #dbeafe; color: #1e40af; }
+        .status-dikirim { background: #f3e8ff; color: #6b21a8; }
+        .status-selesai { background: #d1fae5; color: #065f46; }
+        .status-ditolak { background: #fee2e2; color: #991b1b; }
+        .order-card {
+            border-left: 4px solid; transition: all 0.3s;
+        }
+        .order-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .tab-active { border-bottom: 2px solid #16a34a; color: #16a34a; font-weight: 600; }
+        .copy-btn { cursor: pointer; transition: all 0.2s; }
+        .copy-btn:hover { transform: scale(1.1); }
+        .rekening-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .konfirmasi-row {
+            background-color: #f9fafb;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            border: 1px dashed #d1d5db;
+        }
+        .btn-konfirmasi {
+            background-color: #10b981;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-konfirmasi:hover {
+            background-color: #059669;
+        }
+        .input-id {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 8px 12px;
+            width: 100%;
+            font-size: 14px;
+        }
+        .input-id:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -53,8 +108,6 @@
         const db = firebase.database();
         const storage = firebase.storage();
         const OWNER_WA = "6285187980564";
-        
-        // Anti spam: tracking IP via session
         let userSession = localStorage.getItem('sessionId') || 'session_' + Date.now() + '_' + Math.random().toString(36).substring(2);
         localStorage.setItem('sessionId', userSession);
     </script>
@@ -74,6 +127,7 @@
                 <a href="#produk" class="hover:text-green-200">Produk</a>
                 <a href="#testimoni" class="hover:text-green-200">Testimoni</a>
                 <a href="#kontak" class="hover:text-green-200">Kontak</a>
+                <a href="#cek-pesanan" class="hover:text-green-200">Cek Pesanan</a>
             </div>
             <span id="totalTerjual" class="bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-bold">
                 <i class="fas fa-chart-line mr-1"></i>0 Terjual
@@ -88,7 +142,7 @@
             <p class="text-xl">100% Alami - Tradisional - Berkhasiat</p>
             <p class="mt-4 text-sm opacity-75">📦 Gratis Ongkir • 💳 Bayar di Tempat • 🌿 Terpercaya</p>
         </div>
-        <!-- KLIK 5x DISINI (POJOK KANAN BAWAH) -->
+        <!-- KLIK 5x DISINI -->
         <div class="hidden-click-area absolute bottom-4 right-4 w-20 h-20 opacity-0 hover:opacity-20 bg-black rounded-full" id="hiddenClickArea"></div>
     </section>
 
@@ -99,8 +153,29 @@
         <div id="produkList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
     </section>
 
+    <!-- CEK PESANAN SECTION -->
+    <section id="cek-pesanan" class="bg-gray-100 py-12">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4">🔍 Cek Status Pesanan</h2>
+            <p class="text-center text-gray-600 mb-8">Masukkan ID Pesanan untuk melihat status terbaru</p>
+            
+            <div class="max-w-md mx-auto bg-white rounded-xl shadow-md p-6">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">ID Pesanan</label>
+                    <input type="text" id="cekIdPesanan" class="w-full border rounded-lg p-3" placeholder="Contoh: INV-12345678-ABCD">
+                </div>
+                <button onclick="cekPesanan()" class="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 font-semibold">
+                    <i class="fas fa-search mr-2"></i>Cek Sekarang
+                </button>
+                
+                <!-- HASIL CEK PESANAN -->
+                <div id="cekPesananResult" class="mt-6 hidden"></div>
+            </div>
+        </div>
+    </section>
+
     <!-- TESTIMONI SECTION -->
-    <section id="testimoni" class="bg-gray-100 py-12">
+    <section id="testimoni" class="bg-white py-12">
         <div class="container mx-auto px-4">
             <h2 class="text-3xl font-bold text-center mb-4">⭐ Testimoni Pembeli</h2>
             <p class="text-center text-gray-600 mb-8">Apa kata mereka yang sudah merasakan khasiatnya</p>
@@ -116,15 +191,9 @@
         <a href="https://wa.me/6285187980564" class="bg-green-500 text-white px-8 py-3 rounded-lg inline-block hover:bg-green-600 transition text-lg font-semibold" target="_blank">
             <i class="fab fa-whatsapp mr-2"></i>Chat WhatsApp
         </a>
-        <div class="mt-4">
-            <button onclick="bukaCekPesananModal()" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600 transition">
-                <i class="fas fa-search mr-2"></i>Cek Status Pesanan
-            </button>
-        </div>
     </section>
 
-    <!-- MODAL ORDER (ISI DETAIL) -->
-    <div id="orderModal" class="modal">
+    <!-- MODAL ORDER -->
         <div class="modal-content">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-xl font-bold">📋 Detail Pemesanan</h3>
@@ -152,10 +221,10 @@
                     <p class="font-semibold">Total: <span id="orderTotal" class="text-green-600">Rp 0</span></p>
                 </div>
                 
-                <!-- Anti spam: hidden field -->
                 <input type="hidden" id="orderSession" value="">
                 <input type="hidden" id="orderProdukId">
                 <input type="hidden" id="orderProdukHarga">
+                <input type="hidden" id="orderProdukNama">
                 
                 <div class="flex gap-2">
                     <button type="button" onclick="tutupOrderModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400">Batal</button>
@@ -167,25 +236,7 @@
         </div>
     </div>
 
-    <!-- MODAL CEK PESANAN -->
-    <div id="cekPesananModal" class="modal">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold">🔍 Cek Status Pesanan</h3>
-                <button onclick="tutupCekPesananModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 mb-2">Masukkan ID Pesanan</label>
-                <input type="text" id="cekIdPesanan" class="w-full border rounded-lg p-2" placeholder="Contoh: INV-12345678">
-            </div>
-            <button onclick="cekPesanan()" class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 font-semibold">
-                <i class="fas fa-search mr-1"></i>Cek Sekarang
-            </button>
-            <div id="cekPesananResult" class="mt-4 p-3 rounded-lg hidden"></div>
-        </div>
-    </div>
-
-    <!-- MODAL REVIEW (KASIH ULASAN) -->
+    <!-- MODAL REVIEW -->
     <div id="reviewModal" class="modal">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-4">
@@ -216,6 +267,77 @@
             <input type="hidden" id="reviewProductId">
             <input type="hidden" id="reviewProductName">
             <button onclick="submitReview()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold">Kirim Ulasan</button>
+        </div>
+    </div>
+
+    <!-- MODAL KONFIRMASI PEMBAYARAN DETAIL -->
+    <div id="konfirmasiDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">💰 Detail Konfirmasi Pembayaran</h3>
+                <button onclick="tutupKonfirmasiDetailModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            
+            <div id="konfirmasiDetailInfo" class="mb-4 p-3 bg-blue-50 rounded-lg"></div>
+            
+            <div class="rekening-card mb-4">
+                <p class="font-bold text-lg mb-2">🏦 Rekening Tujuan</p>
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-sm opacity-90">Bank BCA</p>
+                        <p class="font-mono text-lg">1234567890</p>
+                        <p class="text-sm">a.n. Jamu Herbal Alami</p>
+                    </div>
+                    <button onclick="copyRekening()" class="bg-white text-purple-700 px-3 py-2 rounded-lg copy-btn">
+                        <i class="fas fa-copy mr-1"></i>Copy
+                    </button>
+                </div>
+            </div>
+            
+            <form id="konfirmasiDetailForm" onsubmit="prosesKonfirmasiDetail(event)">
+                <input type="hidden" id="konfirmasiDetailOrderId">
+                <input type="hidden" id="konfirmasiDetailKode">
+                <input type="hidden" id="konfirmasiDetailTotal">
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Jumlah Transfer (Rp)</label>
+                    <input type="number" id="detailJumlahTransfer" required min="0" class="w-full border rounded-lg p-2" readonly>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Bank Asal</label>
+                    <select id="detailBankAsal" required class="w-full border rounded-lg p-2">
+                        <option value="">Pilih Bank</option>
+                        <option value="BCA">BCA</option>
+                        <option value="BNI">BNI</option>
+                        <option value="BRI">BRI</option>
+                        <option value="Mandiri">Mandiri</option>
+                        <option value="Bank Lain">Bank Lain</option>
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Nama Pengirim</label>
+                    <input type="text" id="detailNamaPengirim" required class="w-full border rounded-lg p-2">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Tanggal Transfer</label>
+                    <input type="date" id="detailTanggalTransfer" required class="w-full border rounded-lg p-2">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Bukti Transfer (opsional)</label>
+                    <input type="file" id="detailBuktiTransfer" accept="image/*" class="w-full">
+                </div>
+                
+                <div class="flex gap-2">
+                    <button type="button" onclick="tutupKonfirmasiDetailModal()" class="flex-1 bg-gray-300 py-2 rounded-lg">Batal</button>
+                    <button type="submit" class="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
+                        <i class="fas fa-check mr-2"></i>Konfirmasi Sekarang
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -265,18 +387,43 @@
                 <div id="adminProdukList" class="space-y-2 max-h-60 overflow-y-auto"></div>
             </div>
             
-            <!-- TAB PESANAN -->
+            <!-- TAB PESANAN (DENGAN KONFIRMASI LANGSUNG) -->
             <div id="tabPesanan" class="tab-content hidden">
-                <div class="mb-4 flex gap-2">
+                <div class="mb-4 flex flex-wrap gap-2">
                     <select id="filterStatus" class="border rounded-lg p-2" onchange="filterPesanan()">
                         <option value="all">Semua Status</option>
-                        <option value="pending">⏳ Pending</option>
+                        <option value="menunggu-pembayaran">💰 Menunggu Pembayaran</option>
                         <option value="proses">⚙️ Diproses</option>
                         <option value="dikirim">📦 Dikirim</option>
                         <option value="selesai">✅ Selesai</option>
                         <option value="ditolak">❌ Ditolak</option>
                     </select>
+                    <input type="text" id="searchPesanan" placeholder="Cari nama/ID..." class="border rounded-lg p-2 flex-1" onkeyup="filterPesanan()">
+                    <button onclick="exportLaporan()" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                        <i class="fas fa-download mr-2"></i>Export CSV
+                    </button>
                 </div>
+                
+                <!-- INI TEMPAT KONFIRMASI CEPAT - INPUT ID LANGSUNG -->
+                <div class="bg-blue-50 p-4 rounded-lg mb-4 border-2 border-blue-200">
+                    <h4 class="font-bold text-blue-800 mb-2 flex items-center">
+                        <i class="fas fa-money-bill-wave mr-2"></i>KONFIRMASI PEMBAYARAN INSTAN
+                    </h4>
+                    <p class="text-sm text-blue-600 mb-3">Masukkan ID Pesanan untuk konfirmasi pembayaran dan langsung ubah status menjadi DIPROSES</p>
+                    
+                    <div class="flex gap-2">
+                        <input type="text" id="instantConfirmId" placeholder="Masukkan ID Pesanan (contoh: INV-12345678-ABCD)" 
+                               class="flex-1 border rounded-lg p-3 text-sm">
+                        <button onclick="konfirmasiPembayaranInstant()" 
+                                class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold">
+                            <i class="fas fa-check-circle mr-2"></i>Konfirmasi Sekarang
+                        </button>
+                    </div>
+                    
+                    <div id="instantConfirmResult" class="mt-2 text-sm hidden"></div>
+                </div>
+                
+                <!-- LIST PESANAN -->
                 <div id="adminPesananList" class="space-y-3 max-h-96 overflow-y-auto"></div>
             </div>
             
@@ -296,6 +443,43 @@
             <div class="mt-4 pt-4 border-t">
                 <button onclick="logoutAdmin()" class="bg-red-500 text-white px-4 py-2 rounded-lg"><i class="fas fa-sign-out-alt mr-2"></i>Logout</button>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL TAMBAH/EDIT PRODUK -->
+    <div id="produkModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold" id="produkModalTitle">Tambah Produk</h3>
+                <button onclick="tutupProdukModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <form id="produkForm" onsubmit="simpanProduk(event)">
+                <input type="hidden" id="produkId">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Nama Produk</label>
+                    <input type="text" id="produkNama" required class="w-full border rounded-lg p-2">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Deskripsi</label>
+                    <textarea id="produkDeskripsi" required rows="3" class="w-full border rounded-lg p-2"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Harga (Rp)</label>
+                    <input type="number" id="produkHarga" required min="0" class="w-full border rounded-lg p-2">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Foto URL (opsional)</label>
+                    <input type="url" id="produkFoto" class="w-full border rounded-lg p-2" placeholder="https://...">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Upload Foto (alternatif)</label>
+                    <input type="file" id="produkUpload" accept="image/*" class="w-full">
+                </div>
+                <div class="flex gap-2">
+                    <button type="button" onclick="tutupProdukModal()" class="flex-1 bg-gray-300 py-2 rounded-lg">Batal</button>
+                    <button type="submit" class="flex-1 bg-green-600 text-white py-2 rounded-lg">Simpan</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -322,8 +506,8 @@
         const ADMIN_PASSWORD = "jamu123";
         let clickCount = 0;
         const CLICKS_NEEDED = 5;
-        let currentRating = 0;
-        let currentProductForOrder = null;
+        let allOrders = [];
+        let allProducts = [];
 
         // ========== UTILITY ==========
         function showToast(message, type = 'success') {
@@ -332,6 +516,11 @@
             toast.className = `toast ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
             toast.classList.remove('hidden');
             setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        function copyRekening() {
+            navigator.clipboard.writeText('1234567890 a.n. Jamu Herbal Alami (BCA)');
+            showToast('Rekening berhasil dicopy!');
         }
 
         // ========== HIDDEN CLICK ==========
@@ -344,293 +533,12 @@
             }
         });
 
-        // ========== MODAL FUNCTIONS ==========
-        function bukaOrderModal(produkId) {
-            db.ref('produk/' + produkId).once('value', (snapshot) => {
-                const p = snapshot.val();
-                currentProductForOrder = { id: produkId, ...p };
-                document.getElementById('orderProductInfo').innerHTML = `
-                    <p class="font-semibold">${p.nama}</p>
-                    <p class="text-sm text-gray-600">Harga: Rp ${Number(p.harga).toLocaleString()}</p>
-                `;
-                document.getElementById('orderProdukId').value = produkId;
-                document.getElementById('orderProdukHarga').value = p.harga;
-                document.getElementById('orderSession').value = userSession;
-                document.getElementById('orderQty').value = 1;
-                document.getElementById('orderTotal').textContent = `Rp ${p.harga.toLocaleString()}`;
-                document.getElementById('orderModal').style.display = 'flex';
-            });
-        }
-
-        function tutupOrderModal() {
-            document.getElementById('orderModal').style.display = 'none';
-        }
-
-        document.getElementById('orderQty').addEventListener('input', function() {
-            const harga = parseInt(document.getElementById('orderProdukHarga').value);
-            const qty = parseInt(this.value) || 1;
-            document.getElementById('orderTotal').textContent = `Rp ${(harga * qty).toLocaleString()}`;
-        });
-
-        function bukaCekPesananModal() {
-            document.getElementById('cekPesananModal').style.display = 'flex';
-            document.getElementById('cekIdPesanan').value = '';
-            document.getElementById('cekPesananResult').classList.add('hidden');
-        }
-
-        function tutupCekPesananModal() {
-            document.getElementById('cekPesananModal').style.display = 'none';
-        }
-
-        function bukaReviewModal(orderId, produkId, produkNama) {
-            document.getElementById('reviewOrderId').value = orderId;
-            document.getElementById('reviewProductId').value = produkId;
-            document.getElementById('reviewProductName').value = produkNama;
-            document.getElementById('reviewProductInfo').innerHTML = `
-                <p class="font-semibold">${produkNama}</p>
-                <p class="text-sm text-gray-600">ID Pesanan: ${orderId}</p>
-            `;
-            document.getElementById('reviewRating').value = '0';
-            document.getElementById('reviewText').value = '';
-            document.getElementById('reviewPhoto').value = '';
-            document.querySelectorAll('#ratingStars i').forEach(s => {
-                s.classList.remove('fa-solid', 'text-yellow-400');
-                s.classList.add('fa-regular');
-            });
-            currentRating = 0;
-            document.getElementById('reviewModal').style.display = 'flex';
-        }
-
-        function tutupReviewModal() {
-            document.getElementById('reviewModal').style.display = 'none';
-        }
-
-        // ========== RATING STARS ==========
-        document.querySelectorAll('#ratingStars i').forEach(star => {
-            star.addEventListener('click', function() {
-                const rating = parseInt(this.dataset.rating);
-                currentRating = rating;
-                document.getElementById('reviewRating').value = rating;
-                document.querySelectorAll('#ratingStars i').forEach((s, i) => {
-                    if(i < rating) {
-                        s.classList.remove('fa-regular');
-                        s.classList.add('fa-solid', 'text-yellow-400');
-                    } else {
-                        s.classList.remove('fa-solid', 'text-yellow-400');
-                        s.classList.add('fa-regular');
-                    }
-                });
-            });
-        });
-
-        // ========== SUBMIT ORDER ==========
-        function submitOrder(event) {
-            event.preventDefault();
-            
-            const produkId = document.getElementById('orderProdukId').value;
-            const nama = document.getElementById('orderNama').value.trim();
-            const wa = document.getElementById('orderWA').value.trim();
-            const alamat = document.getElementById('orderAlamat').value.trim();
-            const qty = parseInt(document.getElementById('orderQty').value);
-            const session = document.getElementById('orderSession').value;
-            
-            if(!nama || !wa || !alamat) {
-                showToast('Semua field harus diisi!', 'error');
-                return;
-            }
-            
-            // Validasi nomor WA (minimal 10 digit)
-            if(wa.replace(/[^0-9]/g, '').length < 10) {
-                showToast('Nomor WhatsApp tidak valid!', 'error');
-                return;
-            }
-            
-            db.ref('produk/' + produkId).once('value', (snapshot) => {
-                const produk = snapshot.val();
-                const kodePesanan = 'INV-' + Date.now().toString().slice(-8) + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
-                
-                // Cek anti spam: cek apakah session ini sudah order dalam 5 menit terakhir
-                db.ref('pesanan').orderByChild('session').equalTo(session).once('value', (snap) => {
-                    let recentOrder = false;
-                    const now = Date.now();
-                    snap.forEach(child => {
-                        if(now - child.val().waktu < 5 * 60 * 1000) { // 5 menit
-                            recentOrder = true;
-                        }
-                    });
-                    
-                    if(recentOrder) {
-                        showToast('Anda sudah melakukan order baru-baru ini. Tunggu 5 menit!', 'error');
-                        return;
-                    }
-                    
-                    // Simpan pesanan
-                    db.ref('pesanan').push({
-                        kode: kodePesanan,
-                        produkId: produkId,
-                        produkNama: produk.nama,
-                        produkHarga: produk.harga,
-                        nama: nama,
-                        wa: wa,
-                        alamat: alamat,
-                        jumlah: qty,
-                        total: produk.harga * qty,
-                        status: 'pending',
-                        waktu: Date.now(),
-                        session: session,
-                        dapatUlasan: false
-                    }).then(() => {
-                        showToast(`✅ Pesanan berhasil! ID: ${kodePesanan}`, 'success');
-                        tutupOrderModal();
-                        
-                        // Kirim notifikasi ke WA admin (opsional)
-                        const pesanWA = `🆕 PESANAN BARU!\nID: ${kodePesanan}\nNama: ${nama}\nProduk: ${produk.nama} x${qty}\nTotal: Rp ${(produk.harga * qty).toLocaleString()}\nCek di panel admin.`;
-                        window.open(`https://wa.me/${OWNER_WA}?text=${encodeURIComponent(pesanWA)}`, '_blank');
-                    });
-                });
-            });
-        }
-
-        // ========== CEK PESANAN ==========
-        function cekPesanan() {
-            const idPesanan = document.getElementById('cekIdPesanan').value.trim();
-            if(!idPesanan) {
-                showToast('Masukkan ID pesanan!', 'error');
-                return;
-            }
-            
-            db.ref('pesanan').orderByChild('kode').equalTo(idPesanan).once('value', (snapshot) => {
-                const data = snapshot.val();
-                const resultDiv = document.getElementById('cekPesananResult');
-                
-                if(!data) {
-                    resultDiv.innerHTML = '<p class="text-red-600">❌ ID Pesanan tidak ditemukan!</p>';
-                    resultDiv.classList.remove('hidden');
-                    return;
-                }
-                
-                Object.keys(data).forEach(key => {
-                    const p = data[key];
-                    const statusMap = {
-                        'pending': { text: '⏳ Menunggu Konfirmasi', color: 'text-yellow-600', bg: 'bg-yellow-50' },
-                        'proses': { text: '⚙️ Sedang Diproses', color: 'text-blue-600', bg: 'bg-blue-50' },
-                        'dikirim': { text: '📦 Sedang Dikirim', color: 'text-purple-600', bg: 'bg-purple-50' },
-                        'selesai': { text: '✅ Selesai', color: 'text-green-600', bg: 'bg-green-50' },
-                        'ditolak': { text: '❌ Ditolak', color: 'text-red-600', bg: 'bg-red-50' }
-                    };
-                    const status = statusMap[p.status] || { text: p.status, color: 'text-gray-600', bg: 'bg-gray-50' };
-                    
-                    let html = `
-                        <div class="${status.bg} p-4 rounded-lg">
-                            <p class="font-semibold">${p.kode}</p>
-                            <p class="text-sm">${p.produkNama} x${p.jumlah}</p>
-                            <p class="text-sm">Total: Rp ${p.total.toLocaleString()}</p>
-                            <p class="text-sm mt-2 ${status.color} font-semibold">${status.text}</p>
-                    `;
-                    
-                    if(p.status === 'selesai' && !p.dapatUlasan) {
-                        html += `<button onclick="bukaReviewModal('${key}', '${p.produkId}', '${p.produkNama}')" class="mt-3 bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600">
-                            <i class="fas fa-star mr-1"></i>Kasih Ulasan
-                        </button>`;
-                    } else if(p.status === 'selesai' && p.dapatUlasan) {
-                        html += `<p class="text-green-600 text-sm mt-2"><i class="fas fa-check-circle"></i> Terima kasih sudah memberi ulasan</p>`;
-                    }
-                    
-                    html += '</div>';
-                    resultDiv.innerHTML = html;
-                    resultDiv.classList.remove('hidden');
-                });
-            });
-        }
-
-        // ========== SUBMIT REVIEW ==========
-        function submitReview() {
-            const orderId = document.getElementById('reviewOrderId').value;
-            const produkId = document.getElementById('reviewProductId').value;
-            const produkNama = document.getElementById('reviewProductName').value;
-            const rating = document.getElementById('reviewRating').value;
-            const ulasan = document.getElementById('reviewText').value.trim();
-            
-            if(rating === '0') {
-                showToast('Pilih rating dulu!', 'error');
-                return;
-            }
-            
-            if(!ulasan) {
-                showToast('Tulis ulasan dulu!', 'error');
-                return;
-            }
-            
-            db.ref('pesanan/' + orderId).once('value', (snapshot) => {
-                const pesanan = snapshot.val();
-                
-                if(pesanan.dapatUlasan) {
-                    showToast('Pesanan ini sudah pernah diulas!', 'error');
-                    tutupReviewModal();
-                    return;
-                }
-                
-                if(pesanan.status !== 'selesai') {
-                    showToast('Pesanan harus selesai dulu untuk kasih ulasan!', 'error');
-                    tutupReviewModal();
-                    return;
-                }
-                
-                const photo = document.getElementById('reviewPhoto').files[0];
-                
-                if(photo) {
-                    const storageRef = storage.ref('testimoni/' + Date.now() + '_' + photo.name);
-                    storageRef.put(photo).then(() => {
-                        storageRef.getDownloadURL().then(url => {
-                            saveReview(orderId, produkId, produkNama, rating, ulasan, url, pesanan);
-                        });
-                    });
-                } else {
-                    saveReview(orderId, produkId, produkNama, rating, ulasan, null, pesanan);
-                }
-            });
-        }
-
-                function saveReview(orderId, produkId, produkNama, rating, ulasan, fotoUrl, pesanan) {
-            // Simpan testimoni
-            const reviewRef = db.ref('testimoni').push({
-                produkId: produkId,
-                produk: produkNama,
-                nama: pesanan.nama,
-                wa: pesanan.wa,
-                rating: parseInt(rating),
-                ulasan: ulasan,
-                foto: fotoUrl,
-                waktu: Date.now(),
-                orderId: orderId
-            });
-
-            // Update flag dapatUlasan di pesanan
-            db.ref('pesanan/' + orderId).update({
-                dapatUlasan: true
-            });
-
-            // Update ulasanCount di produk
-            db.ref('produk/' + produkId).transaction((produk) => {
-                if(produk) {
-                    produk.ulasanCount = (produk.ulasanCount || 0) + 1;
-                }
-                return produk;
-            });
-
-            showToast('✅ Terima kasih atas ulasannya!', 'success');
-            tutupReviewModal();
-            
-            // Kirim notifikasi ke admin
-            const pesanWA = `⭐ ULASAN BARU!\nDari: ${pesanan.nama}\nProduk: ${produkNama}\nRating: ${rating}/5\nUlasan: ${ulasan}`;
-            window.open(`https://wa.me/${OWNER_WA}?text=${encodeURIComponent(pesanWA)}`, '_blank');
-        }
-
         // ========== LOAD PRODUK ==========
         function loadProduk() {
             db.ref('produk').on('value', (snapshot) => {
                 const data = snapshot.val();
                 const container = document.getElementById('produkList');
+                allProducts = data ? Object.keys(data).map(key => ({id: key, ...data[key]})) : [];
                 
                 if(!data) {
                     container.innerHTML = '<p class="text-center col-span-3 text-gray-500">Belum ada produk</p>';
@@ -646,7 +554,7 @@
 
                     html += `
                         <div class="bg-white rounded-xl shadow-lg overflow-hidden product-card">
-                            <img src="${p.foto || 'https://via.placeholder.com/300'}" class="w-full h-56 object-cover">
+                                                        <img src="${p.foto || 'https://via.placeholder.com/300'}" class="w-full h-56 object-cover">
                             <div class="p-5">
                                 <h3 class="font-bold text-xl mb-2">${p.nama}</h3>
                                 <p class="text-gray-600 mb-3 text-sm">${p.deskripsi}</p>
@@ -660,20 +568,18 @@
                                     <span class="text-sm text-gray-500">(${p.ulasanCount || 0} ulasan)</span>
                                 </div>
                                 
-                                <div class="flex justify-between items-center mb-4">
-                                    <span class="text-2xl font-bold text-green-600">Rp ${Number(p.harga).toLocaleString()}</span>
-                                    <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
-                                        <i class="fas fa-shopping-bag mr-1"></i>${p.terjual || 0} terjual
-                                    </span>
-                                </div>
-                                
-                                <button onclick="bukaOrderModal('${key}')" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold">
-                                    <i class="fas fa-shopping-cart mr-1"></i>Beli Sekarang
-                                </button>
-                                
-                                <button onclick="lihatUlasan('${key}', '${p.nama}')" class="w-full mt-3 text-blue-600 text-sm hover:underline">
-                                    <i class="fas fa-comment mr-1"></i>Lihat Semua Ulasan (${p.ulasanCount || 0})
-                                </button>
+                                <<div class="flex justify-between items-center mb-4">
+    <span class="text-2xl font-bold text-green-600">Hubungi WA</span>
+    <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+        <i class="fas fa-shopping-bag mr-1"></i>${p.terjual || 0} terjual
+    </span>
+</div>
+
+<a href="https://wa.me/6285187980564?text=Halo%20kak%2C%20saya%20mau%20order%20${encodeURIComponent(p.nama)}" 
+   target="_blank" 
+   class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold text-center block">
+    <i class="fab fa-whatsapp mr-1"></i>Chat WA
+</a>
                             </div>
                         </div>
                     `;
@@ -695,7 +601,6 @@
                     return;
                 }
 
-                // Convert ke array dan reverse (yang terbaru di atas)
                 const testimonials = Object.keys(data).map(key => ({id: key, ...data[key]})).reverse();
 
                 let html = '';
@@ -733,35 +638,529 @@
                 
                 const waNumber = nomor.replace(/[^0-9]/g, '');
                 document.querySelectorAll('a[href*="wa.me"]').forEach(el => {
-                    el.href = `https://wa.me/62${waNumber.substring(1)}`;
+                    if(waNumber.startsWith('0')) {
+                        el.href = `https://wa.me/62${waNumber.substring(1)}`;
+                    } else {
+                        el.href = `https://wa.me/${waNumber}`;
+                    }
                 });
             });
         }
 
-        // ========== LIHAT ULASAN PER PRODUK ==========
-        function lihatUlasan(produkId, produkNama) {
-            db.ref('testimoni').orderByChild('produkId').equalTo(produkId).once('value', (snapshot) => {
+        // ========== MODAL ORDER ==========
+        {
+            document.getElementById('orderProductInfo').innerHTML = `
+                <p class="font-semibold">${produkNama}</p>
+                <p class="text-sm text-gray-600">Harga: Rp ${produkHarga.toLocaleString()}</p>
+            `;
+            document.getElementById('orderProdukId').value = produkId;
+            document.getElementById('orderProdukNama').value = produkNama;
+            document.getElementById('orderProdukHarga').value = produkHarga;
+            document.getElementById('orderSession').value = userSession;
+            document.getElementById('orderQty').value = 1;
+            document.getElementById('orderTotal').textContent = `Rp ${produkHarga.toLocaleString()}`;
+            document.getElementById('orderModal').style.display = 'flex';
+        }
+
+
+        document.getElementById('orderQty')?.addEventListener('input', function() {
+            const harga = parseInt(document.getElementById('orderProdukHarga').value);
+            const qty = parseInt(this.value) || 1;
+            document.getElementById('orderTotal').textContent = `Rp ${(harga * qty).toLocaleString()}`;
+        });
+
+        // ========== SUBMIT ORDER ==========
+        
+            
+            const produkId = document.getElementById('orderProdukId').value;
+            const produkNama = document.getElementById('orderProdukNama').value;
+            const nama = document.getElementById('orderNama').value.trim();
+            const wa = document.getElementById('orderWA').value.trim();
+            const alamat = document.getElementById('orderAlamat').value.trim();
+            const qty = parseInt(document.getElementById('orderQty').value);
+            const harga = parseInt(document.getElementById('orderProdukHarga').value);
+            const session = document.getElementById('orderSession').value;
+            
+            if(!nama || !wa || !alamat) {
+                showToast('Semua field harus diisi!', 'error');
+                return;
+            }
+            
+            if(wa.replace(/[^0-9]/g, '').length < 10) {
+                showToast('Nomor WhatsApp tidak valid!', 'error');
+                return;
+            }
+            
+            // Cek anti spam
+            db.ref('pesanan').orderByChild('session').equalTo(session).once('value', (snap) => {
+                let recentOrder = false;
+                const now = Date.now();
+                snap.forEach(child => {
+                    if(now - child.val().waktu < 5 * 60 * 1000) {
+                        recentOrder = true;
+                    }
+                });
+                
+                if(recentOrder) {
+                    showToast('Anda sudah melakukan order baru-baru ini. Tunggu 5 menit!', 'error');
+                    return;
+                }
+                
+                // Generate kode unik
+                const kodePesanan = 'INV-' + Date.now().toString().slice(-8) + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+                
+                // Simpan pesanan dengan status MENUNGGU PEMBAYARAN
+                db.ref('pesanan').push({
+                    kode: kodePesanan,
+                    produkId: produkId,
+                    produkNama: produkNama,
+                    produkHarga: harga,
+                    nama: nama,
+                    wa: wa,
+                    alamat: alamat,
+                    jumlah: qty,
+                    total: harga * qty,
+                    status: 'menunggu-pembayaran',
+                    waktu: Date.now(),
+                    session: session,
+                    dapatUlasan: false,
+                    riwayatStatus: [{
+                        status: 'menunggu-pembayaran',
+                        waktu: Date.now(),
+                        catatan: 'Pesanan dibuat, menunggu konfirmasi pembayaran'
+                    }]
+                }).then(() => {
+                    showToast(`✅ Pesanan berhasil! ID: ${kodePesanan}`, 'success');
+                    tutupOrderModal();
+                    
+                    // Format pesan WA dengan instruksi pembayaran
+                    const pesanWA = `🆕 *PESANAN BARU - MENUNGGU PEMBAYARAN!*\n\n` +
+                        `*ID Pesanan:* ${kodePesanan}\n` +
+                        `*Nama:* ${nama}\n` +
+                        `*No. WA:* ${wa}\n` +
+                        `*Alamat:* ${alamat}\n\n` +
+                        `*Detail Pesanan:*\n` +
+                        `📦 Produk: ${produkNama}\n` +
+                        `🔢 Jumlah: ${qty} pcs\n` +
+                        `💰 Harga: Rp ${harga.toLocaleString()}\n` +
+                        `💵 Total: Rp ${(harga * qty).toLocaleString()}\n\n` +
+                        `⏳ Status: MENUNGGU PEMBAYARAN\n\n` +
+                        `_Silakan transfer ke rekening BCA 1234567890 a.n. Jamu Herbal Alami_\n` +
+                        `_Konfirmasi pembayaran melalui WA ini dengan mengirim bukti transfer_\n\n` +
+                        `📱 *Cara Konfirmasi:*\n` +
+                        `1. Transfer sesuai total\n` +
+                        `2. Screenshot bukti transfer\n` +
+                        `3. Kirim ke nomor ini dengan menyertakan ID Pesanan`;
+                    
+                    window.open(`https://wa.me/${OWNER_WA}?text=${encodeURIComponent(pesanWA)}`, '_blank');
+                    
+                    // Reset form
+                    document.getElementById('orderNama').value = '';
+                    document.getElementById('orderWA').value = '';
+                    document.getElementById('orderAlamat').value = '';
+                }).catch(error => {
+                    showToast('Gagal memesan: ' + error.message, 'error');
+                });
+            });
+        }
+
+        // ========== CEK PESANAN ==========
+        function cekPesanan() {
+            const idPesanan = document.getElementById('cekIdPesanan').value.trim();
+            if(!idPesanan) {
+                showToast('Masukkan ID pesanan!', 'error');
+                return;
+            }
+            
+            db.ref('pesanan').orderByChild('kode').equalTo(idPesanan).once('value', (snapshot) => {
+                const data = snapshot.val();
+                const resultDiv = document.getElementById('cekPesananResult');
+                
+                if(!data) {
+                    resultDiv.innerHTML = `
+                        <div class="bg-red-50 p-4 rounded-lg text-center">
+                            <i class="fas fa-times-circle text-red-500 text-3xl mb-2"></i>
+                            <p class="text-red-600 font-semibold">❌ ID Pesanan tidak ditemukan</p>
+                            <p class="text-sm text-gray-500 mt-2">Pastikan ID pesanan benar</p>
+                        </div>
+                    `;
+                    resultDiv.classList.remove('hidden');
+                    return;
+                }
+                
+                const orderId = Object.keys(data)[0];
+                const order = data[orderId];
+                
+                const statusClass = {
+                    'menunggu-pembayaran': 'status-menunggu-pembayaran',
+                    'proses': 'status-proses',
+                    'dikirim': 'status-dikirim',
+                    'selesai': 'status-selesai',
+                    'ditolak': 'status-ditolak'
+                }[order.status] || 'status-pending';
+                
+                const statusText = {
+                    'menunggu-pembayaran': '💰 Menunggu Pembayaran',
+                    'proses': '⚙️ Sedang Diproses',
+                    'dikirim': '📦 Dalam Pengiriman',
+                    'selesai': '✅ Pesanan Selesai',
+                    'ditolak': '❌ Pesanan Ditolak'
+                }[order.status] || '⏳ ' + order.status;
+                
+                // Tampilkan info rekening kalau status menunggu pembayaran
+                let paymentInfo = '';
+                if(order.status === 'menunggu-pembayaran') {
+                    paymentInfo = `
+                        <div class="mt-4 p-3 bg-blue-50 rounded-lg">
+                            <p class="font-semibold text-blue-800 mb-2">🏦 INSTRUKSI PEMBAYARAN</p>
+                            <p class="text-sm">Transfer ke rekening:</p>
+                            <p class="font-mono font-bold">BCA 1234567890</p>
+                            <p class="text-sm">a.n. Jamu Herbal Alami</p>
+                            <p class="text-sm mt-2">Total: <span class="font-bold">Rp ${order.total.toLocaleString()}</span></p>
+                            <p class="text-xs text-gray-600 mt-2">*Konfirmasi via WhatsApp setelah transfer</p>
+                        </div>
+                    `;
+                }
+                
+                let reviewButton = '';
+                if(order.status === 'selesai' && !order.dapatUlasan) {
+                    reviewButton = `
+                        <button onclick="bukaReviewModal('${orderId}', '${order.produkId}', '${order.produkNama.replace(/'/g, "\\'")}')" 
+                                class="mt-4 w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">
+                            <i class="fas fa-star mr-2"></i>Beri Ulasan
+                        </button>
+                    `;
+                }
+                
+                resultDiv.innerHTML = `
+                    <div class="bg-white p-4 rounded-lg border-l-4 ${statusClass.split(' ')[0]}">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <p class="text-xs text-gray-500">ID PESANAN</p>
+                                <p class="font-mono font-bold">${order.kode}</p>
+                            </div>
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3 mb-3 text-sm">
+                            <div>
+                                <p class="text-gray-500">Nama</p>
+                                <p class="font-semibold">${order.nama}</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">WhatsApp</p>
+                                <p class="font-semibold">${order.wa}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <p class="text-gray-500 text-sm">Alamat</p>
+                            <p class="text-sm">${order.alamat}</p>
+                        </div>
+                        
+                        <div class="border-t pt-3">
+                            <p class="font-semibold">Detail Produk:</p>
+                            <p class="text-sm">${order.produkNama} x ${order.jumlah}</p>
+                            <p class="text-sm font-bold text-green-600 mt-1">Total: Rp ${order.total.toLocaleString()}</p>
+                        </div>
+                        
+                        ${paymentInfo}
+                        ${reviewButton}
+                        
+                        <p class="text-xs text-gray-400 mt-3">
+                            <i class="far fa-clock mr-1"></i>${new Date(order.waktu).toLocaleString('id-ID')}
+                        </p>
+                    </div>
+                `;
+                resultDiv.classList.remove('hidden');
+            });
+        }
+
+        // ========== KONFIRMASI PEMBAYARAN INSTAN ==========
+        function konfirmasiPembayaranInstant() {
+            const idPesanan = document.getElementById('instantConfirmId').value.trim();
+            const resultDiv = document.getElementById('instantConfirmResult');
+            
+            if(!idPesanan) {
+                resultDiv.innerHTML = '<p class="text-red-600 text-sm">❌ Masukkan ID pesanan!</p>';
+                resultDiv.classList.remove('hidden');
+                return;
+            }
+            
+            // Cari pesanan berdasarkan ID
+            db.ref('pesanan').orderByChild('kode').equalTo(idPesanan).once('value', (snapshot) => {
                 const data = snapshot.val();
                 
                 if(!data) {
-                    showToast('Belum ada ulasan untuk produk ini', 'error');
+                    resultDiv.innerHTML = '<p class="text-red-600 text-sm">❌ ID Pesanan tidak ditemukan!</p>';
+                    resultDiv.classList.remove('hidden');
                     return;
                 }
-
-                let pesan = `⭐ ULASAN UNTUK: ${produkNama}\n\n`;
-                let count = 0;
                 
-                Object.keys(data).forEach(key => {
-                    const t = data[key];
-                    count++;
-                    pesan += `${count}. 👤 ${t.nama}\n`;
-                    pesan += `   ⭐ ${t.rating}/5\n`;
-                    pesan += `   💬 "${t.ulasan}"\n`;
-                    pesan += `   📅 ${new Date(t.waktu).toLocaleDateString('id-ID')}\n`;
-                    pesan += `-------------------\n`;
+                const orderId = Object.keys(data)[0];
+                const order = data[orderId];
+                
+                // Cek status
+                if(order.status !== 'menunggu-pembayaran') {
+                    resultDiv.innerHTML = `<p class="text-red-600 text-sm">❌ Status pesanan bukan "Menunggu Pembayaran" (${order.status})</p>`;
+                    resultDiv.classList.remove('hidden');
+                    return;
+                }
+                
+                // Update status jadi PROSES
+                const riwayatBaru = order.riwayatStatus || [];
+                riwayatBaru.push({
+                    status: 'proses',
+                    waktu: Date.now(),
+                    catatan: 'Pembayaran dikonfirmasi via INSTAN CONFIRM'
                 });
                 
-                alert(pesan);
+                db.ref('pesanan/' + orderId).update({
+                    status: 'proses',
+                    riwayatStatus: riwayatBaru,
+                    konfirmasiPembayaran: {
+                        metode: 'Instant Confirm',
+                        waktuKonfirmasi: Date.now(),
+                        dikonfirmasiOleh: 'Admin'
+                    }
+                }).then(() => {
+                    resultDiv.innerHTML = '<p class="text-green-600 text-sm font-bold">✅ PEMBAYARAN DIKONFIRMASI! Status sekarang: DIPROSES</p>';
+                    resultDiv.classList.remove('hidden');
+                    
+                    // Kirim notifikasi WA ke pembeli
+                    const pesanWA = `✅ *PEMBAYARAN DIKONFIRMASI!*\n\n` +
+                        `Halo ${order.nama},\n` +
+                        `Pembayaran untuk pesanan *${order.kode}* sudah kami terima dan konfirmasi.\n\n` +
+                        `📦 *Status Terbaru:* DIPROSES\n` +
+                        `Kami akan segera memproses pesanan Anda.\n\n` +
+                        `Terima kasih telah berbelanja di Jamu Herbal Alami 🌿`;
+                    
+                    window.open(`https://wa.me/${order.wa.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(pesanWA)}`, '_blank');
+                    
+                    // Reset input
+                    document.getElementById('instantConfirmId').value = '';
+                    
+                    // Refresh data
+                    loadAdminPesanan();
+                    
+                    setTimeout(() => {
+                        resultDiv.classList.add('hidden');
+                    }, 5000);
+                });
+            });
+        }
+
+        // ========== MODAL KONFIRMASI DETAIL ==========
+        function bukaKonfirmasiDetailModal(orderId, kode, total) {
+            document.getElementById('konfirmasiDetailOrderId').value = orderId;
+            document.getElementById('konfirmasiDetailKode').value = kode;
+            document.getElementById('konfirmasiDetailTotal').value = total;
+            
+            document.getElementById('konfirmasiDetailInfo').innerHTML = `
+                <p class="font-semibold">Konfirmasi Pembayaran</p>
+                <p class="text-sm">ID Pesanan: <span class="font-mono">${kode}</span></p>
+                <p class="text-sm">Total: <span class="font-bold">Rp ${total.toLocaleString()}</span></p>
+            `;
+            
+            document.getElementById('detailJumlahTransfer').value = total;
+            
+            // Set default date ke hari ini
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('detailTanggalTransfer').value = today;
+            
+            document.getElementById('konfirmasiDetailModal').style.display = 'flex';
+        }
+
+        function tutupKonfirmasiDetailModal() {
+            document.getElementById('konfirmasiDetailModal').style.display = 'none';
+            document.getElementById('konfirmasiDetailForm').reset();
+        }
+
+        function prosesKonfirmasiDetail(event) {
+            event.preventDefault();
+            
+            const orderId = document.getElementById('konfirmasiDetailOrderId').value;
+            const kode = document.getElementById('konfirmasiDetailKode').value;
+            const jumlahTransfer = parseInt(document.getElementById('detailJumlahTransfer').value);
+            const bankAsal = document.getElementById('detailBankAsal').value;
+            const namaPengirim = document.getElementById('detailNamaPengirim').value.trim();
+            const tanggalTransfer = document.getElementById('detailTanggalTransfer').value;
+            const buktiFile = document.getElementById('detailBuktiTransfer').files[0];
+            
+            if(!bankAsal || !namaPengirim || !tanggalTransfer) {
+                showToast('Semua field harus diisi!', 'error');
+                return;
+            }
+            
+            // Ambil data order
+            db.ref('pesanan/' + orderId).once('value', (snap) => {
+                const order = snap.val();
+                
+                const konfirmasiData = {
+                    jumlahTransfer: jumlahTransfer,
+                    bankAsal: bankAsal,
+                    namaPengirim: namaPengirim,
+                    tanggalTransfer: tanggalTransfer,
+                    waktuKonfirmasi: Date.now(),
+                    dikonfirmasiOleh: 'Admin'
+                };
+                
+                if(buktiFile) {
+                    // Upload bukti transfer
+                    const storageRef = storage.ref('bukti-transfer/' + Date.now() + '_' + buktiFile.name);
+                    storageRef.put(buktiFile).then(snapshot => {
+                        return snapshot.ref.getDownloadURL();
+                    }).then(downloadURL => {
+                        konfirmasiData.buktiURL = downloadURL;
+                        return updatePesananSetelahKonfirmasi(orderId, konfirmasiData, order);
+                    }).catch(error => {
+                        showToast('Gagal upload bukti: ' + error.message, 'error');
+                    });
+                } else {
+                    updatePesananSetelahKonfirmasi(orderId, konfirmasiData, order);
+                }
+            });
+        }
+
+        function updatePesananSetelahKonfirmasi(orderId, konfirmasiData, order) {
+            // Update status pesanan jadi PROSES
+            const riwayatBaru = order.riwayatStatus || [];
+            riwayatBaru.push({
+                status: 'proses',
+                waktu: Date.now(),
+                catatan: `Pembayaran dikonfirmasi - Transfer dari ${konfirmasiData.namaPengirim} (${konfirmasiData.bankAsal}) Rp ${konfirmasiData.jumlahTransfer.toLocaleString()}`
+            });
+            
+            return db.ref('pesanan/' + orderId).update({
+                status: 'proses',
+                riwayatStatus: riwayatBaru,
+                konfirmasiPembayaran: konfirmasiData,
+                waktuKonfirmasi: Date.now()
+            }).then(() => {
+                showToast('✅ Pembayaran dikonfirmasi! Pesanan sekarang DIPROSES', 'success');
+                tutupKonfirmasiDetailModal();
+                
+                // Kirim notifikasi WA ke pembeli
+                const pesanWA = `✅ *PEMBAYARAN DIKONFIRMASI!*\n\n` +
+                    `Halo ${order.nama},\n` +
+                    `Pembayaran untuk pesanan *${order.kode}* sudah kami terima dan konfirmasi.\n\n` +
+                    `📦 *Status Terbaru:* DIPROSES\n` +
+                    `Kami akan segera memproses pesanan Anda.\n\n` +
+                    `Terima kasih telah berbelanja di Jamu Herbal Alami 🌿`;
+                
+                window.open(`https://wa.me/${order.wa.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(pesanWA)}`, '_blank');
+                
+                // Refresh data
+                loadAdminPesanan();
+            });
+        }
+
+        // ========== MODAL REVIEW ==========
+        function bukaReviewModal(orderId, produkId, produkNama) {
+            document.getElementById('reviewOrderId').value = orderId;
+            document.getElementById('reviewProductId').value = produkId;
+            document.getElementById('reviewProductName').value = produkNama;
+            document.getElementById('reviewProductInfo').innerHTML = `
+                <p class="font-semibold">${produkNama}</p>
+                <p class="text-sm text-gray-600">Kasih rating & ulasan untuk produk ini</p>
+            `;
+            document.getElementById('reviewRating').value = 0;
+            document.getElementById('reviewText').value = '';
+            document.getElementById('reviewPhoto').value = '';
+            
+            // Reset stars
+            document.querySelectorAll('#ratingStars i').forEach(star => {
+                star.className = 'fa-regular fa-star cursor-pointer hover:text-yellow-400';
+            });
+            
+            document.getElementById('reviewModal').style.display = 'flex';
+        }
+
+        function tutupReviewModal() {
+            document.getElementById('reviewModal').style.display = 'none';
+        }
+
+        // Rating stars
+        document.querySelectorAll('#ratingStars i').forEach(star => {
+            star.addEventListener('click', function() {
+                const rating = parseInt(this.dataset.rating);
+                document.getElementById('reviewRating').value = rating;
+                
+                document.querySelectorAll('#ratingStars i').forEach((s, index) => {
+                    if(index < rating) {
+                        s.className = 'fa-solid fa-star text-yellow-400 cursor-pointer';
+                    } else {
+                        s.className = 'fa-regular fa-star cursor-pointer hover:text-yellow-400';
+                    }
+                });
+            });
+        });
+
+        // ========== SUBMIT REVIEW ==========
+        function submitReview() {
+            const orderId = document.getElementById('reviewOrderId').value;
+            const produkId = document.getElementById('reviewProductId').value;
+            const produkNama = document.getElementById('reviewProductName').value;
+            const rating = parseInt(document.getElementById('reviewRating').value);
+            const ulasan = document.getElementById('reviewText').value.trim();
+            const photoFile = document.getElementById('reviewPhoto').files[0];
+            
+            if(rating === 0) {
+                showToast('Pilih rating dulu!', 'error');
+                return;
+            }
+            
+            if(!ulasan) {
+                showToast('Tulis ulasan dulu!', 'error');
+                return;
+            }
+            
+            // Ambil data order buat dapetin nama
+            db.ref('pesanan/' + orderId).once('value', (snap) => {
+                const order = snap.val();
+                if(!order) {
+                    showToast('Data pesanan tidak ditemukan!', 'error');
+                    return;
+                }
+                
+                const reviewData = {
+                    nama: order.nama,
+                    produk: produkNama,
+                    rating: rating,
+                    ulasan: ulasan,
+                    waktu: Date.now(),
+                    foto: null
+                };
+                
+                if(photoFile) {
+                    // Upload foto ke storage
+                    const storageRef = storage.ref('testimoni/' + Date.now() + '_' + photoFile.name);
+                    storageRef.put(photoFile).then(snapshot => {
+                        return snapshot.ref.getDownloadURL();
+                    }).then(downloadURL => {
+                        reviewData.foto = downloadURL;
+                        return simpanReview(reviewData, orderId, produkId);
+                    }).catch(error => {
+                        showToast('Gagal upload foto: ' + error.message, 'error');
+                    });
+                } else {
+                    simpanReview(reviewData, orderId, produkId);
+                }
+            });
+        }
+        
+        function simpanReview(reviewData, orderId, produkId) {
+            db.ref('testimoni').push(reviewData).then(() => {
+                // Tandai pesanan sudah dapat ulasan
+                db.ref('pesanan/' + orderId).update({ dapatUlasan: true });
+                
+                // Update count ulasan di produk
+                db.ref('produk/' + produkId + '/ulasanCount').transaction(current => (current || 0) + 1);
+                
+                showToast('✅ Terima kasih atas ulasannya!', 'success');
+                tutupReviewModal();
+            }).catch(error => {
+                showToast('Gagal menyimpan ulasan: ' + error.message, 'error');
             });
         }
 
@@ -777,9 +1176,9 @@
         }
 
         function cekPassword() {
-            if(document.getElementById('adminPassword').value === ADMIN_PASSWORD) {
+            const pwd = document.getElementById('adminPassword').value;
+            if(pwd === ADMIN_PASSWORD) {
                 tutupLoginModal();
-                document.getElementById('hiddenAdminButton').classList.add('hidden');
                 bukaAdminPanel();
             } else {
                 document.getElementById('passwordError').classList.remove('hidden');
@@ -789,7 +1188,6 @@
         function bukaAdminPanel() {
             document.getElementById('adminPanelModal').style.display = 'flex';
             loadAdminData();
-            loadStats();
         }
 
         function tutupAdminPanel() {
@@ -798,23 +1196,55 @@
 
         function logoutAdmin() {
             tutupAdminPanel();
-            clickCount = 0;
+            document.getElementById('hiddenAdminButton').classList.add('hidden');
+            showToast('👋 Logout berhasil');
         }
 
         function switchTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('hidden');
-            
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('text-green-600', 'border-green-600');
+                btn.classList.remove('text-green-600', 'border-b-2', 'border-green-600');
                 btn.classList.add('text-gray-500');
             });
-            event.target.classList.remove('text-gray-500');
-            event.target.classList.add('text-green-600', 'border-green-600');
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('text-green-600', 'border-b-2', 'border-green-600');
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('hidden');
         }
 
         function loadAdminData() {
-            // Load produk
+            // Statistik
+            db.ref('produk').once('value', snap => {
+                const produk = snap.val();
+                document.getElementById('statProduk').textContent = produk ? Object.keys(produk).length : 0;
+            });
+            
+            db.ref('pesanan').once('value', snap => {
+                const pesanan = snap.val();
+                document.getElementById('statPesanan').textContent = pesanan ? Object.keys(pesanan).length : 0;
+                
+                // Hitung total terjual
+                let totalTerjual = 0;
+                Object.keys(pesanan || {}).forEach(key => {
+                    if(pesanan[key].status === 'selesai') {
+                        totalTerjual += pesanan[key].jumlah || 0;
+                    }
+                });
+                document.getElementById('statTerjual').textContent = totalTerjual;
+            });
+            
+            db.ref('testimoni').once('value', snap => {
+                const testimoni = snap.val();
+                document.getElementById('statTestimoni').textContent = testimoni ? Object.keys(testimoni).length : 0;
+            });
+            
+            loadAdminProduk();
+            loadAdminPesanan();
+            loadAdminTestimoni();
+        }
+
+        function loadAdminProduk() {
             db.ref('produk').on('value', (snapshot) => {
                 const data = snapshot.val();
                 const container = document.getElementById('adminProdukList');
@@ -823,21 +1253,21 @@
                     container.innerHTML = '<p class="text-gray-500">Belum ada produk</p>';
                     return;
                 }
-
+                
                 let html = '';
                 Object.keys(data).forEach(key => {
                     const p = data[key];
                     html += `
-                        <div class="bg-gray-50 p-4 rounded-lg flex justify-between items-center">
+                        <div class="bg-gray-50 p-3 rounded-lg flex justify-between items-center">
                             <div>
                                 <p class="font-semibold">${p.nama}</p>
-                                <p class="text-sm text-gray-600">Rp ${Number(p.harga).toLocaleString()} | Terjual: ${p.terjual || 0} | Ulasan: ${p.ulasanCount || 0}</p>
+                                <p class="text-sm text-gray-600">${p.harga === 'Hubungi WA' ? '💰 Hubungi WA' : 'Rp ' + p.harga.toLocaleString()} | Terjual: ${p.terjual || 0}</p>
                             </div>
                             <div>
-                                <button onclick="editProduk('${key}')" class="text-blue-500 mr-2">
+                                <button onclick="editProduk('${key}')" class="text-blue-600 hover:text-blue-800 mr-2">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button onclick="hapusProduk('${key}')" class="text-red-500">
+                                <button onclick="hapusProduk('${key}')" class="text-red-600 hover:text-red-800">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -846,15 +1276,223 @@
                 });
                 container.innerHTML = html;
             });
+        }
 
-            // Load pesanan
+        function loadAdminPesanan() {
             db.ref('pesanan').orderByChild('waktu').on('value', (snapshot) => {
                 const data = snapshot.val();
-                filterPesanan(data);
+                if(!data) {
+                    document.getElementById('adminPesananList').innerHTML = '<p class="text-gray-500">Belum ada pesanan</p>';
+                    return;
+                }
+                
+                allOrders = Object.keys(data).map(key => ({id: key, ...data[key]})).reverse();
+                filterPesanan();
             });
+        }
 
-            // Load testimoni
-            db.ref('testimoni').on('value', (snapshot) => {
+        function filterPesanan() {
+            const status = document.getElementById('filterStatus').value;
+            const search = document.getElementById('searchPesanan')?.value.toLowerCase() || '';
+            
+            let filtered = allOrders;
+            
+            if(status !== 'all') {
+                filtered = filtered.filter(o => o.status === status);
+            }
+            
+            if(search) {
+                filtered = filtered.filter(o => 
+                    o.nama.toLowerCase().includes(search) || 
+                    o.kode.toLowerCase().includes(search) ||
+                    o.wa.includes(search)
+                );
+            }
+            
+            const container = document.getElementById('adminPesananList');
+            let html = '';
+            
+            filtered.forEach(order => {
+                const statusClass = {
+                    'menunggu-pembayaran': 'status-menunggu-pembayaran',
+                    'proses': 'status-proses',
+                    'dikirim': 'status-dikirim',
+                    'selesai': 'status-selesai',
+                    'ditolak': 'status-ditolak'
+                }[order.status] || 'status-pending';
+                
+                const statusText = {
+                    'menunggu-pembayaran': '💰 Menunggu Pembayaran',
+                    'proses': '⚙️ Diproses',
+                    'dikirim': '📦 Dikirim',
+                    'selesai': '✅ Selesai',
+                    'ditolak': '❌ Ditolak'
+                }[order.status] || order.status;
+                
+                // Tombol konfirmasi khusus untuk status menunggu-pembayaran
+                const confirmButton = order.status === 'menunggu-pembayaran' ? 
+                    `<button onclick="bukaKonfirmasiDetailModal('${order.id}', '${order.kode}', ${order.total})" class="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700 mr-2">
+                        <i class="fas fa-check mr-1"></i>Konfirmasi Detail
+                    </button>` : '';
+                
+                // Tampilkan info konfirmasi kalau ada
+                let confirmInfo = '';
+                if(order.konfirmasiPembayaran) {
+                    confirmInfo = `
+                        <div class="mt-2 text-xs bg-green-50 p-2 rounded">
+                            <p class="font-semibold text-green-700">✓ Dikonfirmasi: ${new Date(order.konfirmasiPembayaran.waktuKonfirmasi).toLocaleString('id-ID')}</p>
+                            <p>Pengirim: ${order.konfirmasiPembayaran.namaPengirim || '-'} (${order.konfirmasiPembayaran.bankAsal || '-'})</p>
+                        </div>
+                    `;
+                }
+                
+                html += `
+                    <div class="bg-white p-4 rounded-lg shadow order-card" style="border-left-color: ${
+                        order.status === 'menunggu-pembayaran' ? '#f59e0b' :
+                                                order.status === 'proses' ? '#3b82f6' : 
+                        order.status === 'dikirim' ? '#8b5cf6' : 
+                        order.status === 'selesai' ? '#10b981' : '#ef4444'
+                    }">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p class="font-mono text-sm font-bold">${order.kode}</p>
+                                <p class="font-semibold">${order.nama}</p>
+                                <p class="text-xs text-gray-500">${order.wa}</p>
+                            </div>
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </div>
+                        
+                        <p class="text-sm mb-1">${order.produkNama} x ${order.jumlah}</p>
+                        <p class="text-sm font-bold text-green-600 mb-2">Rp ${order.total.toLocaleString()}</p>
+                        
+                        ${confirmInfo}
+                        
+                        <div class="flex gap-2 mt-2 items-center flex-wrap">
+                            ${confirmButton}
+                            
+                            <select onchange="ubahStatusPesanan('${order.id}', this.value)" class="text-sm border rounded p-1">
+                                <option value="menunggu-pembayaran" ${order.status === 'menunggu-pembayaran' ? 'selected' : ''}>💰 Menunggu Bayar</option>
+                                <option value="proses" ${order.status === 'proses' ? 'selected' : ''}>⚙️ Diproses</option>
+                                <option value="dikirim" ${order.status === 'dikirim' ? 'selected' : ''}>📦 Dikirim</option>
+                                <option value="selesai" ${order.status === 'selesai' ? 'selected' : ''}>✅ Selesai</option>
+                                <option value="ditolak" ${order.status === 'ditolak' ? 'selected' : ''}>❌ Ditolak</option>
+                            </select>
+                            
+                            <button onclick="lihatRiwayat('${order.id}')" class="text-blue-600 hover:text-blue-800 text-sm" title="Lihat Riwayat">
+                                <i class="fas fa-history"></i>
+                            </button>
+                            
+                            <button onclick="hapusPesanan('${order.id}')" class="text-red-600 hover:text-red-800 ml-auto">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        
+                        <p class="text-xs text-gray-400 mt-2">
+                            <i class="far fa-clock mr-1"></i>${new Date(order.waktu).toLocaleString('id-ID')}
+                        </p>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html || '<p class="text-gray-500">Tidak ada pesanan</p>';
+        }
+
+        function ubahStatusPesanan(id, status) {
+            db.ref('pesanan/' + id).once('value', snap => {
+                const order = snap.val();
+                const riwayatBaru = order.riwayatStatus || [];
+                riwayatBaru.push({
+                    status: status,
+                    waktu: Date.now(),
+                    catatan: `Status diubah dari ${order.status} ke ${status} oleh Admin`
+                });
+                
+                db.ref('pesanan/' + id).update({ 
+                    status: status,
+                    riwayatStatus: riwayatBaru
+                }).then(() => {
+                    showToast(`✅ Status pesanan diubah ke ${status}`);
+                    
+                    // Kalau status selesai, tambah jumlah terjual
+                    if(status === 'selesai') {
+                        db.ref('pesanan/' + id).once('value', snap => {
+                            const order = snap.val();
+                            db.ref('produk/' + order.produkId + '/terjual').transaction(current => (current || 0) + order.jumlah);
+                        });
+                        
+                        // Kirim notifikasi WA ke pembeli
+                        const pesanWA = `✅ *PESANAN SELESAI!*\n\n` +
+                            `Halo ${order.nama},\n` +
+                            `Pesanan *${order.kode}* telah selesai.\n\n` +
+                            `Terima kasih telah berbelanja di Jamu Herbal Alami 🌿\n` +
+                            `Jangan lupa kasih ulasan ya!`;
+                        
+                        window.open(`https://wa.me/${order.wa.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(pesanWA)}`, '_blank');
+                    }
+                    
+                    // Refresh data
+                    loadAdminPesanan();
+                });
+            });
+        }
+
+        function hapusPesanan(id) {
+            if(confirm('Yakin mau hapus pesanan ini?')) {
+                db.ref('pesanan/' + id).remove().then(() => {
+                    showToast('✅ Pesanan dihapus');
+                    loadAdminPesanan();
+                });
+            }
+        }
+
+        function lihatRiwayat(id) {
+            db.ref('pesanan/' + id).once('value', snap => {
+                const order = snap.val();
+                let riwayatHtml = '<div class="p-2">';
+                
+                if(order.riwayatStatus && order.riwayatStatus.length > 0) {
+                    order.riwayatStatus.forEach(r => {
+                        const statusText = {
+                            'menunggu-pembayaran': '💰 Menunggu Pembayaran',
+                            'proses': '⚙️ Diproses',
+                            'dikirim': '📦 Dikirim',
+                            'selesai': '✅ Selesai',
+                            'ditolak': '❌ Ditolak'
+                        }[r.status] || r.status;
+                        
+                        riwayatHtml += `
+                            <div class="border-l-2 border-green-500 pl-3 py-2 mb-2">
+                                <p class="text-sm font-semibold">${statusText}</p>
+                                <p class="text-xs text-gray-600">${r.catatan || ''}</p>
+                                <p class="text-xs text-gray-400">${new Date(r.waktu).toLocaleString('id-ID')}</p>
+                            </div>
+                        `;
+                    });
+                } else {
+                    riwayatHtml += '<p class="text-gray-500">Belum ada riwayat</p>';
+                }
+                
+                riwayatHtml += '</div>';
+                
+                // Tampilkan dalam modal sederhana
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                modal.innerHTML = `
+                    <div class="bg-white rounded-lg p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold">📋 Riwayat Pesanan ${order.kode}</h3>
+                            <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                        </div>
+                        ${riwayatHtml}
+                        <button onclick="this.closest('.fixed').remove()" class="w-full mt-4 bg-gray-200 py-2 rounded-lg">Tutup</button>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            });
+        }
+
+        function loadAdminTestimoni() {
+            db.ref('testimoni').orderByChild('waktu').on('value', (snapshot) => {
                 const data = snapshot.val();
                 const container = document.getElementById('adminTestimoniList');
                 
@@ -862,18 +1500,24 @@
                     container.innerHTML = '<p class="text-gray-500">Belum ada testimoni</p>';
                     return;
                 }
-
+                
                 let html = '';
-                Object.keys(data).forEach(key => {
+                Object.keys(data).reverse().forEach(key => {
                     const t = data[key];
                     html += `
-                        <div class="bg-gray-50 p-4 rounded-lg flex justify-between items-center">
+                        <div class="bg-gray-50 p-3 rounded-lg flex justify-between items-start">
                             <div>
                                 <p class="font-semibold">${t.nama}</p>
-                                <p class="text-sm text-gray-600">${t.ulasan.substring(0,50)}...</p>
-                                <p class="text-xs text-gray-400">Produk: ${t.produk || '-'} | Rating: ${t.rating}/5</p>
+                                <div class="flex text-yellow-400 text-xs mb-1">
+                                    ${Array(5).fill(0).map((_, i) => 
+                                        `<i class="fa-${i < t.rating ? 'solid' : 'regular'} fa-star"></i>`
+                                    ).join('')}
+                                </div>
+                                <p class="text-sm">${t.ulasan}</p>
+                                <p class="text-xs text-gray-500 mt-1">${t.produk}</p>
+                                <p class="text-xs text-gray-400">${new Date(t.waktu).toLocaleString('id-ID')}</p>
                             </div>
-                            <button onclick="hapusTestimoni('${key}')" class="text-red-500">
+                            <button onclick="hapusTestimoni('${key}')" class="text-red-600 hover:text-red-800">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -883,190 +1527,188 @@
             });
         }
 
-        function filterPesanan(data) {
-            const filter = document.getElementById('filterStatus').value;
-            const container = document.getElementById('adminPesananList');
-            
-            if(!data) {
-                container.innerHTML = '<p class="text-gray-500">Belum ada pesanan</p>';
-                return;
-            }
-
-            let html = '';
-            let hasData = false;
-            
-            // Urutkan dari yang terbaru
-            const sortedKeys = Object.keys(data).sort((a, b) => data[b].waktu - data[a].waktu);
-            
-            sortedKeys.forEach(key => {
-                const p = data[key];
-                if(filter === 'all' || p.status === filter) {
-                    hasData = true;
-                    const waktu = new Date(p.waktu).toLocaleString('id-ID');
-                    
-                    const statusColors = {
-                        'pending': { bg: 'bg-yellow-50', border: 'border-yellow-500', text: 'text-yellow-800', badge: 'bg-yellow-100' },
-                        'proses': { bg: 'bg-blue-50', border: 'border-blue-500', text: 'text-blue-800', badge: 'bg-blue-100' },
-                        'dikirim': { bg: 'bg-purple-50', border: 'border-purple-500', text: 'text-purple-800', badge: 'bg-purple-100' },
-                        'selesai': { bg: 'bg-green-50', border: 'border-green-500', text: 'text-green-800', badge: 'bg-green-100' },
-                        'ditolak': { bg: 'bg-red-50', border: 'border-red-500', text: 'text-red-800', badge: 'bg-red-100' }
-                    };
-                    
-                    const colors = statusColors[p.status] || { bg: 'bg-gray-50', border: 'border-gray-500', text: 'text-gray-800', badge: 'bg-gray-100' };
-                    
-                    html += `
-                        <div class="${colors.bg} p-4 rounded-lg border-l-4 ${colors.border}">
-                            <div class="flex flex-col md:flex-row justify-between items-start gap-4">
-                                <div class="flex-1">
-                                    <div class="flex items-center gap-2 mb-2">
-                                        <span class="font-mono text-sm bg-gray-200 px-2 py-1 rounded">${p.kode}</span>
-                                        <span class="px-2 py-1 rounded text-xs font-semibold ${colors.badge} ${colors.text}">
-                                            ${p.status.toUpperCase()}
-                                        </span>
-                                    </div>
-                                    <p class="font-semibold">${p.produkNama} x${p.jumlah}</p>
-                                    <p class="text-sm">👤 ${p.nama}</p>
-                                    <p class="text-sm">📞 ${p.wa}</p>
-                                    <p class="text-sm">📍 ${p.alamat.substring(0,50)}${p.alamat.length > 50 ? '...' : ''}</p>
-                                    <p class="text-sm font-semibold mt-2">💰 Rp ${p.total.toLocaleString()}</p>
-                                    <p class="text-xs text-gray-400 mt-1">${waktu}</p>
-                                </div>
-                                <div class="flex flex-col gap-2 w-full md:w-48">
-                                    <select onchange="updateStatusPesanan('${key}', this.value)" class="border rounded p-2 text-sm">
-                                        <option value="pending" ${p.status === 'pending' ? 'selected' : ''}>⏳ Pending</option>
-                                        <option value="proses" ${p.status === 'proses' ? 'selected' : ''}>⚙️ Diproses</option>
-                                        <option value="dikirim" ${p.status === 'dikirim' ? 'selected' : ''}>📦 Dikirim</option>
-                                        <option value="selesai" ${p.status === 'selesai' ? 'selected' : ''}>✅ Selesai</option>
-                                        <option value="ditolak" ${p.status === 'ditolak' ? 'selected' : ''}>❌ Ditolak</option>
-                                    </select>
-                                    
-                                    <a href="https://wa.me/${p.wa.replace(/[^0-9]/g, '')}" target="_blank" class="bg-green-500 text-white text-center px-3 py-1 rounded text-sm hover:bg-green-600">
-                                        <i class="fab fa-whatsapp mr-1"></i>Chat
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-            
-            container.innerHTML = html || '<p class="text-gray-500">Tidak ada pesanan dengan status tersebut</p>';
-        }
-
-        function updateStatusPesanan(id, status) {
-            db.ref('pesanan/' + id).update({ status: status });
-            
-            // Kalau status selesai, tambah counter terjual
-            if(status === 'selesai') {
-                db.ref('pesanan/' + id).once('value', (snapshot) => {
-                    const p = snapshot.val();
-                    db.ref('produk/' + p.produkId).transaction((produk) => {
-                        if(produk) {
-                            produk.terjual = (produk.terjual || 0) + p.jumlah;
-                        }
-                        return produk;
-                    });
-                    
-                    // Kirim notifikasi ke customer
-                    const pesanWA = `✅ Halo ${p.nama}, pesanan kamu dengan ID ${p.kode} sudah SELESAI. Terima kasih sudah berbelanja! 🌿\n\nKasih ulasan di website kami ya!`;
-                    window.open(`https://wa.me/${p.wa.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(pesanWA)}`, '_blank');
+        function hapusTestimoni(id) {
+            if(confirm('Yakin mau hapus testimoni ini?')) {
+                db.ref('testimoni/' + id).remove().then(() => {
+                    showToast('✅ Testimoni dihapus');
                 });
             }
-            
-            showToast(`Status pesanan diupdate ke ${status}`, 'success');
         }
 
-        // ========== ADMIN CRUD ==========
+        // ========== PRODUK MODAL ==========
         function tambahProduk() {
-            const nama = prompt("Nama produk:");
-            if(!nama) return;
-            
-            const harga = prompt("Harga produk (angka saja):");
-            if(!harga) return;
-            
-            const deskripsi = prompt("Deskripsi produk:");
-            if(!deskripsi) return;
-            
-            const foto = prompt("URL foto produk (opsional):");
-
-            db.ref('produk').push({
-                nama: nama,
-                harga: parseInt(harga),
-                deskripsi: deskripsi,
-                foto: foto || 'https://via.placeholder.com/300',
-                terjual: 0,
-                ulasanCount: 0
-            }).then(() => showToast('✅ Produk ditambahkan!', 'success'));
+            document.getElementById('produkModalTitle').textContent = 'Tambah Produk';
+            document.getElementById('produkId').value = '';
+            document.getElementById('produkNama').value = '';
+            document.getElementById('produkDeskripsi').value = '';
+            document.getElementById('produkHarga').value = '';
+            document.getElementById('produkFoto').value = '';
+            document.getElementById('produkUpload').value = '';
+            document.getElementById('produkModal').style.display = 'flex';
         }
 
         function editProduk(id) {
-            db.ref('produk/' + id).once('value', (snapshot) => {
-                const p = snapshot.val();
-                
-                const nama = prompt("Nama produk:", p.nama);
-                if(!nama) return;
-                
-                const harga = prompt("Harga produk:", p.harga);
-                if(!harga) return;
-                
-                const deskripsi = prompt("Deskripsi:", p.deskripsi);
-                if(!deskripsi) return;
-                
-                const foto = prompt("URL foto:", p.foto);
-
-                db.ref('produk/' + id).update({
-                    nama: nama,
-                    harga: parseInt(harga),
-                    deskripsi: deskripsi,
-                    foto: foto || p.foto
-                }).then(() => showToast('✅ Produk diupdate!', 'success'));
+            db.ref('produk/' + id).once('value', snap => {
+                const p = snap.val();
+                document.getElementById('produkModalTitle').textContent = 'Edit Produk';
+                document.getElementById('produkId').value = id;
+                document.getElementById('produkNama').value = p.nama;
+                document.getElementById('produkDeskripsi').value = p.deskripsi;
+                document.getElementById('produkHarga').value = p.harga || 'Hubungi WA';
+                document.getElementById('produkFoto').value = p.foto || '';
+                document.getElementById('produkUpload').value = '';
+                document.getElementById('produkModal').style.display = 'flex';
             });
         }
 
-        function hapusProduk(id) {
-            if(confirm("Yakin hapus produk?")) {
-                db.ref('produk/' + id).remove().then(() => showToast('✅ Produk dihapus!', 'success'));
+        function tutupProdukModal() {
+            document.getElementById('produkModal').style.display = 'none';
+        }
+
+        function simpanProduk(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('produkId').value;
+            const nama = document.getElementById('produkNama').value;
+            const deskripsi = document.getElementById('produkDeskripsi').value;
+            const hargaInput = document.getElementById('produkHarga').value;
+const harga = hargaInput === 'Hubungi WA' ? 'Hubungi WA' : parseInt(hargaInput);
+            const foto = document.getElementById('produkFoto').value;
+            const file = document.getElementById('produkUpload').files[0];
+            
+            const produkData = {
+                nama: nama,
+                deskripsi: deskripsi,
+                harga: harga,
+                terjual: 0,
+                ulasanCount: 0
+            };
+            
+            if(foto) produkData.foto = foto;
+            
+            if(file) {
+                // Upload file dulu
+                const storageRef = storage.ref('produk/' + Date.now() + '_' + file.name);
+                storageRef.put(file).then(snapshot => {
+                    return snapshot.ref.getDownloadURL();
+                }).then(downloadURL => {
+                    produkData.foto = downloadURL;
+                    return simpanProdukKeDB(id, produkData);
+                }).catch(error => {
+                    showToast('Gagal upload: ' + error.message, 'error');
+                });
+            } else {
+                simpanProdukKeDB(id, produkData);
+            }
+        }
+        
+        function simpanProdukKeDB(id, data) {
+            if(id) {
+                return db.ref('produk/' + id).update(data).then(() => {
+                    showToast('✅ Produk diperbarui');
+                    tutupProdukModal();
+                });
+            } else {
+                return db.ref('produk').push(data).then(() => {
+                    showToast('✅ Produk ditambahkan');
+                    tutupProdukModal();
+                });
             }
         }
 
-        function hapusTestimoni(id) {
-            if(confirm("Yakin hapus testimoni?")) {
-                db.ref('testimoni/' + id).remove().then(() => showToast('✅ Testimoni dihapus!', 'success'));
+        function hapusProduk(id) {
+            if(confirm('Yakin mau hapus produk ini?')) {
+                db.ref('produk/' + id).remove().then(() => {
+                    showToast('✅ Produk dihapus');
+                });
             }
         }
 
         function simpanPengaturan() {
             const nomor = document.getElementById('editNomor').value;
-            db.ref('pengaturan').set({ nomor: nomor }).then(() => {
-                showToast('✅ Pengaturan disimpan!', 'success');
+            db.ref('pengaturan/nomor').set(nomor).then(() => {
+                showToast('✅ Nomor WhatsApp diperbarui');
             });
         }
 
-        function loadStats() {
-            db.ref('produk').once('value', (s) => { 
-                document.getElementById('statProduk').textContent = s.numChildren(); 
-            });
-            
-            db.ref('pesanan').once('value', (s) => { 
-                document.getElementById('statPesanan').textContent = s.numChildren();
-                let total = 0;
-                s.forEach(c => { 
-                    if(c.val().status === 'selesai') {
-                        total += c.val().jumlah || 0; 
-                    }
+        // ========== EXPORT LAPORAN ==========
+        function exportLaporan() {
+            db.ref('pesanan').once('value', snap => {
+                const orders = snap.val();
+                if(!orders) {
+                    showToast('Tidak ada data untuk diexport', 'error');
+                    return;
+                }
+                
+                let csv = 'Kode,Nama,WhatsApp,Produk,Jumlah,Total,Status,Waktu\n';
+                
+                Object.keys(orders).forEach(key => {
+                    const o = orders[key];
+                    csv += `"${o.kode}","${o.nama}","${o.wa}","${o.produkNama}",${o.jumlah},${o.total},"${o.status}","${new Date(o.waktu).toLocaleString('id-ID')}"\n`;
                 });
-                document.getElementById('statTerjual').textContent = total;
-            });
-            
-            db.ref('testimoni').once('value', (s) => { 
-                document.getElementById('statTestimoni').textContent = s.numChildren(); 
+                
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'laporan-pesanan-' + new Date().toISOString().slice(0,10) + '.csv';
+                a.click();
+                
+                showToast('✅ Laporan diexport');
             });
         }
 
         // ========== INIT ==========
-        loadProduk();
-        loadTestimoni();
-        loadNomor();
+        window.onload = function() {
+            loadProduk();
+            loadTestimoni();
+            loadNomor();
+            
+            // Auto cek kalau ada parameter ID di URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('order');
+            if(orderId) {
+                document.getElementById('cekIdPesanan').value = orderId;
+                cekPesanan();
+            }
+            
+            console.log('🌿 Jamu Herbal Alami - Siap digunakan!');
+        };
     </script>
+
+    <!-- TOMBOL CEPAT KONFIRMASI DI HALAMAN UTAMA (UNTUK ADMIN) -->
+    <div id="quickConfirmFloating" class="fixed bottom-6 left-24 hidden z-50 admin-button-appear">
+        <button onclick="document.getElementById('instantConfirmId').focus(); document.getElementById('adminPanelModal').style.display='flex'; switchTab('pesanan');" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 hover:bg-blue-700">
+            <i class="fas fa-money-bill-wave"></i> Konfirmasi Bayar
+        </button>
+    </div>
+
+    <script>
+        // Tampilkan tombol quick confirm kalau admin panel aktif
+        document.getElementById('hiddenClickArea').addEventListener('click', function() {
+            clickCount++;
+            if(clickCount >= CLICKS_NEEDED) {
+                document.getElementById('hiddenAdminButton').classList.remove('hidden');
+                document.getElementById('quickConfirmFloating').classList.remove('hidden');
+                clickCount = 0;
+                showToast('🔓 Admin panel tersedia!', 'success');
+            }
+        });
+        
+        
+        
+        // ========== CHAT WA LANGSUNG ==========
+function chatWA(produkNama) {
+    const pesan = `Halo kak, saya mau order ${produkNama}`;
+    window.open(`https://wa.me/6285187980564?text=${encodeURIComponent(pesan)}`, '_blank');
+}
+
+function chatWA(produkNama) {
+    const pesan = `Halo kak, saya mau order *${produkNama}*.\n\nMohon info cara pembayaran dan ketersediaan stok ya. Terima kasih 🌿`;
+    window.open(`https://wa.me/6285187980564?text=${encodeURIComponent(pesan)}`, '_blank');
+}
+
+    </script>
+
 </body>
-</html>
+                    </html>
