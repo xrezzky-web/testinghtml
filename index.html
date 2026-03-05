@@ -13,7 +13,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
     <style>
-        /* Hidden click area */
         #hidden-click-area {
             cursor: pointer;
             transition: all 0.3s;
@@ -52,6 +51,9 @@
             transform: scale(1.1);
             background: #128C7E;
         }
+        .review-modal {
+            transition: all 0.3s;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -72,11 +74,11 @@
         const storage = firebase.storage();
 
         // Nomor WhatsApp Owner (GANTI DENGAN NOMOR LU)
-        const OWNER_WA = "6282126941909"; // Pakai format internasional tanpa +
+        const OWNER_WA = "6285187980564"; // 085187980564 dalam format internasional
     </script>
 
     <!-- WhatsApp Float Button -->
-    <a href="https://wa.me/6282126941909" class="whatsapp-float" target="_blank">
+    <a href="https://wa.me/6285187980564" class="whatsapp-float" target="_blank">
         <i class="fab fa-whatsapp text-3xl"></i>
     </a>
 
@@ -137,11 +139,57 @@
     <section id="kontak" class="container mx-auto px-4 py-12 text-center">
         <h2 class="text-3xl font-bold mb-4">📞 Hubungi Kami</h2>
         <p class="text-gray-600 mb-6">Senin - Sabtu (08.00 - 20.00 WIB)</p>
-        <p class="text-3xl text-green-600 font-bold mb-4" id="nomorKontak">0821-2694-1909</p>
-        <a href="https://wa.me/6282126941909" class="bg-green-500 text-white px-8 py-3 rounded-lg inline-block hover:bg-green-600 transition text-lg font-semibold" target="_blank">
+        <p class="text-3xl text-green-600 font-bold mb-4" id="nomorKontak">0851-8798-0564</p>
+        <a href="https://wa.me/6285187980564" class="bg-green-500 text-white px-8 py-3 rounded-lg inline-block hover:bg-green-600 transition text-lg font-semibold" target="_blank">
             <i class="fab fa-whatsapp mr-2"></i>Chat WhatsApp
         </a>
     </section>
+
+    <!-- Review Modal (untuk kasih ulasan) -->
+    <div id="reviewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[150]">
+        <div class="bg-white rounded-lg max-w-md w-full m-4 p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">⭐ Kasih Ulasan</h3>
+                <button onclick="tutupReviewModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div id="reviewProductInfo" class="mb-4 p-3 bg-gray-50 rounded-lg">
+                <!-- Product info will appear here -->
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2">Rating</label>
+                <div class="flex space-x-2 text-3xl" id="ratingStars">
+                    <i class="fa-regular fa-star cursor-pointer hover:text-yellow-400" data-rating="1"></i>
+                    <i class="fa-regular fa-star cursor-pointer hover:text-yellow-400" data-rating="2"></i>
+                    <i class="fa-regular fa-star cursor-pointer hover:text-yellow-400" data-rating="3"></i>
+                    <i class="fa-regular fa-star cursor-pointer hover:text-yellow-400" data-rating="4"></i>
+                    <i class="fa-regular fa-star cursor-pointer hover:text-yellow-400" data-rating="5"></i>
+                </div>
+                <input type="hidden" id="reviewRating" value="0">
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2">Ulasan</label>
+                <textarea id="reviewText" rows="4" class="w-full border rounded-lg p-2" placeholder="Tulis pengalaman kamu setelah memakai produk ini..."></textarea>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2">Foto (opsional)</label>
+                <input type="file" id="reviewPhoto" accept="image/*" class="w-full">
+            </div>
+            
+            <input type="hidden" id="reviewOrderId">
+            <input type="hidden" id="reviewProductId">
+            <input type="hidden" id="reviewProductName">
+            
+            <button onclick="submitReview()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold">
+                Kirim Ulasan
+            </button>
+        </div>
+    </div>
 
     <!-- Admin Login Modal -->
     <div id="adminLoginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[100]">
@@ -240,7 +288,7 @@
                 <!-- Tab Kontak -->
                 <div id="tabKontak" class="tab-content hidden">
                     <label class="block mb-2 font-semibold">Nomor WhatsApp/Telepon</label>
-                    <input type="text" id="editNomor" class="w-full border p-2 rounded-lg mb-4" placeholder="0821-2694-1909">
+                    <input type="text" id="editNomor" class="w-full border p-2 rounded-lg mb-4" value="0851-8798-0564">
                     
                     <label class="block mb-2 font-semibold">Pesan Otomatis WhatsApp</label>
                     <textarea id="editWaMessage" rows="3" class="w-full border p-2 rounded-lg mb-4" placeholder="Halo kak, terima kasih telah order..."></textarea>
@@ -273,6 +321,7 @@
         const ADMIN_PASSWORD = "jamu123";
         let clickCount = 0;
         const CLICKS_NEEDED = 5;
+        let currentRating = 0;
 
         // ========== HIDDEN CLICK ==========
         document.getElementById('hidden-click-area').addEventListener('click', function() {
@@ -352,6 +401,16 @@
                     const terjual = p.terjual || 0;
                     totalTerjual += terjual;
 
+                    // Hitung rating rata-rata dari ulasan
+                    let avgRating = 0;
+                    if(p.ulasan && p.ulasanCount > 0) {
+                        let totalRating = 0;
+                        Object.keys(p.ulasan).forEach(uid => {
+                            totalRating += p.ulasan[uid].rating;
+                        });
+                        avgRating = (totalRating / p.ulasanCount).toFixed(1);
+                    }
+
                     html += `
                         <div class="bg-white rounded-xl shadow-lg overflow-hidden product-card">
                             <div class="relative">
@@ -367,7 +426,7 @@
                                 <div class="flex items-center mb-3">
                                     <div class="flex text-yellow-400 mr-2">
                                         ${Array(5).fill(0).map((_, i) => 
-                                            `<i class="fa-${i < (p.rating || 4) ? 'solid' : 'regular'} fa-star text-sm"></i>`
+                                            `<i class="fa-${i < Math.round(avgRating) ? 'solid' : 'regular'} fa-star text-sm"></i>`
                                         ).join('')}
                                     </div>
                                     <span class="text-sm text-gray-500">(${p.ulasanCount || 0} ulasan)</span>
@@ -441,9 +500,8 @@
         }
 
         function loadNomor() {
-            db.ref('pengaturan').on('value', (snapshot) => {
-                const data = snapshot.val() || {};
-                const nomor = data.nomor || '0821-2694-1909';
+            db.ref('pengaturan/nomor').on('value', (snapshot) => {
+                const nomor = snapshot.val() || '0851-8798-0564';
                 document.getElementById('nomorKontak').textContent = nomor;
                 
                 const waNumber = nomor.replace(/[^0-9]/g, '');
@@ -461,12 +519,12 @@
                 const produk = snapshot.val();
                 
                 // Generate kode unik
-                const kodePesanan = 'INV-' + Date.now().toString().slice(-8);
+                const kodePesanan = 'INV-' + Date.now().toString().slice(-8) + '-' + Math.random().toString(36).substring(2, 5).toUpperCase();
                 
                 // Format pesan WhatsApp
                 const pesan = `Halo kak, saya mau order:
 
-🆔 Kode: ${kodePesanan}
+🆔 ID PESANAN: ${kodePesanan}
 📦 Produk: ${produk.nama}
 🔢 Jumlah: ${qty} pcs
 💰 Total: Rp ${(produk.harga * qty).toLocaleString()}
@@ -475,65 +533,197 @@ Nama: [isi nama]
 Alamat: [isi alamat]
 No. HP: [isi nomor]
 
+*Simpan ID Pesanan ini untuk cek status dan kasih ulasan nanti!*
+
 Terima kasih! 🌿`;
 
                 // Encode pesan untuk URL
                 const encodedPesan = encodeURIComponent(pesan);
                 
-                // Dapatkan nomor owner dari database
-                db.ref('pengaturan/nomor').once('value', (snap) => {
-                    let nomorOwner = snap.val() || '0821-2694-1909';
-                    nomorOwner = nomorOwner.replace(/[^0-9]/g, '');
-                    if(nomorOwner.startsWith('0')) {
-                        nomorOwner = '62' + nomorOwner.substring(1);
-                    }
-                    
+                // Dapatkan nomor owner
+                let nomorOwner = OWNER_WA;
+                
+                // Simpan ke database dengan status pending
+                db.ref('pesanan').push({
+                    kode: kodePesanan,
+                    produkId: id,
+                    produkNama: produk.nama,
+                    jumlah: parseInt(qty),
+                    total: produk.harga * qty,
+                    status: 'pending',
+                    waktu: Date.now(),
+                    dapatUlasan: false // Flag untuk cek apakah sudah bisa kasih ulasan
+                }).then(() => {
                     // Buka WhatsApp
                     window.open(`https://wa.me/${nomorOwner}?text=${encodedPesan}`, '_blank');
-                    
-                    // Simpan ke database
-                    db.ref('pesanan').push({
-                        kode: kodePesanan,
-                        produkId: id,
-                        produkNama: produk.nama,
-                        jumlah: parseInt(qty),
-                        total: produk.harga * qty,
-                        status: 'pending',
-                        waktu: Date.now()
-                    }).then(() => {
-                        // Update counter terjual nanti setelah admin konfirmasi
-                        alert('✅ Pesanan diterima! Silakan lanjutkan chat WA untuk konfirmasi.');
-                    });
+                    alert('✅ Pesanan diterima! Silakan lanjutkan chat WA untuk konfirmasi.\n\n📌 ID Pesanan: ' + kodePesanan + '\n\nSimpan ID ini untuk kasih ulasan setelah pesanan selesai.');
                 });
             });
         }
 
+        // ========== FUNGSI REVIEW ==========
+        function bukaReviewModal(orderId, produkId, produkNama) {
+            document.getElementById('reviewOrderId').value = orderId;
+            document.getElementById('reviewProductId').value = produkId;
+            document.getElementById('reviewProductName').value = produkNama;
+            
+            document.getElementById('reviewProductInfo').innerHTML = `
+                <p class="font-semibold">${produkNama}</p>
+                <p class="text-sm text-gray-600">ID Pesanan: ${orderId}</p>
+            `;
+            
+            // Reset form
+            document.getElementById('reviewRating').value = '0';
+            document.getElementById('reviewText').value = '';
+            document.getElementById('reviewPhoto').value = '';
+            
+            // Reset bintang
+            document.querySelectorAll('#ratingStars i').forEach(star => {
+                star.classList.remove('fa-solid', 'text-yellow-400');
+                star.classList.add('fa-regular');
+            });
+            
+            currentRating = 0;
+            
+            document.getElementById('reviewModal').style.display = 'flex';
+        }
+
+        function tutupReviewModal() {
+            document.getElementById('reviewModal').style.display = 'none';
+        }
+
+        // Setup rating stars
+        document.addEventListener('DOMContentLoaded', function() {
+            const stars = document.querySelectorAll('#ratingStars i');
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const rating = parseInt(this.dataset.rating);
+                    currentRating = rating;
+                    document.getElementById('reviewRating').value = rating;
+                    
+                    stars.forEach((s, index) => {
+                        if(index < rating) {
+                            s.classList.remove('fa-regular');
+                            s.classList.add('fa-solid', 'text-yellow-400');
+                        } else {
+                            s.classList.remove('fa-solid', 'text-yellow-400');
+                            s.classList.add('fa-regular');
+                        }
+                    });
+                });
+            });
+        });
+
+        function submitReview() {
+            const orderId = document.getElementById('reviewOrderId').value;
+            const produkId = document.getElementById('reviewProductId').value;
+            const produkNama = document.getElementById('reviewProductName').value;
+            const rating = document.getElementById('reviewRating').value;
+            const ulasan = document.getElementById('reviewText').value;
+            const photo = document.getElementById('reviewPhoto').files[0];
+
+            if(rating === '0') {
+                alert('Pilih rating dulu bang!');
+                return;
+            }
+
+            if(!ulasan) {
+                alert('Tulis ulasan dulu bang!');
+                return;
+            }
+
+            // Cek apakah pesanan ini udah pernah kasih ulasan
+            db.ref('pesanan/' + orderId).once('value', (snapshot) => {
+                const pesanan = snapshot.val();
+                
+                if(pesanan.dapatUlasan === true) {
+                    alert('Pesanan ini sudah pernah dikasih ulasan!');
+                    tutupReviewModal();
+                    return;
+                }
+
+                // Upload foto kalo ada
+                if(photo) {
+                    const storageRef = storage.ref('testimoni/' + Date.now() + '_' + photo.name);
+                    storageRef.put(photo).then(() => {
+                        storageRef.getDownloadURL().then(url => {
+                            simpanReview(orderId, produkId, produkNama, rating, ulasan, url, pesanan);
+                        });
+                    });
+                } else {
+                    simpanReview(orderId, produkId, produkNama, rating, ulasan, null, pesanan);
+                }
+            });
+        }
+
+        function simpanReview(orderId, produkId, produkNama, rating, ulasan, fotoUrl, pesanan) {
+            // Ambil data user dari pesanan (asumsi user isi nama di WA)
+            let namaUser = pesanan.nama || 'Customer';
+            
+            // Simpan testimoni
+            const reviewRef = db.ref('testimoni').push({
+                produkId: produkId,
+                produk: produkNama,
+                nama: namaUser,
+                rating: parseInt(rating),
+                ulasan: ulasan,
+                foto: fotoUrl,
+                waktu: Date.now(),
+                orderId: orderId
+            });
+
+            // Update flag dapatUlasan di pesanan
+            db.ref('pesanan/' + orderId).update({
+                dapatUlasan: true
+            });
+
+            // Update ulasanCount dan rating di produk
+            db.ref('produk/' + produkId).transaction((produk) => {
+                if(produk) {
+                    produk.ulasanCount = (produk.ulasanCount || 0) + 1;
+                    if(!produk.ulasan) produk.ulasan = {};
+                    produk.ulasan[reviewRef.key] = {
+                        rating: parseInt(rating),
+                        waktu: Date.now()
+                    };
+                }
+                return produk;
+            });
+
+            alert('✅ Terima kasih atas ulasannya!');
+            tutupReviewModal();
+        }
+
         // ========== LIHAT ULASAN PER PRODUK ==========
         function lihatUlasan(produkId, produkNama) {
-            db.ref('testimoni').orderByChild('produkId').equalTo(produkId).on('value', (snapshot) => {
+            db.ref('testimoni').orderByChild('produkId').equalTo(produkId).once('value', (snapshot) => {
                 const data = snapshot.val();
-                let pesan = `⭐ ULASAN UNTUK: ${produkNama}\n\n`;
                 
                 if(!data) {
-                    pesan += 'Belum ada ulasan untuk produk ini.';
-                } else {
-                    Object.keys(data).forEach(key => {
-                        const t = data[key];
-                        pesan += `👤 ${t.nama}\n`;
-                        pesan += `⭐ ${t.rating}/5\n`;
-                        pesan += `💬 "${t.ulasan}"\n`;
-                        pesan += `📅 ${new Date(t.waktu).toLocaleDateString('id-ID')}\n`;
-                        pesan += `-------------------\n`;
-                    });
+                    alert('Belum ada ulasan untuk produk ini.');
+                    return;
                 }
+
+                let pesan = `⭐ ULASAN UNTUK: ${produkNama}\n\n`;
+                let count = 0;
+                
+                Object.keys(data).forEach(key => {
+                    const t = data[key];
+                    count++;
+                    pesan += `${count}. 👤 ${t.nama}\n`;
+                    pesan += `   ⭐ ${t.rating}/5\n`;
+                    pesan += `   💬 "${t.ulasan}"\n`;
+                    pesan += `   📅 ${new Date(t.waktu).toLocaleDateString('id-ID')}\n`;
+                    pesan += `-------------------\n`;
+                });
                 
                 alert(pesan);
-            }, { onlyOnce: true });
+            });
         }
 
         // ========== ADMIN FUNCTIONS ==========
         function loadAdminData() {
-            // Load produk untuk admin
+            // Load produk
             db.ref('produk').on('value', (snapshot) => {
                 const data = snapshot.val();
                 const container = document.getElementById('adminProdukList');
@@ -549,7 +739,7 @@ Terima kasih! 🌿`;
                         <div class="bg-gray-50 p-4 rounded-lg flex justify-between items-center">
                             <div>
                                 <p class="font-semibold">${data[key].nama}</p>
-                                <p class="text-sm text-gray-600">Rp ${Number(data[key].harga).toLocaleString()} | Terjual: ${data[key].terjual || 0}</p>
+                                <p class="text-sm text-gray-600">Rp ${Number(data[key].harga).toLocaleString()} | Terjual: ${data[key].terjual || 0} | Ulasan: ${data[key].ulasanCount || 0}</p>
                             </div>
                             <div>
                                 <button onclick="editProduk('${key}')" class="text-blue-500 mr-2">
@@ -565,13 +755,13 @@ Terima kasih! 🌿`;
                 container.innerHTML = html;
             });
 
-            // Load pesanan untuk admin
+                       // Load pesanan
             db.ref('pesanan').orderByChild('waktu').on('value', (snapshot) => {
                 const data = snapshot.val();
                 filterPesanan(data);
             });
 
-            // Load testimoni untuk admin
+            // Load testimoni
             db.ref('testimoni').on('value', (snapshot) => {
                 const data = snapshot.val();
                 const container = document.getElementById('adminTestimoniList');
@@ -583,20 +773,36 @@ Terima kasih! 🌿`;
 
                 let html = '';
                 Object.keys(data).forEach(key => {
+                    const t = data[key];
                     html += `
                         <div class="bg-gray-50 p-4 rounded-lg flex justify-between items-center">
-                            <div>
-                                <p class="font-semibold">${data[key].nama}</p>
-                                <p class="text-sm text-gray-600">${data[key].ulasan.substring(0,50)}...</p>
-                                <p class="text-xs text-gray-400">Produk: ${data[key].produk || '-'}</p>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2">
+                                    <p class="font-semibold">${t.nama}</p>
+                                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">${t.produk}</span>
+                                </div>
+                                <div class="flex text-yellow-400 my-1">
+                                    ${Array(5).fill(0).map((_, i) => 
+                                        `<i class="fa-${i < t.rating ? 'solid' : 'regular'} fa-star text-xs"></i>`
+                                    ).join('')}
+                                </div>
+                                <p class="text-sm text-gray-600">${t.ulasan}</p>
+                                <p class="text-xs text-gray-400 mt-1">Order ID: ${t.orderId || '-'}</p>
                             </div>
-                            <button onclick="hapusTestimoni('${key}')" class="text-red-500">
+                            <button onclick="hapusTestimoni('${key}')" class="text-red-500 hover:text-red-700 ml-2">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     `;
                 });
                 container.innerHTML = html;
+            });
+
+            // Load pengaturan
+            db.ref('pengaturan').once('value', (snapshot) => {
+                const data = snapshot.val() || {};
+                document.getElementById('editNomor').value = data.nomor || '0851-8798-0564';
+                document.getElementById('editWaMessage').value = data.waMessage || 'Halo kak, terima kasih telah order. Kami akan segera memproses pesanan Anda.';
             });
         }
 
@@ -610,32 +816,60 @@ Terima kasih! 🌿`;
             }
 
             let html = '';
+            let hasData = false;
+            
             Object.keys(data).forEach(key => {
                 const p = data[key];
                 if(filter === 'all' || p.status === filter) {
+                    hasData = true;
+                    const waktu = new Date(p.waktu).toLocaleString('id-ID');
+                    const statusClass = {
+                        'pending': 'bg-yellow-100 text-yellow-800',
+                        'proses': 'bg-blue-100 text-blue-800',
+                        'dikirim': 'bg-purple-100 text-purple-800',
+                        'selesai': 'bg-green-100 text-green-800'
+                    }[p.status] || 'bg-gray-100 text-gray-800';
+                    
+                    const statusText = {
+                        'pending': '⏳ Pending',
+                        'proses': '⚙️ Diproses',
+                        'dikirim': '📦 Dikirim',
+                        'selesai': '✅ Selesai'
+                    }[p.status] || p.status;
+
                     html += `
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="font-semibold">${p.kode || 'No Kode'}</p>
-                                    <p class="text-sm">${p.produkNama} x${p.jumlah}</p>
+                        <div class="bg-gray-50 p-4 rounded-lg border-l-4 ${p.status === 'pending' ? 'border-yellow-400' : p.status === 'proses' ? 'border-blue-400' : p.status === 'dikirim' ? 'border-purple-400' : 'border-green-400'}">
+                            <div class="flex flex-col md:flex-row justify-between items-start gap-3">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="font-mono font-bold">${p.kode || 'No Kode'}</span>
+                                        <span class="text-xs ${statusClass} px-2 py-1 rounded-full">${statusText}</span>
+                                    </div>
+                                    <p class="font-semibold">${p.produkNama} x ${p.jumlah}</p>
                                     <p class="text-sm text-gray-600">Total: Rp ${p.total.toLocaleString()}</p>
-                                    <p class="text-xs text-gray-400">${new Date(p.waktu).toLocaleString('id-ID')}</p>
+                                    <p class="text-xs text-gray-400">${waktu}</p>
+                                    ${p.dapatUlasan ? '<p class="text-xs text-green-600 mt-1"><i class="fas fa-check-circle"></i> Sudah diberi ulasan</p>' : ''}
                                 </div>
-                                <div>
-                                    <select onchange="updateStatusPesanan('${key}', this.value)" class="border rounded p-1 text-sm">
+                                <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+                                    <select onchange="updateStatusPesanan('${key}', this.value)" class="border rounded p-2 text-sm">
                                         <option value="pending" ${p.status === 'pending' ? 'selected' : ''}>⏳ Pending</option>
                                         <option value="proses" ${p.status === 'proses' ? 'selected' : ''}>⚙️ Diproses</option>
                                         <option value="dikirim" ${p.status === 'dikirim' ? 'selected' : ''}>📦 Dikirim</option>
                                         <option value="selesai" ${p.status === 'selesai' ? 'selected' : ''}>✅ Selesai</option>
                                     </select>
+                                    
+                                    ${p.status === 'selesai' && !p.dapatUlasan ? 
+                                        `<button onclick="bukaReviewModalDariAdmin('${key}', '${p.produkId}', '${p.produkNama}')" class="bg-green-500 text-white px-3 py-2 rounded text-sm hover:bg-green-600">
+                                            <i class="fas fa-star mr-1"></i>Minta Ulasan
+                                        </button>` : ''}
                                 </div>
                             </div>
                         </div>
                     `;
                 }
             });
-            container.innerHTML = html || '<p class="text-gray-500">Tidak ada pesanan dengan status tersebut</p>';
+            
+            container.innerHTML = hasData ? html : '<p class="text-gray-500">Tidak ada pesanan dengan status tersebut</p>';
         }
 
         function updateStatusPesanan(id, status) {
@@ -652,6 +886,26 @@ Terima kasih! 🌿`;
                         return produk;
                     });
                 });
+            }
+            
+            alert('✅ Status pesanan diperbarui!');
+        }
+
+        function bukaReviewModalDariAdmin(orderId, produkId, produkNama) {
+            // Admin bisa buka modal review untuk customer (opsional)
+            if(confirm('Kirim link ulasan ke customer via WhatsApp?')) {
+                const pesan = `Halo kak, terima kasih telah berbelanja di Jamu Herbal Alami! 🌿
+
+Kami harap produknya bermanfaat. Kakak bisa kasih ulasan untuk produk ${produkNama} dengan klik link berikut:
+
+[Link Ulasan akan otomatis terkirim]
+
+Silakan buka website kami dan masukkan ID Pesanan: ${orderId}
+
+Terima kasih!`;
+                
+                const encodedPesan = encodeURIComponent(pesan);
+                window.open(`https://wa.me/${OWNER_WA}?text=${encodedPesan}`, '_blank');
             }
         }
 
@@ -674,7 +928,6 @@ Terima kasih! 🌿`;
                 deskripsi: deskripsi,
                 foto: foto || 'https://via.placeholder.com/300',
                 terjual: 0,
-                rating: 0,
                 ulasanCount: 0
             }).then(() => alert('✅ Produk ditambahkan!'));
         }
@@ -687,7 +940,11 @@ Terima kasih! 🌿`;
                 if(!nama) return;
                 
                 const harga = prompt("Harga produk:", p.harga);
+                if(!harga) return;
+                
                 const deskripsi = prompt("Deskripsi:", p.deskripsi);
+                if(!deskripsi) return;
+                
                 const foto = prompt("URL foto:", p.foto);
 
                 db.ref('produk/' + id).update({
@@ -700,14 +957,39 @@ Terima kasih! 🌿`;
         }
 
         function hapusProduk(id) {
-            if(confirm("Yakin hapus produk?")) {
-                db.ref('produk/' + id).remove().then(() => alert('✅ Produk dihapus!'));
+            if(confirm("Yakin hapus produk? Semua data terkait akan ikut terhapus!")) {
+                db.ref('produk/' + id).remove().then(() => {
+                    // Hapus juga testimoni terkait
+                    db.ref('testimoni').orderByChild('produkId').equalTo(id).once('value', (snap) => {
+                        snap.forEach(child => {
+                            child.ref.remove();
+                        });
+                    });
+                    alert('✅ Produk dihapus!');
+                });
             }
         }
 
         function hapusTestimoni(id) {
             if(confirm("Yakin hapus testimoni?")) {
-                db.ref('testimoni/' + id).remove().then(() => alert('✅ Testimoni dihapus!'));
+                db.ref('testimoni/' + id).once('value', (snapshot) => {
+                    const t = snapshot.val();
+                    
+                    // Kurangi ulasanCount di produk
+                    if(t && t.produkId) {
+                        db.ref('produk/' + t.produkId).transaction((produk) => {
+                            if(produk && produk.ulasanCount > 0) {
+                                produk.ulasanCount--;
+                            }
+                            return produk;
+                        });
+                    }
+                    
+                    // Hapus testimoni
+                    db.ref('testimoni/' + id).remove().then(() => {
+                        alert('✅ Testimoni dihapus!');
+                    });
+                });
             }
         }
 
@@ -725,6 +1007,7 @@ Terima kasih! 🌿`;
             db.ref('produk').once('value', (snap) => {
                 document.getElementById('statProduk').textContent = snap.numChildren();
             });
+            
             db.ref('pesanan').once('value', (snap) => {
                 document.getElementById('statPesanan').textContent = snap.numChildren();
                 let total = 0;
@@ -735,15 +1018,70 @@ Terima kasih! 🌿`;
                 });
                 document.getElementById('statTerjual').textContent = total;
             });
+            
             db.ref('testimoni').once('value', (snap) => {
                 document.getElementById('statTestimoni').textContent = snap.numChildren();
             });
         }
 
+        // ========== FUNGSI CEK STATUS PESANAN (UNTUK USER) ==========
+        function cekStatusPesanan() {
+            const kode = prompt("Masukkan ID Pesanan (contoh: INV-12345678-ABC):");
+            if(!kode) return;
+            
+            db.ref('pesanan').orderByChild('kode').equalTo(kode).once('value', (snapshot) => {
+                const data = snapshot.val();
+                
+                if(!data) {
+                    alert('❌ ID Pesanan tidak ditemukan!');
+                    return;
+                }
+                
+                let pesan = '📋 STATUS PESANAN\n\n';
+                
+                Object.keys(data).forEach(key => {
+                    const p = data[key];
+                    const statusIcon = {
+                        'pending': '⏳',
+                        'proses': '⚙️',
+                        'dikirim': '📦',
+                        'selesai': '✅'
+                    }[p.status] || '❓';
+                    
+                    pesan += `${statusIcon} ID: ${p.kode}\n`;
+                    pesan += `Produk: ${p.produkNama} x${p.jumlah}\n`;
+                    pesan += `Total: Rp ${p.total.toLocaleString()}\n`;
+                    pesan += `Status: ${p.status.toUpperCase()}\n`;
+                    pesan += `Tanggal: ${new Date(p.waktu).toLocaleDateString('id-ID')}\n`;
+                    
+                    if(p.status === 'selesai' && !p.dapatUlasan) {
+                        pesan += `\n✨ Pesanan selesai! Kasih ulasan sekarang:\n`;
+                        pesan += `Website → Cari produk → Klik "Lihat Semua Ulasan" → "Tambah Ulasan"\n`;
+                    }
+                    
+                    pesan += `-------------------\n`;
+                });
+                
+                alert(pesan);
+            });
+        }
+
         // ========== INIT ==========
-        loadProduk();
-        loadTestimoni();
-        loadNomor();
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProduk();
+            loadTestimoni();
+            loadNomor();
+            
+            // Tambah tombol cek status di navigasi
+            const nav = document.querySelector('nav .container .hidden.md\\:flex');
+            if(nav) {
+                const cekStatusBtn = document.createElement('button');
+                cekStatusBtn.onclick = cekStatusPesanan;
+                cekStatusBtn.className = 'hover:text-green-200 transition ml-4';
+                cekStatusBtn.innerHTML = '<i class="fas fa-search mr-1"></i>Cek Status';
+                nav.appendChild(cekStatusBtn);
+            }
+        });
     </script>
 
     <!-- Footer -->
@@ -751,6 +1089,7 @@ Terima kasih! 🌿`;
         <div class="container mx-auto text-center">
             <p>&copy; 2024 Jamu Herbal Alami. All rights reserved.</p>
             <p class="text-sm text-gray-400 mt-2">🌿 100% Alami dan Tradisional 🌿</p>
+            <p class="text-xs text-gray-500 mt-4">ID Pesanan: Simpan untuk cek status dan beri ulasan</p>
         </div>
     </footer>
 </body>
