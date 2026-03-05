@@ -13,9 +13,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
     <style>
-        #hidden-click-area {
+        .hidden-click-area {
             cursor: pointer;
-            transition: all 0.3s;
         }
         .admin-button-appear {
             animation: slideIn 0.5s ease-out;
@@ -23,9 +22,6 @@
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-        .rating-star {
-            color: #ffd700;
         }
         .product-card {
             transition: all 0.3s;
@@ -40,24 +36,27 @@
             left: 20px;
             background: #25D366;
             color: white;
-            padding: 15px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
             z-index: 50;
             cursor: pointer;
             transition: all 0.3s;
+            font-size: 30px;
         }
         .whatsapp-float:hover {
             transform: scale(1.1);
             background: #128C7E;
         }
-        .review-modal {
-            transition: all 0.3s;
-        }
     </style>
 </head>
 <body class="bg-gray-50">
-    <!-- Firebase Config -->
+
+    <!-- FIREBASE CONFIG -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyD1xADf6KbttaSRl3bYuKEMUrQ4SJmTtH4",
@@ -68,74 +67,62 @@
             messagingSenderId: "770031966685",
             appId: "1:770031966685:web:dc20683776e310c0b0fe34"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const storage = firebase.storage();
-
-        // Nomor WhatsApp Owner (GANTI DENGAN NOMOR LU)
-        const OWNER_WA = "6285187980564"; // 085187980564 dalam format internasional
+        const OWNER_WA = "6285187980564";
     </script>
 
-    <!-- WhatsApp Float Button -->
+    <!-- WHATSAPP FLOAT -->
     <a href="https://wa.me/6285187980564" class="whatsapp-float" target="_blank">
-        <i class="fab fa-whatsapp text-3xl"></i>
+        <i class="fab fa-whatsapp"></i>
     </a>
 
-    <!-- Navigation -->
+    <!-- NAVBAR -->
     <nav class="bg-green-600 text-white p-4 sticky top-0 z-40 shadow-lg">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-2xl font-bold flex items-center gap-2">
-                <i class="fas fa-leaf"></i>
-                Jamu Herbal Alami
+                <i class="fas fa-leaf"></i> Jamu Herbal Alami
             </h1>
             <div class="hidden md:flex space-x-6">
-                <a href="#produk" class="hover:text-green-200 transition">Produk</a>
-                <a href="#testimoni" class="hover:text-green-200 transition">Testimoni</a>
-                <a href="#kontak" class="hover:text-green-200 transition">Kontak</a>
+                <a href="#produk" class="hover:text-green-200">Produk</a>
+                <a href="#testimoni" class="hover:text-green-200">Testimoni</a>
+                <a href="#kontak" class="hover:text-green-200">Kontak</a>
             </div>
-            <div class="flex items-center gap-3">
-                <span id="totalTerjual" class="bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-bold">
-                    <i class="fas fa-chart-line mr-1"></i>0 Terjual
-                </span>
-            </div>
+            <span id="totalTerjual" class="bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-bold">
+                <i class="fas fa-chart-line mr-1"></i>0 Terjual
+            </span>
         </div>
     </nav>
 
-    <!-- Hero Section with Hidden Click Area -->
+    <!-- HERO + HIDDEN CLICK AREA -->
     <section class="bg-gradient-to-r from-green-500 to-green-700 text-white py-16 text-center relative">
         <div class="container mx-auto">
             <h2 class="text-4xl font-bold mb-4">Herbal Alami Untuk Kesehatan</h2>
             <p class="text-xl">100% Alami - Tradisional - Berkhasiat</p>
             <p class="mt-4 text-sm opacity-75">📦 Gratis Ongkir • 💳 Bayar di Tempat • 🌿 Terpercaya</p>
         </div>
-        
-        <!-- Hidden Click Area -->
-        <div id="hidden-click-area" class="absolute bottom-4 right-4 w-20 h-20 cursor-pointer opacity-0 hover:opacity-20 transition-opacity bg-black rounded-full">
-        </div>
+        <!-- KLIK 5x DISINI (POJOK KANAN BAWAH) -->
+        <div class="hidden-click-area absolute bottom-4 right-4 w-20 h-20 opacity-0 hover:opacity-20 bg-black rounded-full" id="hiddenClickArea"></div>
     </section>
 
-    <!-- Products Section -->
+    <!-- PRODUK SECTION -->
     <section id="produk" class="container mx-auto px-4 py-12">
         <h2 class="text-3xl font-bold text-center mb-4">🌿 Produk Kami</h2>
         <p class="text-center text-gray-600 mb-8">Herbal pilihan untuk kesehatan keluarga</p>
-        <div id="produkList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Products will appear here -->
-        </div>
+        <div id="produkList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
     </section>
 
-    <!-- Testimonials Section -->
+    <!-- TESTIMONI SECTION -->
     <section id="testimoni" class="bg-gray-100 py-12">
         <div class="container mx-auto px-4">
             <h2 class="text-3xl font-bold text-center mb-4">⭐ Testimoni Pembeli</h2>
             <p class="text-center text-gray-600 mb-8">Apa kata mereka yang sudah merasakan khasiatnya</p>
-            <div id="testimoniList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Testimonials will appear here -->
-            </div>
+            <div id="testimoniList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
     </section>
 
-    <!-- Contact Section -->
+    <!-- KONTAK SECTION -->
     <section id="kontak" class="container mx-auto px-4 py-12 text-center">
         <h2 class="text-3xl font-bold mb-4">📞 Hubungi Kami</h2>
         <p class="text-gray-600 mb-6">Senin - Sabtu (08.00 - 20.00 WIB)</p>
@@ -143,22 +130,21 @@
         <a href="https://wa.me/6285187980564" class="bg-green-500 text-white px-8 py-3 rounded-lg inline-block hover:bg-green-600 transition text-lg font-semibold" target="_blank">
             <i class="fab fa-whatsapp mr-2"></i>Chat WhatsApp
         </a>
+        <div class="mt-4">
+            <button onclick="cekPesanan()" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600 transition">
+                <i class="fas fa-search mr-2"></i>Cek Status Pesanan
+            </button>
+        </div>
     </section>
 
-    <!-- Review Modal (untuk kasih ulasan) -->
-    <div id="reviewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[150]">
+    <!-- REVIEW MODAL -->
+    <div id="reviewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[150]" style="display: none;">
         <div class="bg-white rounded-lg max-w-md w-full m-4 p-6">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-xl font-bold">⭐ Kasih Ulasan</h3>
-                <button onclick="tutupReviewModal()" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
+                <button onclick="tutupReviewModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
             </div>
-            
-            <div id="reviewProductInfo" class="mb-4 p-3 bg-gray-50 rounded-lg">
-                <!-- Product info will appear here -->
-            </div>
-            
+            <div id="reviewProductInfo" class="mb-4 p-3 bg-gray-50 rounded-lg"></div>
             <div class="mb-4">
                 <label class="block text-gray-700 mb-2">Rating</label>
                 <div class="flex space-x-2 text-3xl" id="ratingStars">
@@ -170,161 +156,110 @@
                 </div>
                 <input type="hidden" id="reviewRating" value="0">
             </div>
-            
             <div class="mb-4">
                 <label class="block text-gray-700 mb-2">Ulasan</label>
-                <textarea id="reviewText" rows="4" class="w-full border rounded-lg p-2" placeholder="Tulis pengalaman kamu setelah memakai produk ini..."></textarea>
+                <textarea id="reviewText" rows="4" class="w-full border rounded-lg p-2" placeholder="Tulis pengalaman kamu..."></textarea>
             </div>
-            
             <div class="mb-4">
                 <label class="block text-gray-700 mb-2">Foto (opsional)</label>
                 <input type="file" id="reviewPhoto" accept="image/*" class="w-full">
             </div>
-            
             <input type="hidden" id="reviewOrderId">
             <input type="hidden" id="reviewProductId">
             <input type="hidden" id="reviewProductName">
-            
-            <button onclick="submitReview()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold">
-                Kirim Ulasan
-            </button>
+            <button onclick="submitReview()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold">Kirim Ulasan</button>
         </div>
     </div>
 
-    <!-- Admin Login Modal -->
-    <div id="adminLoginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[100]">
+    <!-- ADMIN LOGIN MODAL -->
+    <div id="adminLoginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[100]" style="display: none;">
         <div class="bg-white rounded-lg max-w-md w-full m-4 p-6">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-xl font-bold">🔐 Admin Login</h3>
-                <button onclick="tutupLoginModal()" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
+                <button onclick="tutupLoginModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
             </div>
             <div class="mb-4">
                 <label class="block text-gray-700 mb-2">Password Admin</label>
                 <input type="password" id="adminPassword" class="w-full border rounded-lg p-2" placeholder="••••••••">
             </div>
-            <button onclick="cekPassword()" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
-                Login
-            </button>
+            <button onclick="cekPassword()" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">Login</button>
             <p id="passwordError" class="text-red-500 text-sm mt-2 hidden">❌ Password salah!</p>
         </div>
     </div>
 
-    <!-- Admin Panel Modal -->
-    <div id="adminPanelModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[100]">
-        <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto m-4">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-bold">⚙️ Admin Panel</h2>
-                    <button onclick="tutupAdminPanel()" class="text-gray-500 hover:text-gray-700">
-                        <i class="fas fa-times text-2xl"></i>
-                    </button>
-                </div>
-
-                <!-- Admin Stats -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <div class="bg-blue-50 p-4 rounded-lg text-center">
-                        <p class="text-2xl font-bold text-blue-600" id="statProduk">0</p>
-                        <p class="text-sm text-gray-600">Total Produk</p>
-                    </div>
-                    <div class="bg-green-50 p-4 rounded-lg text-center">
-                        <p class="text-2xl font-bold text-green-600" id="statPesanan">0</p>
-                        <p class="text-sm text-gray-600">Pesanan Masuk</p>
-                    </div>
-                    <div class="bg-yellow-50 p-4 rounded-lg text-center">
-                        <p class="text-2xl font-bold text-yellow-600" id="statTerjual">0</p>
-                        <p class="text-sm text-gray-600">Total Terjual</p>
-                    </div>
-                    <div class="bg-purple-50 p-4 rounded-lg text-center">
-                        <p class="text-2xl font-bold text-purple-600" id="statTestimoni">0</p>
-                        <p class="text-sm text-gray-600">Testimoni</p>
-                    </div>
-                </div>
-
-                <!-- Admin Tabs -->
-                <div class="flex flex-wrap border-b mb-4 gap-2">
-                    <button onclick="switchTab('produk')" class="tab-btn px-4 py-2 text-green-600 border-b-2 border-green-600" data-tab="produk">
-                        <i class="fas fa-box mr-1"></i>Produk
-                    </button>
-                    <button onclick="switchTab('pesanan')" class="tab-btn px-4 py-2 text-gray-500" data-tab="pesanan">
-                        <i class="fas fa-shopping-cart mr-1"></i>Pesanan
-                    </button>
-                    <button onclick="switchTab('testimoni')" class="tab-btn px-4 py-2 text-gray-500" data-tab="testimoni">
-                        <i class="fas fa-star mr-1"></i>Testimoni
-                    </button>
-                    <button onclick="switchTab('kontak')" class="tab-btn px-4 py-2 text-gray-500" data-tab="kontak">
-                        <i class="fas fa-phone mr-1"></i>Kontak
-                    </button>
-                </div>
-
-                <!-- Tab Produk -->
-                <div id="tabProduk" class="tab-content">
-                    <button onclick="tambahProduk()" class="bg-green-600 text-white px-4 py-2 rounded-lg mb-4">
-                        <i class="fas fa-plus mr-2"></i>Tambah Produk
-                    </button>
-                    <div id="adminProdukList" class="space-y-2"></div>
-                </div>
-
-                <!-- Tab Pesanan -->
-                <div id="tabPesanan" class="tab-content hidden">
-                    <div class="mb-4 flex gap-2">
-                        <select id="filterStatus" class="border rounded-lg p-2" onchange="filterPesanan()">
-                            <option value="all">Semua Status</option>
-                            <option value="pending">⏳ Pending</option>
-                            <option value="proses">⚙️ Diproses</option>
-                            <option value="dikirim">📦 Dikirim</option>
-                            <option value="selesai">✅ Selesai</option>
-                        </select>
-                    </div>
-                    <div id="adminPesananList" class="space-y-3"></div>
-                </div>
-
-                <!-- Tab Testimoni -->
-                <div id="tabTestimoni" class="tab-content hidden">
-                    <div id="adminTestimoniList" class="space-y-2"></div>
-                </div>
-
-                <!-- Tab Kontak -->
-                <div id="tabKontak" class="tab-content hidden">
-                    <label class="block mb-2 font-semibold">Nomor WhatsApp/Telepon</label>
-                    <input type="text" id="editNomor" class="w-full border p-2 rounded-lg mb-4" value="0851-8798-0564">
-                    
-                    <label class="block mb-2 font-semibold">Pesan Otomatis WhatsApp</label>
-                    <textarea id="editWaMessage" rows="3" class="w-full border p-2 rounded-lg mb-4" placeholder="Halo kak, terima kasih telah order..."></textarea>
-                    
-                    <button onclick="simpanPengaturan()" class="bg-green-600 text-white px-4 py-2 rounded-lg">
-                        <i class="fas fa-save mr-2"></i>Simpan Pengaturan
-                    </button>
-                </div>
-
-                <!-- Logout Button -->
-                <div class="mt-4 pt-4 border-t">
-                    <button onclick="logoutAdmin()" class="bg-red-500 text-white px-4 py-2 rounded-lg">
-                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                    </button>
-                </div>
+    <!-- ADMIN PANEL MODAL -->
+    <div id="adminPanelModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[100]" style="display: none;">
+        <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto m-4 p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">⚙️ Admin Panel</h2>
+                <button onclick="tutupAdminPanel()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <!-- STATS -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-blue-50 p-4 rounded-lg text-center"><p class="text-2xl font-bold text-blue-600" id="statProduk">0</p><p class="text-sm">Produk</p></div>
+                <div class="bg-green-50 p-4 rounded-lg text-center"><p class="text-2xl font-bold text-green-600" id="statPesanan">0</p><p class="text-sm">Pesanan</p></div>
+                <div class="bg-yellow-50 p-4 rounded-lg text-center"><p class="text-2xl font-bold text-yellow-600" id="statTerjual">0</p><p class="text-sm">Terjual</p></div>
+                <div class="bg-purple-50 p-4 rounded-lg text-center"><p class="text-2xl font-bold text-purple-600" id="statTestimoni">0</p><p class="text-sm">Testimoni</p></div>
+            </div>
+            <!-- TABS -->
+            <div class="flex flex-wrap border-b mb-4 gap-2">
+                <button onclick="switchTab('produk')" class="tab-btn px-4 py-2 text-green-600 border-b-2 border-green-600" data-tab="produk"><i class="fas fa-box mr-1"></i>Produk</button>
+                <button onclick="switchTab('pesanan')" class="tab-btn px-4 py-2 text-gray-500" data-tab="pesanan"><i class="fas fa-shopping-cart mr-1"></i>Pesanan</button>
+                <button onclick="switchTab('testimoni')" class="tab-btn px-4 py-2 text-gray-500" data-tab="testimoni"><i class="fas fa-star mr-1"></i>Testimoni</button>
+                <button onclick="switchTab('kontak')" class="tab-btn px-4 py-2 text-gray-500" data-tab="kontak"><i class="fas fa-phone mr-1"></i>Kontak</button>
+            </div>
+            <!-- TAB PRODUK -->
+            <div id="tabProduk" class="tab-content">
+                <button onclick="tambahProduk()" class="bg-green-600 text-white px-4 py-2 rounded-lg mb-4"><i class="fas fa-plus mr-2"></i>Tambah Produk</button>
+                <div id="adminProdukList" class="space-y-2"></div>
+            </div>
+            <!-- TAB PESANAN -->
+            <div id="tabPesanan" class="tab-content hidden">
+                <div class="mb-4"><select id="filterStatus" class="border rounded-lg p-2" onchange="filterPesanan()"><option value="all">Semua</option><option value="pending">⏳ Pending</option><option value="proses">⚙️ Diproses</option><option value="dikirim">📦 Dikirim</option><option value="selesai">✅ Selesai</option></select></div>
+                <div id="adminPesananList" class="space-y-3"></div>
+            </div>
+            <!-- TAB TESTIMONI -->
+            <div id="tabTestimoni" class="tab-content hidden">
+                <div id="adminTestimoniList" class="space-y-2"></div>
+            </div>
+            <!-- TAB KONTAK -->
+            <div id="tabKontak" class="tab-content hidden">
+                <label class="block mb-2 font-semibold">Nomor WhatsApp</label>
+                <input type="text" id="editNomor" class="w-full border p-2 rounded-lg mb-4" value="0851-8798-0564">
+                <button onclick="simpanPengaturan()" class="bg-green-600 text-white px-4 py-2 rounded-lg"><i class="fas fa-save mr-2"></i>Simpan</button>
+            </div>
+            <!-- LOGOUT -->
+            <div class="mt-4 pt-4 border-t">
+                <button onclick="logoutAdmin()" class="bg-red-500 text-white px-4 py-2 rounded-lg"><i class="fas fa-sign-out-alt mr-2"></i>Logout</button>
             </div>
         </div>
     </div>
 
-    <!-- Hidden Admin Button -->
+    <!-- HIDDEN ADMIN BUTTON -->
     <div id="hiddenAdminButton" class="fixed bottom-6 right-6 hidden z-50 admin-button-appear">
-        <button onclick="bukaLoginModal()" class="bg-black text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 hover:bg-gray-800 transition">
-            <i class="fas fa-lock"></i>
-            Admin Panel
+        <button onclick="bukaLoginModal()" class="bg-black text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 hover:bg-gray-800">
+            <i class="fas fa-lock"></i> Admin Panel
         </button>
     </div>
 
+    <!-- FOOTER -->
+    <footer class="bg-gray-800 text-white py-8 mt-8">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2024 Jamu Herbal Alami</p>
+            <p class="text-sm text-gray-400 mt-2">🌿 100% Alami dan Tradisional 🌿</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LENGKAP -->
     <script>
-        // ========== KONFIGURASI ==========
+        // KONFIGURASI
         const ADMIN_PASSWORD = "jamu123";
         let clickCount = 0;
         const CLICKS_NEEDED = 5;
         let currentRating = 0;
 
-        // ========== HIDDEN CLICK ==========
-        document.getElementById('hidden-click-area').addEventListener('click', function() {
+        // HIDDEN CLICK
+        document.getElementById('hiddenClickArea').addEventListener('click', function() {
             clickCount++;
             if(clickCount >= CLICKS_NEEDED) {
                 document.getElementById('hiddenAdminButton').classList.remove('hidden');
@@ -333,17 +268,15 @@
             }
         });
 
-        // ========== FUNGSI LOGIN ==========
+        // LOGIN MODAL
         function bukaLoginModal() {
             document.getElementById('adminLoginModal').style.display = 'flex';
             document.getElementById('adminPassword').value = '';
             document.getElementById('passwordError').classList.add('hidden');
         }
-
         function tutupLoginModal() {
             document.getElementById('adminLoginModal').style.display = 'none';
         }
-
         function cekPassword() {
             if(document.getElementById('adminPassword').value === ADMIN_PASSWORD) {
                 tutupLoginModal();
@@ -354,26 +287,22 @@
             }
         }
 
-        // ========== ADMIN PANEL ==========
+        // ADMIN PANEL
         function bukaAdminPanel() {
             document.getElementById('adminPanelModal').style.display = 'flex';
             loadAdminData();
             loadStats();
         }
-
         function tutupAdminPanel() {
             document.getElementById('adminPanelModal').style.display = 'none';
         }
-
         function logoutAdmin() {
             tutupAdminPanel();
             clickCount = 0;
         }
-
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('hidden');
-            
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('text-green-600', 'border-green-600');
                 btn.classList.add('text-gray-500');
@@ -382,715 +311,239 @@
             event.target.classList.add('text-green-600', 'border-green-600');
         }
 
-        // ========== LOAD DATA UTAMA ==========
+        // LOAD PRODUK
         function loadProduk() {
             db.ref('produk').on('value', (snapshot) => {
                 const data = snapshot.val();
                 const container = document.getElementById('produkList');
-                
-                if(!data) {
-                    container.innerHTML = '<p class="text-center col-span-3 text-gray-500">Belum ada produk</p>';
-                    return;
-                }
-
-                let html = '';
-                let totalTerjual = 0;
-
+                if(!data) { container.innerHTML = '<p class="text-center col-span-3">Belum ada produk</p>'; return; }
+                let html = '', totalTerjual = 0;
                 Object.keys(data).forEach(key => {
                     const p = data[key];
-                    const terjual = p.terjual || 0;
-                    totalTerjual += terjual;
-
-                    // Hitung rating rata-rata dari ulasan
-                    let avgRating = 0;
-                    if(p.ulasan && p.ulasanCount > 0) {
-                        let totalRating = 0;
-                        Object.keys(p.ulasan).forEach(uid => {
-                            totalRating += p.ulasan[uid].rating;
-                        });
-                        avgRating = (totalRating / p.ulasanCount).toFixed(1);
-                    }
-
-                    html += `
-                        <div class="bg-white rounded-xl shadow-lg overflow-hidden product-card">
-                            <div class="relative">
-                                <img src="${p.foto || 'https://via.placeholder.com/300'}" class="w-full h-56 object-cover">
-                                <span class="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs">
-                                    <i class="fas fa-check-circle"></i> Tersedia
-                                </span>
+                    totalTerjual += p.terjual || 0;
+                    html += `<div class="bg-white rounded-xl shadow-lg overflow-hidden product-card">
+                        <img src="${p.foto || 'https://via.placeholder.com/300'}" class="w-full h-56 object-cover">
+                        <div class="p-5">
+                            <h3 class="font-bold text-xl mb-2">${p.nama}</h3>
+                            <p class="text-gray-600 mb-3 text-sm">${p.deskripsi}</p>
+                            <div class="flex items-center mb-3">
+                                <div class="flex text-yellow-400 mr-2">${Array(5).fill(0).map((_, i) => `<i class="fa-${i < (p.ulasanCount ? 4 : 0) ? 'solid' : 'regular'} fa-star text-sm"></i>`).join('')}</div>
+                                <span class="text-sm text-gray-500">(${p.ulasanCount || 0} ulasan)</span>
                             </div>
-                            <div class="p-5">
-                                <h3 class="font-bold text-xl mb-2">${p.nama}</h3>
-                                <p class="text-gray-600 mb-3 text-sm">${p.deskripsi}</p>
-                                
-                                <div class="flex items-center mb-3">
-                                    <div class="flex text-yellow-400 mr-2">
-                                        ${Array(5).fill(0).map((_, i) => 
-                                            `<i class="fa-${i < Math.round(avgRating) ? 'solid' : 'regular'} fa-star text-sm"></i>`
-                                        ).join('')}
-                                    </div>
-                                    <span class="text-sm text-gray-500">(${p.ulasanCount || 0} ulasan)</span>
-                                </div>
-                                
-                                <div class="flex justify-between items-center mb-4">
-                                    <span class="text-2xl font-bold text-green-600">Rp ${Number(p.harga).toLocaleString()}</span>
-                                    <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
-                                        <i class="fas fa-shopping-bag mr-1"></i>${terjual} terjual
-                                    </span>
-                                </div>
-                                
-                                <div class="flex gap-2">
-                                    <input type="number" id="qty_${key}" min="1" value="1" class="w-20 border rounded-lg text-center">
-                                    <button onclick="beli('${key}')" class="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition font-semibold">
-                                        <i class="fab fa-whatsapp mr-1"></i>Beli via WA
-                                    </button>
-                                </div>
-                                
-                                <!-- Tombol Lihat Ulasan -->
-                                <button onclick="lihatUlasan('${key}', '${p.nama}')" class="w-full mt-3 text-blue-600 text-sm hover:underline">
-                                    <i class="fas fa-comment mr-1"></i>Lihat Semua Ulasan (${p.ulasanCount || 0})
-                                </button>
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-2xl font-bold text-green-600">Rp ${Number(p.harga).toLocaleString()}</span>
+                                <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full"><i class="fas fa-shopping-bag mr-1"></i>${p.terjual || 0} terjual</span>
                             </div>
+                            <div class="flex gap-2">
+                                <input type="number" id="qty_${key}" min="1" value="1" class="w-20 border rounded-lg text-center">
+                                <button onclick="beli('${key}')" class="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 font-semibold"><i class="fab fa-whatsapp mr-1"></i>Beli via WA</button>
+                            </div>
+                            <button onclick="lihatUlasan('${key}', '${p.nama}')" class="w-full mt-3 text-blue-600 text-sm hover:underline"><i class="fas fa-comment mr-1"></i>Lihat Semua Ulasan (${p.ulasanCount || 0})</button>
                         </div>
-                    `;
+                    </div>`;
                 });
-
                 container.innerHTML = html;
                 document.getElementById('totalTerjual').innerHTML = `<i class="fas fa-chart-line mr-1"></i>${totalTerjual} Terjual`;
             });
         }
 
+        // LOAD TESTIMONI
         function loadTestimoni() {
             db.ref('testimoni').orderByChild('waktu').limitToLast(6).on('value', (snapshot) => {
                 const data = snapshot.val();
                 const container = document.getElementById('testimoniList');
-                
-                if(!data) {
-                    container.innerHTML = '<p class="text-center col-span-3 text-gray-500">Belum ada testimoni</p>';
-                    return;
-                }
-
-                const testimonials = Object.keys(data).map(key => ({id: key, ...data[key]})).reverse();
-
+                if(!data) { container.innerHTML = '<p class="text-center col-span-3">Belum ada testimoni</p>'; return; }
                 let html = '';
-                testimonials.forEach(t => {
-                    html += `
-                        <div class="bg-white rounded-xl shadow-md p-5">
-                            <div class="flex items-center mb-3">
-                                <img src="${t.foto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(t.nama)}" 
-                                     class="w-12 h-12 rounded-full object-cover mr-3 border-2 border-green-200">
-                                <div>
-                                    <p class="font-semibold">${t.nama}</p>
-                                    <div class="flex text-yellow-400">
-                                        ${Array(5).fill(0).map((_, i) => 
-                                            `<i class="fa-${i < t.rating ? 'solid' : 'regular'} fa-star text-xs"></i>`
-                                        ).join('')}
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="text-gray-600 mb-2">"${t.ulasan}"</p>
-                            <p class="text-xs text-gray-400">
-                                <i class="fas fa-tag mr-1"></i>${t.produk || 'Jamu Herbal'}
-                            </p>
+                Object.keys(data).reverse().forEach(key => {
+                    const t = data[key];
+                    html += `<div class="bg-white rounded-xl shadow-md p-5">
+                        <div class="flex items-center mb-3">
+                            <img src="${t.foto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(t.nama)}" class="w-12 h-12 rounded-full mr-3 border-2 border-green-200">
+                            <div><p class="font-semibold">${t.nama}</p><div class="flex text-yellow-400">${Array(5).fill(0).map((_, i) => `<i class="fa-${i < t.rating ? 'solid' : 'regular'} fa-star text-xs"></i>`).join('')}</div></div>
                         </div>
-                    `;
+                        <p class="text-gray-600 mb-2">"${t.ulasan}"</p>
+                        <p class="text-xs text-gray-400"><i class="fas fa-tag mr-1"></i>${t.produk || 'Jamu Herbal'}</p>
+                    </div>`;
                 });
                 container.innerHTML = html;
             });
         }
 
+        // LOAD NOMOR
         function loadNomor() {
             db.ref('pengaturan/nomor').on('value', (snapshot) => {
                 const nomor = snapshot.val() || '0851-8798-0564';
                 document.getElementById('nomorKontak').textContent = nomor;
-                
-                const waNumber = nomor.replace(/[^0-9]/g, '');
-                document.querySelectorAll('a[href*="wa.me"]').forEach(el => {
-                    el.href = `https://wa.me/62${waNumber.substring(1)}`;
-                });
+                document.querySelectorAll('a[href*="wa.me"]').forEach(el => el.href = `https://wa.me/62${nomor.replace(/[^0-9]/g, '').substring(1)}`);
             });
         }
 
-        // ========== FUNGSI PEMBELIAN ==========
+        // BELI
         function beli(id) {
             const qty = document.getElementById('qty_' + id).value;
-            
             db.ref('produk/' + id).once('value', (snapshot) => {
                 const produk = snapshot.val();
-                
-                // Generate kode unik
                 const kodePesanan = 'INV-' + Date.now().toString().slice(-8) + '-' + Math.random().toString(36).substring(2, 5).toUpperCase();
-                
-                // Format pesan WhatsApp
-                const pesan = `Halo kak, saya mau order:
-
-🆔 ID PESANAN: ${kodePesanan}
-📦 Produk: ${produk.nama}
-🔢 Jumlah: ${qty} pcs
-💰 Total: Rp ${(produk.harga * qty).toLocaleString()}
-
-Nama: [isi nama]
-Alamat: [isi alamat]
-No. HP: [isi nomor]
-
-*Simpan ID Pesanan ini untuk cek status dan kasih ulasan nanti!*
-
-Terima kasih! 🌿`;
-
-                // Encode pesan untuk URL
-                const encodedPesan = encodeURIComponent(pesan);
-                
-                // Dapatkan nomor owner
-                let nomorOwner = OWNER_WA;
-                
-                // Simpan ke database dengan status pending
-                db.ref('pesanan').push({
-                    kode: kodePesanan,
-                    produkId: id,
-                    produkNama: produk.nama,
-                    jumlah: parseInt(qty),
-                    total: produk.harga * qty,
-                    status: 'pending',
-                    waktu: Date.now(),
-                    dapatUlasan: false // Flag untuk cek apakah sudah bisa kasih ulasan
-                }).then(() => {
-                    // Buka WhatsApp
-                    window.open(`https://wa.me/${nomorOwner}?text=${encodedPesan}`, '_blank');
-                    alert('✅ Pesanan diterima! Silakan lanjutkan chat WA untuk konfirmasi.\n\n📌 ID Pesanan: ' + kodePesanan + '\n\nSimpan ID ini untuk kasih ulasan setelah pesanan selesai.');
-                });
+                const pesan = `Halo kak, saya mau order:\n\n🆔 ID: ${kodePesanan}\n📦 Produk: ${produk.nama}\n🔢 Jumlah: ${qty}\n💰 Total: Rp ${(produk.harga * qty).toLocaleString()}\n\nNama:\nAlamat:\nNo. HP:\n\n*Simpan ID ini untuk cek status dan kasih ulasan*`;
+                db.ref('pesanan').push({ kode: kodePesanan, produkId: id, produkNama: produk.nama, jumlah: parseInt(qty), total: produk.harga * qty, status: 'pending', waktu: Date.now(), dapatUlasan: false })
+                  .then(() => {
+                      window.open(`https://wa.me/${OWNER_WA}?text=${encodeURIComponent(pesan)}`, '_blank');
+                      alert('✅ ID Pesanan: ' + kodePesanan + '\nSimpan ID ini!');
+                  });
             });
         }
 
-        // ========== FUNGSI REVIEW ==========
+        // REVIEW MODAL
         function bukaReviewModal(orderId, produkId, produkNama) {
             document.getElementById('reviewOrderId').value = orderId;
             document.getElementById('reviewProductId').value = produkId;
             document.getElementById('reviewProductName').value = produkNama;
-            
-            document.getElementById('reviewProductInfo').innerHTML = `
-                <p class="font-semibold">${produkNama}</p>
-                <p class="text-sm text-gray-600">ID Pesanan: ${orderId}</p>
-            `;
-            
-            // Reset form
+            document.getElementById('reviewProductInfo').innerHTML = `<p class="font-semibold">${produkNama}</p><p class="text-sm">ID: ${orderId}</p>`;
             document.getElementById('reviewRating').value = '0';
             document.getElementById('reviewText').value = '';
             document.getElementById('reviewPhoto').value = '';
-            
-            // Reset bintang
-            document.querySelectorAll('#ratingStars i').forEach(star => {
-                star.classList.remove('fa-solid', 'text-yellow-400');
-                star.classList.add('fa-regular');
-            });
-            
+            document.querySelectorAll('#ratingStars i').forEach(s => { s.classList.remove('fa-solid', 'text-yellow-400'); s.classList.add('fa-regular'); });
             currentRating = 0;
-            
             document.getElementById('reviewModal').style.display = 'flex';
         }
-
         function tutupReviewModal() {
             document.getElementById('reviewModal').style.display = 'none';
         }
-
-        // Setup rating stars
-        document.addEventListener('DOMContentLoaded', function() {
-            const stars = document.querySelectorAll('#ratingStars i');
-            stars.forEach(star => {
-                star.addEventListener('click', function() {
-                    const rating = parseInt(this.dataset.rating);
-                    currentRating = rating;
-                    document.getElementById('reviewRating').value = rating;
-                    
-                    stars.forEach((s, index) => {
-                        if(index < rating) {
-                            s.classList.remove('fa-regular');
-                            s.classList.add('fa-solid', 'text-yellow-400');
-                        } else {
-                            s.classList.remove('fa-solid', 'text-yellow-400');
-                            s.classList.add('fa-regular');
-                        }
-                    });
+        document.querySelectorAll('#ratingStars i').forEach(star => {
+            star.addEventListener('click', function() {
+                const rating = parseInt(this.dataset.rating);
+                currentRating = rating;
+                document.getElementById('reviewRating').value = rating;
+                document.querySelectorAll('#ratingStars i').forEach((s, i) => {
+                    if(i < rating) { s.classList.remove('fa-regular'); s.classList.add('fa-solid', 'text-yellow-400'); }
+                    else { s.classList.remove('fa-solid', 'text-yellow-400'); s.classList.add('fa-regular'); }
                 });
             });
         });
-
         function submitReview() {
             const orderId = document.getElementById('reviewOrderId').value;
             const produkId = document.getElementById('reviewProductId').value;
             const produkNama = document.getElementById('reviewProductName').value;
             const rating = document.getElementById('reviewRating').value;
             const ulasan = document.getElementById('reviewText').value;
-            const photo = document.getElementById('reviewPhoto').files[0];
-
-            if(rating === '0') {
-                alert('Pilih rating dulu bang!');
-                return;
-            }
-
-            if(!ulasan) {
-                alert('Tulis ulasan dulu bang!');
-                return;
-            }
-
-            // Cek apakah pesanan ini udah pernah kasih ulasan
+            if(rating === '0') { alert('Pilih rating dulu!'); return; }
+            if(!ulasan) { alert('Tulis ulasan dulu!'); return; }
             db.ref('pesanan/' + orderId).once('value', (snapshot) => {
-                const pesanan = snapshot.val();
-                
-                if(pesanan.dapatUlasan === true) {
-                    alert('Pesanan ini sudah pernah dikasih ulasan!');
-                    tutupReviewModal();
-                    return;
-                }
-
-                // Upload foto kalo ada
-                if(photo) {
-                    const storageRef = storage.ref('testimoni/' + Date.now() + '_' + photo.name);
-                    storageRef.put(photo).then(() => {
-                        storageRef.getDownloadURL().then(url => {
-                            simpanReview(orderId, produkId, produkNama, rating, ulasan, url, pesanan);
-                        });
-                    });
-                } else {
-                    simpanReview(orderId, produkId, produkNama, rating, ulasan, null, pesanan);
-                }
+                if(snapshot.val().dapatUlasan) { alert('Sudah pernah kasih ulasan!'); tutupReviewModal(); return; }
+                const reviewRef = db.ref('testimoni').push({ produkId, produk: produkNama, nama: snapshot.val().nama || 'Customer', rating: parseInt(rating), ulasan, foto: null, waktu: Date.now(), orderId });
+                db.ref('pesanan/' + orderId).update({ dapatUlasan: true });
+                db.ref('produk/' + produkId).transaction(p => { if(p) { p.ulasanCount = (p.ulasanCount || 0) + 1; } return p; });
+                alert('✅ Terima kasih!'); tutupReviewModal();
             });
         }
 
-        function simpanReview(orderId, produkId, produkNama, rating, ulasan, fotoUrl, pesanan) {
-            // Ambil data user dari pesanan (asumsi user isi nama di WA)
-            let namaUser = pesanan.nama || 'Customer';
-            
-            // Simpan testimoni
-            const reviewRef = db.ref('testimoni').push({
-                produkId: produkId,
-                produk: produkNama,
-                nama: namaUser,
-                rating: parseInt(rating),
-                ulasan: ulasan,
-                foto: fotoUrl,
-                waktu: Date.now(),
-                orderId: orderId
-            });
-
-            // Update flag dapatUlasan di pesanan
-            db.ref('pesanan/' + orderId).update({
-                dapatUlasan: true
-            });
-
-            // Update ulasanCount dan rating di produk
-            db.ref('produk/' + produkId).transaction((produk) => {
-                if(produk) {
-                    produk.ulasanCount = (produk.ulasanCount || 0) + 1;
-                    if(!produk.ulasan) produk.ulasan = {};
-                    produk.ulasan[reviewRef.key] = {
-                        rating: parseInt(rating),
-                        waktu: Date.now()
-                    };
-                }
-                return produk;
-            });
-
-            alert('✅ Terima kasih atas ulasannya!');
-            tutupReviewModal();
-        }
-
-        // ========== LIHAT ULASAN PER PRODUK ==========
+        // LIHAT ULASAN
         function lihatUlasan(produkId, produkNama) {
             db.ref('testimoni').orderByChild('produkId').equalTo(produkId).once('value', (snapshot) => {
                 const data = snapshot.val();
-                
-                if(!data) {
-                    alert('Belum ada ulasan untuk produk ini.');
-                    return;
-                }
-
-                let pesan = `⭐ ULASAN UNTUK: ${produkNama}\n\n`;
-                let count = 0;
-                
-                Object.keys(data).forEach(key => {
-                    const t = data[key];
-                    count++;
-                    pesan += `${count}. 👤 ${t.nama}\n`;
-                    pesan += `   ⭐ ${t.rating}/5\n`;
-                    pesan += `   💬 "${t.ulasan}"\n`;
-                    pesan += `   📅 ${new Date(t.waktu).toLocaleDateString('id-ID')}\n`;
-                    pesan += `-------------------\n`;
-                });
-                
+                if(!data) { alert('Belum ada ulasan'); return; }
+                let pesan = `⭐ ULASAN ${produkNama}\n\n`;
+                Object.keys(data).forEach((key, i) => { const t = data[key]; pesan += `${i+1}. 👤 ${t.nama}\n   ⭐ ${t.rating}/5\n   💬 "${t.ulasan}"\n\n`; });
                 alert(pesan);
             });
         }
 
-        // ========== ADMIN FUNCTIONS ==========
-        function loadAdminData() {
-            // Load produk
-            db.ref('produk').on('value', (snapshot) => {
+        // CEK PESANAN
+        function cekPesanan() {
+            const idPesanan = prompt("Masukkan ID Pesanan:");
+            if(!idPesanan) return;
+            db.ref('pesanan').orderByChild('kode').equalTo(idPesanan).once('value', (snapshot) => {
                 const data = snapshot.val();
-                const container = document.getElementById('adminProdukList');
-                
-                if(!data) {
-                    container.innerHTML = '<p class="text-gray-500">Belum ada produk</p>';
-                    return;
-                }
-
-                let html = '';
+                if(!data) { alert('❌ ID tidak ditemukan!'); return; }
                 Object.keys(data).forEach(key => {
-                    html += `
-                        <div class="bg-gray-50 p-4 rounded-lg flex justify-between items-center">
-                            <div>
-                                <p class="font-semibold">${data[key].nama}</p>
-                                <p class="text-sm text-gray-600">Rp ${Number(data[key].harga).toLocaleString()} | Terjual: ${data[key].terjual || 0} | Ulasan: ${data[key].ulasanCount || 0}</p>
-                            </div>
-                            <div>
-                                <button onclick="editProduk('${key}')" class="text-blue-500 mr-2">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button onclick="hapusProduk('${key}')" class="text-red-500">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `;
+                    const p = data[key];
+                    const status = { pending: '⏳ Menunggu', proses: '⚙️ Diproses', dikirim: '📦 Dikirim', selesai: '✅ Selesai' }[p.status] || p.status;
+                    if(p.status === 'selesai' && !p.dapatUlasan && confirm(`Status: ${status}\n\nMau kasih ulasan?`)) {
+                        bukaReviewModal(key, p.produkId, p.produkNama);
+                    } else alert(`Status: ${status}`);
                 });
-                container.innerHTML = html;
-            });
-
-                       // Load pesanan
-            db.ref('pesanan').orderByChild('waktu').on('value', (snapshot) => {
-                const data = snapshot.val();
-                filterPesanan(data);
-            });
-
-            // Load testimoni
-            db.ref('testimoni').on('value', (snapshot) => {
-                const data = snapshot.val();
-                const container = document.getElementById('adminTestimoniList');
-                
-                if(!data) {
-                    container.innerHTML = '<p class="text-gray-500">Belum ada testimoni</p>';
-                    return;
-                }
-
-                let html = '';
-                Object.keys(data).forEach(key => {
-                    const t = data[key];
-                    html += `
-                        <div class="bg-gray-50 p-4 rounded-lg flex justify-between items-center">
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2">
-                                    <p class="font-semibold">${t.nama}</p>
-                                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">${t.produk}</span>
-                                </div>
-                                <div class="flex text-yellow-400 my-1">
-                                    ${Array(5).fill(0).map((_, i) => 
-                                        `<i class="fa-${i < t.rating ? 'solid' : 'regular'} fa-star text-xs"></i>`
-                                    ).join('')}
-                                </div>
-                                <p class="text-sm text-gray-600">${t.ulasan}</p>
-                                <p class="text-xs text-gray-400 mt-1">Order ID: ${t.orderId || '-'}</p>
-                            </div>
-                            <button onclick="hapusTestimoni('${key}')" class="text-red-500 hover:text-red-700 ml-2">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
-            });
-
-            // Load pengaturan
-            db.ref('pengaturan').once('value', (snapshot) => {
-                const data = snapshot.val() || {};
-                document.getElementById('editNomor').value = data.nomor || '0851-8798-0564';
-                document.getElementById('editWaMessage').value = data.waMessage || 'Halo kak, terima kasih telah order. Kami akan segera memproses pesanan Anda.';
             });
         }
 
+        // ADMIN LOAD DATA
+        function loadAdminData() {
+            db.ref('produk').on('value', (s) => { let html = ''; s.forEach(c => { let p = c.val(); html += `<div class="bg-gray-50 p-4 rounded-lg flex justify-between"><div><p class="font-semibold">${p.nama}</p><p class="text-sm">Rp ${p.harga} | Terjual: ${p.terjual||0}</p></div><div><button onclick="editProduk('${c.key}')" class="text-blue-500 mr-2"><i class="fas fa-edit"></i></button><button onclick="hapusProduk('${c.key}')" class="text-red-500"><i class="fas fa-trash"></i></button></div></div>`; }); document.getElementById('adminProdukList').innerHTML = html || '<p>Kosong</p>'; });
+            db.ref('pesanan').on('value', (s) => { filterPesanan(s.val()); });
+            db.ref('testimoni').on('value', (s) => { let html = ''; s.forEach(c => { let t = c.val(); html += `<div class="bg-gray-50 p-4 rounded-lg flex justify-between"><div><p class="font-semibold">${t.nama}</p><p class="text-sm">${t.ulasan.substring(0,30)}...</p></div><button onclick="hapusTestimoni('${c.key}')" class="text-red-500"><i class="fas fa-trash"></i></button></div>`; }); document.getElementById('adminTestimoniList').innerHTML = html || '<p>Kosong</p>'; });
+        }
         function filterPesanan(data) {
             const filter = document.getElementById('filterStatus').value;
-            const container = document.getElementById('adminPesananList');
-            
-            if(!data) {
-                container.innerHTML = '<p class="text-gray-500">Belum ada pesanan</p>';
-                return;
-            }
-
             let html = '';
-            let hasData = false;
-            
-            Object.keys(data).forEach(key => {
+            if(data) Object.keys(data).forEach(key => {
                 const p = data[key];
                 if(filter === 'all' || p.status === filter) {
-                    hasData = true;
-                    const waktu = new Date(p.waktu).toLocaleString('id-ID');
-                    const statusClass = {
-                        'pending': 'bg-yellow-100 text-yellow-800',
-                        'proses': 'bg-blue-100 text-blue-800',
-                        'dikirim': 'bg-purple-100 text-purple-800',
-                        'selesai': 'bg-green-100 text-green-800'
-                    }[p.status] || 'bg-gray-100 text-gray-800';
-                    
-                    const statusText = {
-                        'pending': '⏳ Pending',
-                        'proses': '⚙️ Diproses',
-                        'dikirim': '📦 Dikirim',
-                        'selesai': '✅ Selesai'
-                    }[p.status] || p.status;
-
-                    html += `
-                        <div class="bg-gray-50 p-4 rounded-lg border-l-4 ${p.status === 'pending' ? 'border-yellow-400' : p.status === 'proses' ? 'border-blue-400' : p.status === 'dikirim' ? 'border-purple-400' : 'border-green-400'}">
-                            <div class="flex flex-col md:flex-row justify-between items-start gap-3">
-                                <div class="flex-1">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <span class="font-mono font-bold">${p.kode || 'No Kode'}</span>
-                                        <span class="text-xs ${statusClass} px-2 py-1 rounded-full">${statusText}</span>
-                                    </div>
-                                    <p class="font-semibold">${p.produkNama} x ${p.jumlah}</p>
-                                    <p class="text-sm text-gray-600">Total: Rp ${p.total.toLocaleString()}</p>
-                                    <p class="text-xs text-gray-400">${waktu}</p>
-                                    ${p.dapatUlasan ? '<p class="text-xs text-green-600 mt-1"><i class="fas fa-check-circle"></i> Sudah diberi ulasan</p>' : ''}
-                                </div>
-                                <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto">
-                                    <select onchange="updateStatusPesanan('${key}', this.value)" class="border rounded p-2 text-sm">
-                                        <option value="pending" ${p.status === 'pending' ? 'selected' : ''}>⏳ Pending</option>
-                                        <option value="proses" ${p.status === 'proses' ? 'selected' : ''}>⚙️ Diproses</option>
-                                        <option value="dikirim" ${p.status === 'dikirim' ? 'selected' : ''}>📦 Dikirim</option>
-                                        <option value="selesai" ${p.status === 'selesai' ? 'selected' : ''}>✅ Selesai</option>
-                                    </select>
-                                    
-                                    ${p.status === 'selesai' && !p.dapatUlasan ? 
-                                        `<button onclick="bukaReviewModalDariAdmin('${key}', '${p.produkId}', '${p.produkNama}')" class="bg-green-500 text-white px-3 py-2 rounded text-sm hover:bg-green-600">
-                                            <i class="fas fa-star mr-1"></i>Minta Ulasan
-                                        </button>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    `;
+                    html += `<div class="bg-gray-50 p-4 rounded-lg border-l-4 ${p.status === 'pending' ? 'border-yellow-500' : p.status === 'proses' ? 'border-blue-500' : p.status === 'dikirim' ? 'border-purple-500' : 'border-green-500'}">
+                        <div class="flex flex-col md:flex-row justify-between"><div><span class="font-mono text-sm bg-gray-200 px-2 py-1 rounded">${p.kode}</span><p class="font-semibold mt-2">${p.produkNama} x${p.jumlah}</p><p class="text-sm">Rp ${p.total.toLocaleString()}</p></div>
+                        <div><select onchange="updateStatusPesanan('${key}', this.value)" class="border rounded p-2 text-sm"><option value="pending" ${p.status === 'pending' ? 'selected' : ''}>⏳ Pending</option><option value="proses" ${p.status === 'proses' ? 'selected' : ''}>⚙️ Proses</option><option value="dikirim" ${p.status === 'dikirim' ? 'selected' : ''}>📦 Dikirim</option><option value="selesai" ${p.status === 'selesai' ? 'selected' : ''}>✅ Selesai</option></select></div></div></div>`;
                 }
             });
-            
-            container.innerHTML = hasData ? html : '<p class="text-gray-500">Tidak ada pesanan dengan status tersebut</p>';
+            document.getElementById('adminPesananList').innerHTML = html || '<p class="text-gray-500">Tidak ada pesanan</p>';
         }
-
         function updateStatusPesanan(id, status) {
-            db.ref('pesanan/' + id).update({status: status});
-            
-            // Kalau status selesai, tambah counter terjual
+            db.ref('pesanan/' + id).update({status});
             if(status === 'selesai') {
-                db.ref('pesanan/' + id).once('value', (snapshot) => {
-                    const p = snapshot.val();
-                    db.ref('produk/' + p.produkId).transaction((produk) => {
-                        if(produk) {
-                            produk.terjual = (produk.terjual || 0) + p.jumlah;
-                        }
-                        return produk;
-                    });
-                });
-            }
-            
-            alert('✅ Status pesanan diperbarui!');
-        }
-
-        function bukaReviewModalDariAdmin(orderId, produkId, produkNama) {
-            // Admin bisa buka modal review untuk customer (opsional)
-            if(confirm('Kirim link ulasan ke customer via WhatsApp?')) {
-                const pesan = `Halo kak, terima kasih telah berbelanja di Jamu Herbal Alami! 🌿
-
-Kami harap produknya bermanfaat. Kakak bisa kasih ulasan untuk produk ${produkNama} dengan klik link berikut:
-
-[Link Ulasan akan otomatis terkirim]
-
-Silakan buka website kami dan masukkan ID Pesanan: ${orderId}
-
-Terima kasih!`;
-                
-                const encodedPesan = encodeURIComponent(pesan);
-                window.open(`https://wa.me/${OWNER_WA}?text=${encodedPesan}`, '_blank');
+                db.ref('pesanan/' + id).once('value', s => { let p = s.val(); db.ref('produk/' + p.produkId).transaction(pr => { if(pr) pr.terjual = (pr.terjual||0) + p.jumlah; return pr; }); });
             }
         }
-
-        // ========== ADMIN CRUD ==========
         function tambahProduk() {
-            const nama = prompt("Nama produk:");
-            if(!nama) return;
-            
-            const harga = prompt("Harga produk (angka saja):");
-            if(!harga) return;
-            
-            const deskripsi = prompt("Deskripsi produk:");
-            if(!deskripsi) return;
-            
-            const foto = prompt("URL foto produk (opsional):");
-
-            db.ref('produk').push({
-                nama: nama,
-                harga: parseInt(harga),
-                deskripsi: deskripsi,
-                foto: foto || 'https://via.placeholder.com/300',
-                terjual: 0,
-                ulasanCount: 0
-            }).then(() => alert('✅ Produk ditambahkan!'));
+            let nama = prompt("Nama produk:"); if(!nama) return;
+            let harga = prompt("Harga:"); if(!harga) return;
+            let desc = prompt("Deskripsi:"); if(!desc) return;
+            let foto = prompt("URL foto (opsional):");
+            db.ref('produk').push({ nama, harga: parseInt(harga), deskripsi: desc, foto: foto||'https://via.placeholder.com/300', terjual:0, ulasanCount:0 }).then(() => alert('✅ Ditambahkan'));
         }
-
         function editProduk(id) {
-            db.ref('produk/' + id).once('value', (snapshot) => {
-                const p = snapshot.val();
-                
-                const nama = prompt("Nama produk:", p.nama);
-                if(!nama) return;
-                
-                const harga = prompt("Harga produk:", p.harga);
-                if(!harga) return;
-                
-                const deskripsi = prompt("Deskripsi:", p.deskripsi);
-                if(!deskripsi) return;
-                
-                const foto = prompt("URL foto:", p.foto);
-
+            db.ref('produk/' + id).once('value', s => { let p = s.val();
+                                let nama = prompt("Nama:", p.nama); if(!nama) return;
+                let harga = prompt("Harga:", p.harga); if(!harga) return;
+                let desc = prompt("Deskripsi:", p.deskripsi); if(!desc) return;
+                let foto = prompt("URL foto:", p.foto);
                 db.ref('produk/' + id).update({
                     nama: nama,
                     harga: parseInt(harga),
-                    deskripsi: deskripsi,
+                    deskripsi: desc,
                     foto: foto || p.foto
                 }).then(() => alert('✅ Produk diupdate!'));
             });
         }
 
         function hapusProduk(id) {
-            if(confirm("Yakin hapus produk? Semua data terkait akan ikut terhapus!")) {
-                db.ref('produk/' + id).remove().then(() => {
-                    // Hapus juga testimoni terkait
-                    db.ref('testimoni').orderByChild('produkId').equalTo(id).once('value', (snap) => {
-                        snap.forEach(child => {
-                            child.ref.remove();
-                        });
-                    });
-                    alert('✅ Produk dihapus!');
-                });
+            if(confirm("Yakin hapus produk?")) {
+                db.ref('produk/' + id).remove().then(() => alert('✅ Produk dihapus!'));
             }
         }
 
         function hapusTestimoni(id) {
             if(confirm("Yakin hapus testimoni?")) {
-                db.ref('testimoni/' + id).once('value', (snapshot) => {
-                    const t = snapshot.val();
-                    
-                    // Kurangi ulasanCount di produk
-                    if(t && t.produkId) {
-                        db.ref('produk/' + t.produkId).transaction((produk) => {
-                            if(produk && produk.ulasanCount > 0) {
-                                produk.ulasanCount--;
-                            }
-                            return produk;
-                        });
-                    }
-                    
-                    // Hapus testimoni
-                    db.ref('testimoni/' + id).remove().then(() => {
-                        alert('✅ Testimoni dihapus!');
-                    });
-                });
+                db.ref('testimoni/' + id).remove().then(() => alert('✅ Testimoni dihapus!'));
             }
         }
 
         function simpanPengaturan() {
             const nomor = document.getElementById('editNomor').value;
-            const waMessage = document.getElementById('editWaMessage').value;
-            
-            db.ref('pengaturan').set({
-                nomor: nomor,
-                waMessage: waMessage
-            }).then(() => alert('✅ Pengaturan disimpan!'));
+            db.ref('pengaturan').set({ nomor: nomor }).then(() => alert('✅ Pengaturan disimpan!'));
         }
 
         function loadStats() {
-            db.ref('produk').once('value', (snap) => {
-                document.getElementById('statProduk').textContent = snap.numChildren();
-            });
-            
-            db.ref('pesanan').once('value', (snap) => {
-                document.getElementById('statPesanan').textContent = snap.numChildren();
+            db.ref('produk').once('value', (s) => { document.getElementById('statProduk').textContent = s.numChildren(); });
+            db.ref('pesanan').once('value', (s) => { 
+                document.getElementById('statPesanan').textContent = s.numChildren();
                 let total = 0;
-                snap.forEach(child => {
-                    if(child.val().status === 'selesai') {
-                        total += child.val().jumlah || 0;
-                    }
-                });
+                s.forEach(c => { if(c.val().status === 'selesai') total += c.val().jumlah || 0; });
                 document.getElementById('statTerjual').textContent = total;
             });
-            
-            db.ref('testimoni').once('value', (snap) => {
-                document.getElementById('statTestimoni').textContent = snap.numChildren();
-            });
+            db.ref('testimoni').once('value', (s) => { document.getElementById('statTestimoni').textContent = s.numChildren(); });
         }
 
-        // ========== FUNGSI CEK STATUS PESANAN (UNTUK USER) ==========
-        function cekStatusPesanan() {
-            const kode = prompt("Masukkan ID Pesanan (contoh: INV-12345678-ABC):");
-            if(!kode) return;
-            
-            db.ref('pesanan').orderByChild('kode').equalTo(kode).once('value', (snapshot) => {
-                const data = snapshot.val();
-                
-                if(!data) {
-                    alert('❌ ID Pesanan tidak ditemukan!');
-                    return;
-                }
-                
-                let pesan = '📋 STATUS PESANAN\n\n';
-                
-                Object.keys(data).forEach(key => {
-                    const p = data[key];
-                    const statusIcon = {
-                        'pending': '⏳',
-                        'proses': '⚙️',
-                        'dikirim': '📦',
-                        'selesai': '✅'
-                    }[p.status] || '❓';
-                    
-                    pesan += `${statusIcon} ID: ${p.kode}\n`;
-                    pesan += `Produk: ${p.produkNama} x${p.jumlah}\n`;
-                    pesan += `Total: Rp ${p.total.toLocaleString()}\n`;
-                    pesan += `Status: ${p.status.toUpperCase()}\n`;
-                    pesan += `Tanggal: ${new Date(p.waktu).toLocaleDateString('id-ID')}\n`;
-                    
-                    if(p.status === 'selesai' && !p.dapatUlasan) {
-                        pesan += `\n✨ Pesanan selesai! Kasih ulasan sekarang:\n`;
-                        pesan += `Website → Cari produk → Klik "Lihat Semua Ulasan" → "Tambah Ulasan"\n`;
-                    }
-                    
-                    pesan += `-------------------\n`;
-                });
-                
-                alert(pesan);
-            });
-        }
-
-        // ========== INIT ==========
-        document.addEventListener('DOMContentLoaded', function() {
-            loadProduk();
-            loadTestimoni();
-            loadNomor();
-            
-            // Tambah tombol cek status di navigasi
-            const nav = document.querySelector('nav .container .hidden.md\\:flex');
-            if(nav) {
-                const cekStatusBtn = document.createElement('button');
-                cekStatusBtn.onclick = cekStatusPesanan;
-                cekStatusBtn.className = 'hover:text-green-200 transition ml-4';
-                cekStatusBtn.innerHTML = '<i class="fas fa-search mr-1"></i>Cek Status';
-                nav.appendChild(cekStatusBtn);
-            }
-        });
+        // INIT
+        loadProduk();
+        loadTestimoni();
+        loadNomor();
     </script>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-8 mt-8">
-        <div class="container mx-auto text-center">
-            <p>&copy; 2024 Jamu Herbal Alami. All rights reserved.</p>
-            <p class="text-sm text-gray-400 mt-2">🌿 100% Alami dan Tradisional 🌿</p>
-            <p class="text-xs text-gray-500 mt-4">ID Pesanan: Simpan untuk cek status dan beri ulasan</p>
-        </div>
-    </footer>
 </body>
 </html>
