@@ -13,11 +13,29 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: #f9fafb; }
+        
         .hidden-click-area { cursor: pointer; }
         .admin-button-appear { animation: slideIn 0.5s ease-out; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .product-card { transition: all 0.3s; }
-        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+        
+        @keyframes slideIn { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        
+        .product-card { 
+            transition: all 0.3s; 
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .product-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); 
+        }
+        
         .whatsapp-float {
             position: fixed; bottom: 20px; left: 20px; background: #25D366; color: white;
             width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center;
@@ -25,76 +43,173 @@
             cursor: pointer; transition: all 0.3s; font-size: 30px;
         }
         .whatsapp-float:hover { transform: scale(1.1); background: #128C7E; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: white; border-radius: 12px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; margin: 20px; padding: 24px; }
+        
+        .modal { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.5); 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 1000; 
+        }
+        .modal-content { 
+            background: white; 
+            border-radius: 20px; 
+            max-width: 500px; 
+            width: 90%; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+            margin: 20px; 
+            padding: 24px; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        
         .toast {
             position: fixed; bottom: 20px; right: 20px; background: #333; color: white;
             padding: 12px 24px; border-radius: 8px; z-index: 2000; animation: slideInRight 0.3s;
         }
-        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideInRight { 
+            from { transform: translateX(100%); opacity: 0; } 
+            to { transform: translateX(0); opacity: 1; } 
+        }
+        
         .status-badge {
             display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
         }
-        .status-pending { background: #fef3c7; color: #92400e; }
         .status-menunggu-pembayaran { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
         .status-proses { background: #dbeafe; color: #1e40af; }
         .status-dikirim { background: #f3e8ff; color: #6b21a8; }
         .status-selesai { background: #d1fae5; color: #065f46; }
         .status-ditolak { background: #fee2e2; color: #991b1b; }
-        .order-card {
-            border-left: 4px solid; transition: all 0.3s;
+        .status-kadaluarsa { background: #e5e7eb; color: #4b5563; border: 1px solid #9ca3af; }
+        
+        .order-card { 
+            border-left: 4px solid; 
+            transition: all 0.3s; 
+            margin-bottom: 12px; 
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        .order-card:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        .order-card:hover { 
+            transform: translateX(5px); 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); 
         }
+        .order-card.confirmed { background: #f0fdf4; border-left-color: #10b981 !important; }
+        .order-card.expired { background: #f3f4f6; border-left-color: #9ca3af !important; opacity: 0.8; }
+        
+        .countdown-timer {
+            font-family: monospace;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 20px;
+            background: #fee2e2;
+            color: #dc2626;
+            font-size: 13px;
+            display: inline-block;
+        }
+        
+        .tab-btn { transition: all 0.2s; }
         .tab-active { border-bottom: 2px solid #16a34a; color: #16a34a; font-weight: 600; }
+        
         .copy-btn { cursor: pointer; transition: all 0.2s; }
         .copy-btn:hover { transform: scale(1.1); }
+        
         .rekening-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
             color: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 15px -3px rgba(16,185,129,0.3);
+        }
+        
+        .btn-primary {
+            background: #059669;
+            color: white;
+            padding: 10px 20px;
             border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 10px;
-        }
-        .konfirmasi-row {
-            background-color: #f9fafb;
-            border-radius: 8px;
-            padding: 12px;
-            margin-top: 10px;
-            border: 1px dashed #d1d5db;
-        }
-        .btn-konfirmasi {
-            background-color: #10b981;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 13px;
             font-weight: 600;
             transition: all 0.2s;
+            cursor: pointer;
+            border: none;
         }
-        .btn-konfirmasi:hover {
-            background-color: #059669;
+        .btn-primary:hover { background: #047857; transform: translateY(-1px); }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
         }
-        .input-id {
+        .btn-success:hover { background: #059669; }
+        
+        .input-field {
             border: 1px solid #d1d5db;
-            border-radius: 6px;
-            padding: 8px 12px;
+            border-radius: 10px;
+            padding: 10px 14px;
             width: 100%;
             font-size: 14px;
+            transition: all 0.2s;
         }
-        .input-id:focus {
+        .input-field:focus {
             outline: none;
             border-color: #10b981;
-            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+        }
+        
+        .floating-confirm {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+            padding: 20px;
+            width: 320px;
+            z-index: 100;
+            border-left: 4px solid #10b981;
+            display: none;
+        }
+        .floating-confirm.show { display: block; }
+        
+        .realtime-update {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .warning-expired {
+            background: #fee2e2;
+            border: 1px solid #ef4444;
+            color: #b91c1c;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        /* Sample produk sementara kalo database kosong */
+        .sample-product {
+            border: 2px dashed #059669;
+            background: #f0fdf4;
         }
     </style>
 </head>
-<body class="bg-gray-50">
+<body>
 
     <!-- FIREBASE CONFIG -->
     <script>
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyD1xADf6KbttaSRl3bYuKEMUrQ4SJmTtH4",
             authDomain: "jamu-herbal-alami.firebaseapp.com",
@@ -102,32 +217,73 @@
             projectId: "jamu-herbal-alami",
             storageBucket: "jamu-herbal-alami.firebasestorage.app",
             messagingSenderId: "770031966685",
-            appId: "1:770031966685:web:dc20683776e310c0b0fe34"
+            appId: "1:770031966685:web:dc20683776e310c0b0fe34",
+            measurementId: "G-YHR9GZD48K"
         };
+
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const storage = firebase.storage();
-        const OWNER_WA = "6285187980564";
+        
+        // Global variables
+        let OWNER_WA = "6285187980564";
         let userSession = localStorage.getItem('sessionId') || 'session_' + Date.now() + '_' + Math.random().toString(36).substring(2);
         localStorage.setItem('sessionId', userSession);
+        let clickCount = 0;
+        const CLICKS_NEEDED = 5;
+        let allOrders = [];
+        let currentOrderListener = null;
+        let expiredCheckInterval = null;
+        const EXPIRY_TIME = 10 * 60 * 1000; // 10 menit dalam milidetik
+        const SPAM_LIMIT = 3; // Maksimal 3 order per sesi
+        const SPAM_WINDOW = 30 * 60 * 1000; // 30 menit
+
+        // Sample products untuk testing kalo database kosong
+        const sampleProducts = [
+            {
+                nama: "Jahe Merah Original",
+                deskripsi: "Jahe merah pilihan, cocok untuk menghangatkan tubuh",
+                harga: 35000,
+                foto: "https://images.tokopedia.net/img/cache/500-square/product-1/2020/1/1/123456/123456_123456.jpg",
+                terjual: 45,
+                ulasanCount: 12
+            },
+            {
+                nama: "Kunyit Asam",
+                deskripsi: "Kunyit asam tradisional, baik untuk kesehatan wanita",
+                harga: 25000,
+                foto: "https://images.tokopedia.net/img/cache/500-square/product-1/2020/1/1/123456/123456_123457.jpg",
+                terjual: 67,
+                ulasanCount: 23
+            },
+            {
+                nama: "Beras Kencur",
+                deskripsi: "Beras kencur asli, resep turun temurun",
+                harga: null,
+                foto: "https://images.tokopedia.net/img/cache/500-square/product-1/2020/1/1/123456/123456_123458.jpg",
+                terjual: 28,
+                ulasanCount: 8
+            }
+        ];
     </script>
 
     <!-- WHATSAPP FLOAT -->
-    <a href="https://wa.me/6285187980564" class="whatsapp-float" target="_blank">
+    <a href="https://wa.me/6285187980564" class="whatsapp-float" target="_blank" id="waFloat">
         <i class="fab fa-whatsapp"></i>
     </a>
 
     <!-- NAVBAR -->
-    <nav class="bg-green-600 text-white p-4 sticky top-0 z-40 shadow-lg">
+    <nav class="bg-gradient-to-r from-green-600 to-green-700 text-white p-4 sticky top-0 z-40 shadow-lg">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-2xl font-bold flex items-center gap-2">
                 <i class="fas fa-leaf"></i> Jamu Herbal Alami
             </h1>
             <div class="hidden md:flex space-x-6">
-                <a href="#produk" class="hover:text-green-200">Produk</a>
-                <a href="#testimoni" class="hover:text-green-200">Testimoni</a>
-                <a href="#kontak" class="hover:text-green-200">Kontak</a>
-                <a href="#cek-pesanan" class="hover:text-green-200">Cek Pesanan</a>
+                <a href="#produk" class="hover:text-green-200 transition">Produk</a>
+                <a href="#testimoni" class="hover:text-green-200 transition">Testimoni</a>
+                <a href="#kontak" class="hover:text-green-200 transition">Kontak</a>
+                <a href="#cek-pesanan" class="hover:text-green-200 transition">Cek Pesanan</a>
             </div>
             <span id="totalTerjual" class="bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-bold">
                 <i class="fas fa-chart-line mr-1"></i>0 Terjual
@@ -140,36 +296,56 @@
         <div class="container mx-auto">
             <h2 class="text-4xl font-bold mb-4">Herbal Alami Untuk Kesehatan</h2>
             <p class="text-xl">100% Alami - Tradisional - Berkhasiat</p>
-            <p class="mt-4 text-sm opacity-75">📦 Gratis Ongkir • 💳 Bayar di Tempat • 🌿 Terpercaya</p>
+            <p class="mt-4 text-sm opacity-75">🌿 Langsung Chat WA • 💬 Konsultasi Gratis • 📦 Kirim Cepat</p>
+            <p class="mt-2 text-sm bg-yellow-500 text-black inline-block px-4 py-1 rounded-full">⏰ Pesanan hangus dalam 10 menit jika tidak dibayar</p>
         </div>
-        <!-- KLIK 5x DISINI -->
-        <div class="hidden-click-area absolute bottom-4 right-4 w-20 h-20 opacity-0 hover:opacity-20 bg-black rounded-full" id="hiddenClickArea"></div>
+        <!-- KLIK 5x DISINI - UDAH FIX -->
+        <div class="hidden-click-area absolute bottom-4 right-4 w-20 h-20 bg-black bg-opacity-0 hover:bg-opacity-20 rounded-full transition-all" id="hiddenClickArea" style="cursor: pointer;"></div>
+    </section>
+
+    <!-- FLOATING KONFIRMASI ADMIN -->
+    <div id="floatingConfirm" class="floating-confirm">
+        <h4 class="font-bold text-green-700 mb-3 flex items-center text-lg">
+            <i class="fas fa-money-bill-wave mr-2 text-green-600"></i>Konfirmasi Pembayaran
+        </h4>
+        <input type="text" id="floatingConfirmId" placeholder="Masukkan ID Pesanan" class="input-field mb-3">
+        <button onclick="konfirmasiDariFloating()" class="w-full btn-primary">
+            <i class="fas fa-check-circle mr-2"></i>Konfirmasi Sekarang
+        </button>
+        <div id="floatingConfirmResult" class="mt-3 text-sm hidden"></div>
+        <p class="text-xs text-gray-500 mt-2">*Pesanan akan hangus otomatis setelah 10 menit</p>
+    </div>
+
+    <!-- CEK PESANAN SECTION -->
+    <section id="cek-pesanan" class="bg-gray-100 py-12">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4">🔍 Cek Status Pesanan</h2>
+            <p class="text-center text-gray-600 mb-8">Masukkan ID Pesanan untuk melihat status terbaru secara realtime</p>
+            
+            <div class="max-w-md mx-auto bg-white rounded-xl shadow-md p-6">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2 font-medium">ID Pesanan</label>
+                    <input type="text" id="cekIdPesanan" class="input-field" placeholder="Contoh: INV-12345678-ABCD">
+                </div>
+                <button onclick="cekPesananRealtime()" class="w-full btn-primary">
+                    <i class="fas fa-search mr-2"></i>Cek Sekarang
+                </button>
+                
+                <div id="cekPesananResult" class="mt-6 hidden"></div>
+                <div id="realtimeStatus" class="mt-4 hidden"></div>
+            </div>
+        </div>
     </section>
 
     <!-- PRODUK SECTION -->
     <section id="produk" class="container mx-auto px-4 py-12">
         <h2 class="text-3xl font-bold text-center mb-4">🌿 Produk Kami</h2>
         <p class="text-center text-gray-600 mb-8">Herbal pilihan untuk kesehatan keluarga</p>
-        <div id="produkList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-    </section>
-
-    <!-- CEK PESANAN SECTION -->
-    <section id="cek-pesanan" class="bg-gray-100 py-12">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-4">🔍 Cek Status Pesanan</h2>
-            <p class="text-center text-gray-600 mb-8">Masukkan ID Pesanan untuk melihat status terbaru</p>
-            
-            <div class="max-w-md mx-auto bg-white rounded-xl shadow-md p-6">
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">ID Pesanan</label>
-                    <input type="text" id="cekIdPesanan" class="w-full border rounded-lg p-3" placeholder="Contoh: INV-12345678-ABCD">
-                </div>
-                <button onclick="cekPesanan()" class="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 font-semibold">
-                    <i class="fas fa-search mr-2"></i>Cek Sekarang
-                </button>
-                
-                <!-- HASIL CEK PESANAN -->
-                <div id="cekPesananResult" class="mt-6 hidden"></div>
+        <div id="produkList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Produk akan di-load via JavaScript -->
+            <div class="text-center col-span-3 py-8">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-green-500 border-t-transparent"></div>
+                <p class="mt-2 text-gray-600">Memuat produk...</p>
             </div>
         </div>
     </section>
@@ -179,7 +355,13 @@
         <div class="container mx-auto px-4">
             <h2 class="text-3xl font-bold text-center mb-4">⭐ Testimoni Pembeli</h2>
             <p class="text-center text-gray-600 mb-8">Apa kata mereka yang sudah merasakan khasiatnya</p>
-            <div id="testimoniList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <div id="testimoniList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Testimoni akan di-load via JavaScript -->
+                <div class="text-center col-span-3 py-8">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-green-500 border-t-transparent"></div>
+                    <p class="mt-2 text-gray-600">Memuat testimoni...</p>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -188,37 +370,42 @@
         <h2 class="text-3xl font-bold mb-4">📞 Hubungi Kami</h2>
         <p class="text-gray-600 mb-6">Senin - Sabtu (08.00 - 20.00 WIB)</p>
         <p class="text-3xl text-green-600 font-bold mb-4" id="nomorKontak">0851-8798-0564</p>
-        <a href="https://wa.me/6285187980564" class="bg-green-500 text-white px-8 py-3 rounded-lg inline-block hover:bg-green-600 transition text-lg font-semibold" target="_blank">
+        <a href="https://wa.me/6285187980564" class="bg-green-500 text-white px-8 py-3 rounded-lg inline-block hover:bg-green-600 transition text-lg font-semibold shadow-md" target="_blank" id="kontakWA">
             <i class="fab fa-whatsapp mr-2"></i>Chat WhatsApp
         </a>
     </section>
 
     <!-- MODAL ORDER -->
+    <div id="orderModal" class="modal">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-xl font-bold">📋 Detail Pemesanan</h3>
                 <button onclick="tutupOrderModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
             </div>
             <div id="orderProductInfo" class="mb-4 p-3 bg-green-50 rounded-lg"></div>
+            <div class="bg-yellow-50 p-3 rounded-lg mb-4 text-sm">
+                <i class="fas fa-hourglass-half text-yellow-600 mr-2"></i>
+                <span class="font-medium">Pesanan akan hangus dalam 10 menit jika tidak dikonfirmasi admin!</span>
+            </div>
             <form id="orderForm" onsubmit="submitOrder(event)">
                 <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Nama Lengkap <span class="text-red-500">*</span></label>
-                    <input type="text" id="orderNama" required class="w-full border rounded-lg p-2" placeholder="Masukkan nama lengkap">
+                    <label class="block text-gray-700 mb-2 font-medium">Nama Lengkap <span class="text-red-500">*</span></label>
+                    <input type="text" id="orderNama" required class="input-field" placeholder="Masukkan nama lengkap">
                 </div>
                 <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Nomor WhatsApp <span class="text-red-500">*</span></label>
-                    <input type="tel" id="orderWA" required class="w-full border rounded-lg p-2" placeholder="08123456789">
+                    <label class="block text-gray-700 mb-2 font-medium">Nomor WhatsApp <span class="text-red-500">*</span></label>
+                    <input type="tel" id="orderWA" required class="input-field" placeholder="08123456789">
                 </div>
                 <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Alamat Lengkap <span class="text-red-500">*</span></label>
-                    <textarea id="orderAlamat" required rows="3" class="w-full border rounded-lg p-2" placeholder="Masukkan alamat lengkap"></textarea>
+                    <label class="block text-gray-700 mb-2 font-medium">Alamat Lengkap <span class="text-red-500">*</span></label>
+                    <textarea id="orderAlamat" required rows="3" class="input-field" placeholder="Masukkan alamat lengkap"></textarea>
                 </div>
                 <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Jumlah <span class="text-red-500">*</span></label>
-                    <input type="number" id="orderQty" min="1" value="1" required class="w-full border rounded-lg p-2">
+                    <label class="block text-gray-700 mb-2 font-medium">Jumlah <span class="text-red-500">*</span></label>
+                    <input type="number" id="orderQty" min="1" value="1" required class="input-field">
                 </div>
                 <div class="mb-4 p-3 bg-gray-50 rounded-lg">
-                    <p class="font-semibold">Total: <span id="orderTotal" class="text-green-600">Rp 0</span></p>
+                    <p class="font-semibold">Total: <span id="orderTotal" class="text-green-600 text-xl">Rp 0</span></p>
                 </div>
                 
                 <input type="hidden" id="orderSession" value="">
@@ -227,8 +414,8 @@
                 <input type="hidden" id="orderProdukNama">
                 
                 <div class="flex gap-2">
-                    <button type="button" onclick="tutupOrderModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400">Batal</button>
-                    <button type="submit" class="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 font-semibold">
+                    <button type="button" onclick="tutupOrderModal()" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 font-medium">Batal</button>
+                    <button type="submit" class="flex-1 btn-primary">
                         <i class="fab fa-whatsapp mr-1"></i>Konfirmasi Order
                     </button>
                 </div>
@@ -245,7 +432,7 @@
             </div>
             <div id="reviewProductInfo" class="mb-4 p-3 bg-gray-50 rounded-lg"></div>
             <div class="mb-4">
-                <label class="block text-gray-700 mb-2">Rating</label>
+                <label class="block text-gray-700 mb-2 font-medium">Rating</label>
                 <div class="flex space-x-2 text-3xl" id="ratingStars">
                     <i class="fa-regular fa-star cursor-pointer hover:text-yellow-400" data-rating="1"></i>
                     <i class="fa-regular fa-star cursor-pointer hover:text-yellow-400" data-rating="2"></i>
@@ -256,57 +443,46 @@
                 <input type="hidden" id="reviewRating" value="0">
             </div>
             <div class="mb-4">
-                <label class="block text-gray-700 mb-2">Ulasan</label>
-                <textarea id="reviewText" rows="4" class="w-full border rounded-lg p-2" placeholder="Tulis pengalaman kamu..."></textarea>
+                <label class="block text-gray-700 mb-2 font-medium">Ulasan</label>
+                <textarea id="reviewText" rows="4" class="input-field" placeholder="Tulis pengalaman kamu..."></textarea>
             </div>
             <div class="mb-4">
-                <label class="block text-gray-700 mb-2">Foto (opsional)</label>
-                <input type="file" id="reviewPhoto" accept="image/*" class="w-full">
+                <label class="block text-gray-700 mb-2 font-medium">Foto (opsional)</label>
+                <input type="file" id="reviewPhoto" accept="image/*" class="input-field">
             </div>
             <input type="hidden" id="reviewOrderId">
             <input type="hidden" id="reviewProductId">
             <input type="hidden" id="reviewProductName">
-            <button onclick="submitReview()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold">Kirim Ulasan</button>
+            <button onclick="submitReview()" class="w-full btn-primary">Kirim Ulasan</button>
         </div>
     </div>
 
-    <!-- MODAL KONFIRMASI PEMBAYARAN DETAIL -->
-    <div id="konfirmasiDetailModal" class="modal">
+    <!-- MODAL KONFIRMASI PEMBAYARAN -->
+    <div id="konfirmasiModal" class="modal">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold">💰 Detail Konfirmasi Pembayaran</h3>
-                <button onclick="tutupKonfirmasiDetailModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                <h3 class="text-xl font-bold">💰 Konfirmasi Pembayaran</h3>
+                <button onclick="tutupKonfirmasiModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
             </div>
             
-            <div id="konfirmasiDetailInfo" class="mb-4 p-3 bg-blue-50 rounded-lg"></div>
+            <div id="konfirmasiInfo" class="mb-4 p-3 bg-blue-50 rounded-lg"></div>
             
-            <div class="rekening-card mb-4">
-                <p class="font-bold text-lg mb-2">🏦 Rekening Tujuan</p>
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-sm opacity-90">Bank BCA</p>
-                        <p class="font-mono text-lg">1234567890</p>
-                        <p class="text-sm">a.n. Jamu Herbal Alami</p>
-                    </div>
-                    <button onclick="copyRekening()" class="bg-white text-purple-700 px-3 py-2 rounded-lg copy-btn">
-                        <i class="fas fa-copy mr-1"></i>Copy
-                    </button>
-                </div>
+            <div class="rekening-card" id="rekeningDisplay">
+                <!-- Isi dari database -->
             </div>
             
-            <form id="konfirmasiDetailForm" onsubmit="prosesKonfirmasiDetail(event)">
-                <input type="hidden" id="konfirmasiDetailOrderId">
-                <input type="hidden" id="konfirmasiDetailKode">
-                <input type="hidden" id="konfirmasiDetailTotal">
+            <form id="konfirmasiForm" onsubmit="prosesKonfirmasi(event)">
+                <input type="hidden" id="konfirmasiOrderId">
+                <input type="hidden" id="konfirmasiKode">
                 
                 <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Jumlah Transfer (Rp)</label>
-                    <input type="number" id="detailJumlahTransfer" required min="0" class="w-full border rounded-lg p-2" readonly>
+                    <label class="block text-gray-700 mb-2 font-medium">Jumlah Transfer (Rp)</label>
+                    <input type="number" id="konfirmasiJumlah" required min="0" class="input-field" readonly>
                 </div>
                 
                 <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Bank Asal</label>
-                    <select id="detailBankAsal" required class="w-full border rounded-lg p-2">
+                    <label class="block text-gray-700 mb-2 font-medium">Bank Asal</label>
+                    <select id="konfirmasiBank" required class="input-field">
                         <option value="">Pilih Bank</option>
                         <option value="BCA">BCA</option>
                         <option value="BNI">BNI</option>
@@ -317,24 +493,24 @@
                 </div>
                 
                 <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Nama Pengirim</label>
-                    <input type="text" id="detailNamaPengirim" required class="w-full border rounded-lg p-2">
+                    <label class="block text-gray-700 mb-2 font-medium">Nama Pengirim</label>
+                    <input type="text" id="konfirmasiPengirim" required class="input-field">
                 </div>
                 
                 <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Tanggal Transfer</label>
-                    <input type="date" id="detailTanggalTransfer" required class="w-full border rounded-lg p-2">
+                    <label class="block text-gray-700 mb-2 font-medium">Tanggal Transfer</label>
+                    <input type="date" id="konfirmasiTanggal" required class="input-field">
                 </div>
                 
                 <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Bukti Transfer (opsional)</label>
-                    <input type="file" id="detailBuktiTransfer" accept="image/*" class="w-full">
+                    <label class="block text-gray-700 mb-2 font-medium">Bukti Transfer (opsional)</label>
+                    <input type="file" id="konfirmasiBukti" accept="image/*" class="input-field">
                 </div>
                 
                 <div class="flex gap-2">
-                    <button type="button" onclick="tutupKonfirmasiDetailModal()" class="flex-1 bg-gray-300 py-2 rounded-lg">Batal</button>
-                    <button type="submit" class="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
-                        <i class="fas fa-check mr-2"></i>Konfirmasi Sekarang
+                    <button type="button" onclick="tutupKonfirmasiModal()" class="flex-1 bg-gray-300 py-3 rounded-lg hover:bg-gray-400 font-medium">Batal</button>
+                    <button type="submit" class="flex-1 btn-primary">
+                        <i class="fas fa-check mr-2"></i>Konfirmasi Pembayaran
                     </button>
                 </div>
             </form>
@@ -349,10 +525,10 @@
                 <button onclick="tutupLoginModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
             </div>
             <div class="mb-4">
-                <label class="block text-gray-700 mb-2">Password Admin</label>
-                <input type="password" id="adminPassword" class="w-full border rounded-lg p-2" placeholder="••••••••">
+                <label class="block text-gray-700 mb-2 font-medium">Password Admin</label>
+                <input type="password" id="adminPassword" class="input-field" placeholder="••••••••">
             </div>
-            <button onclick="cekPassword()" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">Login</button>
+            <button onclick="cekPassword()" class="w-full btn-primary">Login</button>
             <p id="passwordError" class="text-red-500 text-sm mt-2 hidden">❌ Password salah!</p>
         </div>
     </div>
@@ -365,12 +541,24 @@
                 <button onclick="tutupAdminPanel()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
             </div>
             
-            <!-- STATS -->
+            <!-- STATS REAL TIME -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-blue-50 p-4 rounded-lg text-center"><p class="text-2xl font-bold text-blue-600" id="statProduk">0</p><p class="text-sm">Produk</p></div>
-                <div class="bg-green-50 p-4 rounded-lg text-center"><p class="text-2xl font-bold text-green-600" id="statPesanan">0</p><p class="text-sm">Pesanan</p></div>
-                <div class="bg-yellow-50 p-4 rounded-lg text-center"><p class="text-2xl font-bold text-yellow-600" id="statTerjual">0</p><p class="text-sm">Terjual</p></div>
-                <div class="bg-purple-50 p-4 rounded-lg text-center"><p class="text-2xl font-bold text-purple-600" id="statTestimoni">0</p><p class="text-sm">Testimoni</p></div>
+                <div class="bg-blue-50 p-4 rounded-lg text-center">
+                    <p class="text-2xl font-bold text-blue-600" id="statProduk">0</p>
+                    <p class="text-sm">Produk</p>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg text-center">
+                    <p class="text-2xl font-bold text-green-600" id="statPesanan">0</p>
+                    <p class="text-sm">Pesanan</p>
+                </div>
+                <div class="bg-yellow-50 p-4 rounded-lg text-center">
+                    <p class="text-2xl font-bold text-yellow-600" id="statTerjual">0</p>
+                    <p class="text-sm">Terjual</p>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg text-center">
+                    <p class="text-2xl font-bold text-purple-600" id="statTestimoni">0</p>
+                    <p class="text-sm">Testimoni</p>
+                </div>
             </div>
             
             <!-- TABS -->
@@ -378,52 +566,49 @@
                 <button onclick="switchTab('produk')" class="tab-btn px-4 py-2 text-green-600 border-b-2 border-green-600" data-tab="produk"><i class="fas fa-box mr-1"></i>Produk</button>
                 <button onclick="switchTab('pesanan')" class="tab-btn px-4 py-2 text-gray-500" data-tab="pesanan"><i class="fas fa-shopping-cart mr-1"></i>Pesanan</button>
                 <button onclick="switchTab('testimoni')" class="tab-btn px-4 py-2 text-gray-500" data-tab="testimoni"><i class="fas fa-star mr-1"></i>Testimoni</button>
-                <button onclick="switchTab('kontak')" class="tab-btn px-4 py-2 text-gray-500" data-tab="kontak"><i class="fas fa-phone mr-1"></i>Kontak</button>
+                <button onclick="switchTab('pembayaran')" class="tab-btn px-4 py-2 text-gray-500" data-tab="pembayaran"><i class="fas fa-credit-card mr-1"></i>Pembayaran</button>
             </div>
             
             <!-- TAB PRODUK -->
             <div id="tabProduk" class="tab-content">
-                <button onclick="tambahProduk()" class="bg-green-600 text-white px-4 py-2 rounded-lg mb-4"><i class="fas fa-plus mr-2"></i>Tambah Produk</button>
+                <button onclick="tambahProduk()" class="btn-primary mb-4"><i class="fas fa-plus mr-2"></i>Tambah Produk</button>
                 <div id="adminProdukList" class="space-y-2 max-h-60 overflow-y-auto"></div>
             </div>
             
-            <!-- TAB PESANAN (DENGAN KONFIRMASI LANGSUNG) -->
+            <!-- TAB PESANAN (REAL TIME) -->
             <div id="tabPesanan" class="tab-content hidden">
                 <div class="mb-4 flex flex-wrap gap-2">
-                    <select id="filterStatus" class="border rounded-lg p-2" onchange="filterPesanan()">
+                    <select id="filterStatus" class="input-field w-auto" onchange="filterPesanan()">
                         <option value="all">Semua Status</option>
                         <option value="menunggu-pembayaran">💰 Menunggu Pembayaran</option>
                         <option value="proses">⚙️ Diproses</option>
                         <option value="dikirim">📦 Dikirim</option>
                         <option value="selesai">✅ Selesai</option>
                         <option value="ditolak">❌ Ditolak</option>
+                        <option value="kadaluarsa">⏰ Kadaluarsa</option>
                     </select>
-                    <input type="text" id="searchPesanan" placeholder="Cari nama/ID..." class="border rounded-lg p-2 flex-1" onkeyup="filterPesanan()">
+                    <input type="text" id="searchPesanan" placeholder="Cari nama/ID..." class="input-field flex-1" onkeyup="filterPesanan()">
                     <button onclick="exportLaporan()" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
-                        <i class="fas fa-download mr-2"></i>Export CSV
+                        <i class="fas fa-download mr-2"></i>Export
                     </button>
                 </div>
                 
-                <!-- INI TEMPAT KONFIRMASI CEPAT - INPUT ID LANGSUNG -->
-                <div class="bg-blue-50 p-4 rounded-lg mb-4 border-2 border-blue-200">
-                    <h4 class="font-bold text-blue-800 mb-2 flex items-center">
+                <!-- KONFIRMASI CEPAT -->
+                <div class="bg-yellow-50 p-4 rounded-lg mb-4 border-2 border-yellow-300">
+                    <h4 class="font-bold text-yellow-800 mb-2 flex items-center">
                         <i class="fas fa-money-bill-wave mr-2"></i>KONFIRMASI PEMBAYARAN INSTAN
                     </h4>
-                    <p class="text-sm text-blue-600 mb-3">Masukkan ID Pesanan untuk konfirmasi pembayaran dan langsung ubah status menjadi DIPROSES</p>
+                    <p class="text-sm text-yellow-700 mb-3">Masukkan ID Pesanan yang sudah transfer (sebelum 10 menit habis!)</p>
                     
                     <div class="flex gap-2">
-                        <input type="text" id="instantConfirmId" placeholder="Masukkan ID Pesanan (contoh: INV-12345678-ABCD)" 
-                               class="flex-1 border rounded-lg p-3 text-sm">
-                        <button onclick="konfirmasiPembayaranInstant()" 
-                                class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold">
-                            <i class="fas fa-check-circle mr-2"></i>Konfirmasi Sekarang
+                        <input type="text" id="adminConfirmId" placeholder="Contoh: INV-12345678-ABCD" class="input-field flex-1">
+                        <button onclick="cariPesananUntukKonfirmasi()" class="btn-primary whitespace-nowrap">
+                            <i class="fas fa-search mr-2"></i>Cari & Konfirmasi
                         </button>
                     </div>
-                    
-                    <div id="instantConfirmResult" class="mt-2 text-sm hidden"></div>
                 </div>
                 
-                <!-- LIST PESANAN -->
+                <!-- LIST PESANAN REAL TIME -->
                 <div id="adminPesananList" class="space-y-3 max-h-96 overflow-y-auto"></div>
             </div>
             
@@ -432,16 +617,46 @@
                 <div id="adminTestimoniList" class="space-y-2 max-h-96 overflow-y-auto"></div>
             </div>
             
-            <!-- TAB KONTAK -->
-            <div id="tabKontak" class="tab-content hidden">
-                <label class="block mb-2 font-semibold">Nomor WhatsApp</label>
-                <input type="text" id="editNomor" class="w-full border p-2 rounded-lg mb-4" value="0851-8798-0564">
-                <button onclick="simpanPengaturan()" class="bg-green-600 text-white px-4 py-2 rounded-lg"><i class="fas fa-save mr-2"></i>Simpan</button>
+                        <!-- TAB PEMBAYARAN -->
+            <div id="tabPembayaran" class="tab-content hidden">
+                <h3 class="font-bold text-lg mb-3">🏦 Pengaturan Rekening Pembayaran</h3>
+                
+                <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2 font-medium">Nama Bank</label>
+                        <input type="text" id="editBankName" class="input-field" placeholder="Contoh: BCA" value="BCA">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2 font-medium">Nomor Rekening</label>
+                        <input type="text" id="editBankNumber" class="input-field" placeholder="Contoh: 1234567890" value="1234567890">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2 font-medium">Atas Nama</label>
+                        <input type="text" id="editBankAccountName" class="input-field" placeholder="Contoh: Jamu Herbal Alami" value="Jamu Herbal Alami">
+                    </div>
+                    <button onclick="simpanRekening()" class="btn-primary">
+                        <i class="fas fa-save mr-2"></i>Simpan Rekening
+                    </button>
+                </div>
+                
+                <h3 class="font-bold text-lg mb-3 mt-6">📱 Nomor WhatsApp</h3>
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2 font-medium">Nomor WhatsApp (08 atau 62)</label>
+                        <input type="text" id="editWANumber" class="input-field" placeholder="Contoh: 085187980564" value="085187980564">
+                        <p class="text-xs text-gray-500 mt-1">*Otomatis dikonversi ke format 62</p>
+                    </div>
+                    <button onclick="simpanWANumber()" class="btn-primary">
+                        <i class="fas fa-save mr-2"></i>Simpan Nomor WA
+                    </button>
+                </div>
             </div>
             
             <!-- LOGOUT -->
             <div class="mt-4 pt-4 border-t">
-                <button onclick="logoutAdmin()" class="bg-red-500 text-white px-4 py-2 rounded-lg"><i class="fas fa-sign-out-alt mr-2"></i>Logout</button>
+                <button onclick="logoutAdmin()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </button>
             </div>
         </div>
     </div>
@@ -456,28 +671,26 @@
             <form id="produkForm" onsubmit="simpanProduk(event)">
                 <input type="hidden" id="produkId">
                 <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Nama Produk</label>
-                    <input type="text" id="produkNama" required class="w-full border rounded-lg p-2">
+                    <label class="block text-gray-700 mb-2 font-medium">Nama Produk</label>
+                    <input type="text" id="produkNama" required class="input-field" placeholder="Contoh: Jahe Merah">
                 </div>
                 <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Deskripsi</label>
-                    <textarea id="produkDeskripsi" required rows="3" class="w-full border rounded-lg p-2"></textarea>
+                    <label class="block text-gray-700 mb-2 font-medium">Deskripsi</label>
+                    <textarea id="produkDeskripsi" required rows="3" class="input-field" placeholder="Deskripsi produk..."></textarea>
                 </div>
                 <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Harga (Rp)</label>
-                    <input type="number" id="produkHarga" required min="0" class="w-full border rounded-lg p-2">
+                    <label class="block text-gray-700 mb-2 font-medium">Harga</label>
+                    <input type="text" id="produkHarga" class="input-field" placeholder="Contoh: 50000 atau kosongkan jika via WA">
+                    <p class="text-xs text-gray-500 mt-1">*Kosongkan jika harga via chat (tombol WA akan muncul)</p>
                 </div>
                 <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Foto URL (opsional)</label>
-                    <input type="url" id="produkFoto" class="w-full border rounded-lg p-2" placeholder="https://...">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Upload Foto (alternatif)</label>
-                    <input type="file" id="produkUpload" accept="image/*" class="w-full">
+                    <label class="block text-gray-700 mb-2 font-medium">Foto URL</label>
+                    <input type="url" id="produkFoto" class="input-field" placeholder="https://example.com/gambar.jpg">
+                    <p class="text-xs text-gray-500 mt-1">*Gunakan URL gambar (bisa dari Google Images, Imgur, dll)</p>
                 </div>
                 <div class="flex gap-2">
-                    <button type="button" onclick="tutupProdukModal()" class="flex-1 bg-gray-300 py-2 rounded-lg">Batal</button>
-                    <button type="submit" class="flex-1 bg-green-600 text-white py-2 rounded-lg">Simpan</button>
+                    <button type="button" onclick="tutupProdukModal()" class="flex-1 bg-gray-300 py-3 rounded-lg hover:bg-gray-400 font-medium">Batal</button>
+                    <button type="submit" class="flex-1 btn-primary">Simpan</button>
                 </div>
             </form>
         </div>
@@ -507,7 +720,39 @@
         let clickCount = 0;
         const CLICKS_NEEDED = 5;
         let allOrders = [];
-        let allProducts = [];
+        let currentOrderListener = null;
+        let expiredCheckInterval = null;
+        const EXPIRY_TIME = 10 * 60 * 1000; // 10 menit dalam milidetik
+        const SPAM_LIMIT = 3; // Maksimal 3 order per sesi
+        const SPAM_WINDOW = 30 * 60 * 1000; // 30 menit
+
+        // Sample products untuk testing kalo database kosong
+        const sampleProducts = [
+            {
+                nama: "Jahe Merah Original",
+                deskripsi: "Jahe merah pilihan, cocok untuk menghangatkan tubuh",
+                harga: 35000,
+                foto: "https://images.tokopedia.net/img/cache/500-square/product-1/2020/1/1/123456/123456_123456.jpg",
+                terjual: 45,
+                ulasanCount: 12
+            },
+            {
+                nama: "Kunyit Asam",
+                deskripsi: "Kunyit asam tradisional, baik untuk kesehatan wanita",
+                harga: 25000,
+                foto: "https://images.tokopedia.net/img/cache/500-square/product-1/2020/1/1/123456/123456_123457.jpg",
+                terjual: 67,
+                ulasanCount: 23
+            },
+            {
+                nama: "Beras Kencur",
+                deskripsi: "Beras kencur asli, resep turun temurun",
+                harga: null,
+                foto: "https://images.tokopedia.net/img/cache/500-square/product-1/2020/1/1/123456/123456_123458.jpg",
+                terjual: 28,
+                ulasanCount: 8
+            }
+        ];
 
         // ========== UTILITY ==========
         function showToast(message, type = 'success') {
@@ -518,33 +763,255 @@
             setTimeout(() => toast.classList.add('hidden'), 3000);
         }
 
-        function copyRekening() {
-            navigator.clipboard.writeText('1234567890 a.n. Jamu Herbal Alami (BCA)');
-            showToast('Rekening berhasil dicopy!');
+        function formatWA(waNumber) {
+            if (!waNumber) return '';
+            let cleaned = waNumber.replace(/[^0-9]/g, '');
+            if(cleaned.startsWith('0')) {
+                cleaned = '62' + cleaned.substring(1);
+            }
+            return cleaned;
         }
 
-        // ========== HIDDEN CLICK ==========
-        document.getElementById('hiddenClickArea').addEventListener('click', function() {
-            clickCount++;
-            if(clickCount >= CLICKS_NEEDED) {
-                document.getElementById('hiddenAdminButton').classList.remove('hidden');
-                clickCount = 0;
-                showToast('🔓 Admin panel tersedia!', 'success');
+        // ========== HIDDEN CLICK (FIX) ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            const hiddenArea = document.getElementById('hiddenClickArea');
+            if(hiddenArea) {
+                hiddenArea.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    clickCount++;
+                    console.log('Klik ke-' + clickCount);
+                    
+                    if(clickCount >= CLICKS_NEEDED) {
+                        document.getElementById('hiddenAdminButton').classList.remove('hidden');
+                        document.getElementById('floatingConfirm').classList.add('show');
+                        clickCount = 0;
+                        showToast('🔓 Admin panel tersedia!', 'success');
+                    }
+                });
             }
         });
 
-        // ========== LOAD PRODUK ==========
-        function loadProduk() {
-            db.ref('produk').on('value', (snapshot) => {
-                const data = snapshot.val();
-                const container = document.getElementById('produkList');
-                allProducts = data ? Object.keys(data).map(key => ({id: key, ...data[key]})) : [];
+        // ========== CEK EXPIRED OTOMATIS ==========
+        function startExpiredChecker() {
+            // Hapus interval lama kalo ada
+            if(expiredCheckInterval) {
+                clearInterval(expiredCheckInterval);
+            }
+            
+            // Cek setiap 30 detik
+            expiredCheckInterval = setInterval(() => {
+                const now = Date.now();
                 
+                db.ref('pesanan').once('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if(!data) return;
+                    
+                    Object.keys(data).forEach(key => {
+                        const order = data[key];
+                        
+                        // Cek hanya yang statusnya menunggu pembayaran
+                        if(order.status === 'menunggu-pembayaran') {
+                            const waktuOrder = order.waktu || 0;
+                            const waktuKadaluarsa = waktuOrder + EXPIRY_TIME;
+                            
+                            // Kalo udah lewat 10 menit, ubah status jadi kadaluarsa
+                            if(now > waktuKadaluarsa) {
+                                const riwayatBaru = order.riwayatStatus || [];
+                                riwayatBaru.push({
+                                    status: 'kadaluarsa',
+                                    waktu: now,
+                                    catatan: 'Pesanan otomatis kadaluarsa karena tidak dikonfirmasi dalam 10 menit'
+                                });
+                                
+                                db.ref('pesanan/' + key).update({
+                                    status: 'kadaluarsa',
+                                    riwayatStatus: riwayatBaru
+                                }).then(() => {
+                                    console.log(`Pesanan ${order.kode} otomatis kadaluarsa`);
+                                });
+                            }
+                        }
+                    });
+                });
+            }, 30000); // Cek setiap 30 detik
+        }
+
+        // ========== CEK SPAM ==========
+        function cekSpam(session) {
+            return new Promise((resolve) => {
+                const now = Date.now();
+                const batasWaktu = now - SPAM_WINDOW;
+                
+                db.ref('pesanan').orderByChild('session').equalTo(session).once('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if(!data) {
+                        resolve(false); // Belum pernah order
+                        return;
+                    }
+                    
+                    let count = 0;
+                    Object.keys(data).forEach(key => {
+                        const order = data[key];
+                        // Hitung order dalam 30 menit terakhir (kecuali yang kadaluarsa/ditolak)
+                        if(order.waktu > batasWaktu && 
+                           order.status !== 'kadaluarsa' && 
+                           order.status !== 'ditolak') {
+                            count++;
+                        }
+                    });
+                    
+                    resolve(count >= SPAM_LIMIT);
+                });
+            });
+        }
+
+        // ========== LOAD PENGATURAN ==========
+        function loadPengaturan() {
+            db.ref('pengaturan').on('value', (snapshot) => {
+                const data = snapshot.val() || {};
+                
+                // Update nomor WA
+                const waNumber = data.waNumber || '085187980564';
+                OWNER_WA = formatWA(waNumber);
+                
+                // Tampilan nomor di kontak
+                document.getElementById('nomorKontak').textContent = waNumber;
+                
+                // Update semua link WA
+                document.querySelectorAll('a[href*="wa.me"]').forEach(el => {
+                    el.href = `https://wa.me/${OWNER_WA}`;
+                });
+                
+                // Update tampilan rekening
+                const bankData = data.rekening || {
+                    bank: 'BCA',
+                    nomor: '1234567890',
+                    nama: 'Jamu Herbal Alami'
+                };
+                
+                const rekeningHtml = `
+                    <p class="font-bold text-lg mb-2">🏦 Rekening Tujuan</p>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-sm opacity-90">Bank ${bankData.bank}</p>
+                            <p class="font-mono text-lg">${bankData.nomor}</p>
+                            <p class="text-sm">a.n. ${bankData.nama}</p>
+                        </div>
+                        <button onclick="copyRekening('${bankData.bank} ${bankData.nomor} a.n. ${bankData.nama}')" class="bg-white text-purple-700 px-3 py-2 rounded-lg copy-btn">
+                            <i class="fas fa-copy mr-1"></i>Copy
+                        </button>
+                    </div>
+                `;
+                
+                const rekeningDisplay = document.getElementById('rekeningDisplay');
+                if (rekeningDisplay) rekeningDisplay.innerHTML = rekeningHtml;
+                
+                // Isi form edit
+                const bankNameInput = document.getElementById('editBankName');
+                const bankNumberInput = document.getElementById('editBankNumber');
+                const bankAccountInput = document.getElementById('editBankAccountName');
+                const waNumberInput = document.getElementById('editWANumber');
+                
+                if (bankNameInput) bankNameInput.value = bankData.bank || 'BCA';
+                if (bankNumberInput) bankNumberInput.value = bankData.nomor || '1234567890';
+                if (bankAccountInput) bankAccountInput.value = bankData.nama || 'Jamu Herbal Alami';
+                if (waNumberInput) waNumberInput.value = data.waNumber || '085187980564';
+            });
+        }
+
+        function copyRekening(text) {
+            navigator.clipboard.writeText(text);
+            showToast('Rekening berhasil dicopy!');
+        }
+
+        // ========== FUNGSI CHAT WA ==========
+        function chatWA(produkNama, produkHarga) {
+            let pesan = '';
+            if(produkHarga && !isNaN(produkHarga)) {
+                pesan = `Halo kak, saya mau order *${produkNama}* dengan harga Rp ${Number(produkHarga).toLocaleString()}.\n\nMohon info cara pemesanannya. Terima kasih 🌿`;
+            } else {
+                pesan = `Halo kak, saya mau order *${produkNama}*.\n\nMohon info harga dan cara pemesanannya ya. Terima kasih 🌿`;
+            }
+            window.open(`https://wa.me/${OWNER_WA}?text=${encodeURIComponent(pesan)}`, '_blank');
+        }
+
+        // ========== FUNGSI BELI ==========
+        function beliProduk(produkId, produkNama, produkHarga) {
+            if(produkHarga && !isNaN(produkHarga)) {
+                bukaOrderModal(produkId, produkNama, produkHarga);
+            } else {
+                chatWA(produkNama, produkHarga);
+            }
+        }
+
+        // ========== LOAD PRODUK (FIX) ==========
+        function loadProduk() {
+            const container = document.getElementById('produkList');
+            container.innerHTML = '<div class="text-center col-span-3 py-8"><div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-green-500 border-t-transparent"></div><p class="mt-2 text-gray-600">Memuat produk...</p></div>';
+            
+            db.ref('produk').once('value', (snapshot) => {
+                let data = snapshot.val();
+                
+                // Kalo database kosong, pake sample products
                 if(!data) {
-                    container.innerHTML = '<p class="text-center col-span-3 text-gray-500">Belum ada produk</p>';
+                    console.log('Database kosong, menampilkan sample produk');
+                    let html = '';
+                    let totalTerjual = 0;
+                    
+                    sampleProducts.forEach((p, index) => {
+                        totalTerjual += p.terjual || 0;
+                        
+                        const punyaHarga = p.harga && !isNaN(p.harga);
+                        
+                        let hargaTampil = 'Hubungi WA';
+                        let tombol = '';
+                        
+                        if(punyaHarga) {
+                            hargaTampil = 'Rp ' + Number(p.harga).toLocaleString();
+                            tombol = `<button onclick="chatWA('${p.nama.replace(/'/g, "\\'")}', ${p.harga})" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold">
+                                <i class="fas fa-shopping-cart mr-1"></i>Beli Sekarang
+                            </button>`;
+                        } else {
+                            tombol = `<button onclick="chatWA('${p.nama.replace(/'/g, "\\'")}', null)" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold">
+                                <i class="fab fa-whatsapp mr-1"></i>Chat WA
+                            </button>`;
+                        }
+                        
+                        html += `
+                            <div class="bg-white rounded-xl shadow-lg overflow-hidden product-card">
+                                <img src="${p.foto || 'https://via.placeholder.com/300'}" class="w-full h-56 object-cover" onerror="this.src='https://via.placeholder.com/300'">
+                                <div class="p-5">
+                                    <h3 class="font-bold text-xl mb-2">${p.nama}</h3>
+                                    <p class="text-gray-600 mb-3 text-sm">${p.deskripsi}</p>
+                                    
+                                    <div class="flex items-center mb-3">
+                                        <div class="flex text-yellow-400 mr-2">
+                                            ${Array(5).fill(0).map((_, i) => 
+                                                `<i class="fa-${i < (p.ulasanCount || 0) ? 'solid' : 'regular'} fa-star text-sm"></i>`
+                                            ).join('')}
+                                        </div>
+                                        <span class="text-sm text-gray-500">(${p.ulasanCount || 0} ulasan)</span>
+                                    </div>
+                                    
+                                    <div class="flex justify-between items-center mb-4">
+                                        <span class="text-2xl font-bold text-green-600">${hargaTampil}</span>
+                                        <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                                            <i class="fas fa-shopping-bag mr-1"></i>${p.terjual || 0} terjual
+                                        </span>
+                                    </div>
+                                    
+                                    ${tombol}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    container.innerHTML = html;
+                    document.getElementById('totalTerjual').innerHTML = `<i class="fas fa-chart-line mr-1"></i>${totalTerjual} Terjual`;
                     return;
                 }
-
+                
+                // Kalo ada data dari database
                 let html = '';
                 let totalTerjual = 0;
 
@@ -552,9 +1019,25 @@
                     const p = data[key];
                     totalTerjual += p.terjual || 0;
 
+                    const punyaHarga = p.harga && !isNaN(p.harga);
+                    
+                    let hargaTampil = 'Hubungi WA';
+                    let tombol = '';
+                    
+                    if(punyaHarga) {
+                        hargaTampil = 'Rp ' + Number(p.harga).toLocaleString();
+                        tombol = `<button onclick="beliProduk('${key}', '${p.nama.replace(/'/g, "\\'")}', ${p.harga})" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold">
+                            <i class="fas fa-shopping-cart mr-1"></i>Beli Sekarang
+                        </button>`;
+                    } else {
+                        tombol = `<button onclick="chatWA('${p.nama.replace(/'/g, "\\'")}', null)" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold">
+                            <i class="fab fa-whatsapp mr-1"></i>Chat WA
+                        </button>`;
+                    }
+
                     html += `
                         <div class="bg-white rounded-xl shadow-lg overflow-hidden product-card">
-                                                        <img src="${p.foto || 'https://via.placeholder.com/300'}" class="w-full h-56 object-cover">
+                            <img src="${p.foto || 'https://via.placeholder.com/300'}" class="w-full h-56 object-cover" onerror="this.src='https://via.placeholder.com/300'">
                             <div class="p-5">
                                 <h3 class="font-bold text-xl mb-2">${p.nama}</h3>
                                 <p class="text-gray-600 mb-3 text-sm">${p.deskripsi}</p>
@@ -562,24 +1045,20 @@
                                 <div class="flex items-center mb-3">
                                     <div class="flex text-yellow-400 mr-2">
                                         ${Array(5).fill(0).map((_, i) => 
-                                            `<i class="fa-${i < (p.ulasanCount ? 4 : 0) ? 'solid' : 'regular'} fa-star text-sm"></i>`
+                                            `<i class="fa-${i < (p.ulasanCount || 0) ? 'solid' : 'regular'} fa-star text-sm"></i>`
                                         ).join('')}
                                     </div>
                                     <span class="text-sm text-gray-500">(${p.ulasanCount || 0} ulasan)</span>
                                 </div>
                                 
-                                <<div class="flex justify-between items-center mb-4">
-    <span class="text-2xl font-bold text-green-600">Hubungi WA</span>
-    <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
-        <i class="fas fa-shopping-bag mr-1"></i>${p.terjual || 0} terjual
-    </span>
-</div>
-
-<a href="https://wa.me/6285187980564?text=Halo%20kak%2C%20saya%20mau%20order%20${encodeURIComponent(p.nama)}" 
-   target="_blank" 
-   class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold text-center block">
-    <i class="fab fa-whatsapp mr-1"></i>Chat WA
-</a>
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="text-2xl font-bold text-green-600">${hargaTampil}</span>
+                                    <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                                        <i class="fas fa-shopping-bag mr-1"></i>${p.terjual || 0} terjual
+                                    </span>
+                                </div>
+                                
+                                ${tombol}
                             </div>
                         </div>
                     `;
@@ -592,9 +1071,10 @@
 
         // ========== LOAD TESTIMONI ==========
         function loadTestimoni() {
-            db.ref('testimoni').orderByChild('waktu').limitToLast(6).on('value', (snapshot) => {
+            const container = document.getElementById('testimoniList');
+            
+            db.ref('testimoni').orderByChild('waktu').limitToLast(6).once('value', (snapshot) => {
                 const data = snapshot.val();
-                const container = document.getElementById('testimoniList');
                 
                 if(!data) {
                     container.innerHTML = '<p class="text-center col-span-3 text-gray-500">Belum ada testimoni</p>';
@@ -630,38 +1110,206 @@
             });
         }
 
-        // ========== LOAD NOMOR ==========
-        function loadNomor() {
-            db.ref('pengaturan/nomor').on('value', (snapshot) => {
-                const nomor = snapshot.val() || '0851-8798-0564';
-                document.getElementById('nomorKontak').textContent = nomor;
+        // ========== CEK PESANAN REALTIME ==========
+        function cekPesananRealtime() {
+            const idPesanan = document.getElementById('cekIdPesanan').value.trim();
+            const resultDiv = document.getElementById('cekPesananResult');
+            const realtimeDiv = document.getElementById('realtimeStatus');
+            
+            if(!idPesanan) {
+                showToast('Masukkan ID pesanan!', 'error');
+                return;
+            }
+            
+            // Hapus listener lama kalo ada
+            if(currentOrderListener) {
+                db.ref('pesanan').off('value', currentOrderListener);
+            }
+            
+            // Cari pesanan
+            db.ref('pesanan').orderByChild('kode').equalTo(idPesanan).once('value', (snapshot) => {
+                const data = snapshot.val();
                 
-                const waNumber = nomor.replace(/[^0-9]/g, '');
-                document.querySelectorAll('a[href*="wa.me"]').forEach(el => {
-                    if(waNumber.startsWith('0')) {
-                        el.href = `https://wa.me/62${waNumber.substring(1)}`;
-                    } else {
-                        el.href = `https://wa.me/${waNumber}`;
+                if(!data) {
+                    resultDiv.innerHTML = `
+                        <div class="bg-red-50 p-4 rounded-lg text-center">
+                            <i class="fas fa-times-circle text-red-500 text-3xl mb-2"></i>
+                            <p class="text-red-600 font-semibold">❌ ID Pesanan tidak ditemukan</p>
+                        </div>
+                    `;
+                    resultDiv.classList.remove('hidden');
+                    realtimeDiv.classList.add('hidden');
+                    return;
+                }
+                
+                const orderId = Object.keys(data)[0];
+                
+                // Listen realtime
+                if(currentOrderListener) {
+                    db.ref('pesanan/' + orderId).off('value', currentOrderListener);
+                }
+                
+                currentOrderListener = db.ref('pesanan/' + orderId).on('value', (snap) => {
+                    const order = snap.val();
+                    if(!order) return;
+                    
+                    const statusClass = {
+                        'menunggu-pembayaran': 'status-menunggu-pembayaran',
+                        'proses': 'status-proses',
+                        'dikirim': 'status-dikirim',
+                        'selesai': 'status-selesai',
+                        'ditolak': 'status-ditolak',
+                        'kadaluarsa': 'status-kadaluarsa'
+                    }[order.status] || 'status-menunggu-pembayaran';
+                    
+                    const statusText = {
+                        'menunggu-pembayaran': '💰 Menunggu Pembayaran',
+                        'proses': '⚙️ Sedang Diproses',
+                        'dikirim': '📦 Dalam Pengiriman',
+                        'selesai': '✅ Pesanan Selesai',
+                        'ditolak': '❌ Pesanan Ditolak',
+                        'kadaluarsa': '⏰ Pesanan Kadaluarsa'
+                    }[order.status] || order.status;
+                    
+                    // Hitung sisa waktu untuk yang masih menunggu
+                    let countdownHtml = '';
+                    if(order.status === 'menunggu-pembayaran') {
+                        const waktuOrder = order.waktu || 0;
+                        const waktuKadaluarsa = waktuOrder + EXPIRY_TIME;
+                        const sisaWaktu = waktuKadaluarsa - Date.now();
+                        
+                        if(sisaWaktu > 0) {
+                            const menit = Math.floor(sisaWaktu / 60000);
+                            const detik = Math.floor((sisaWaktu % 60000) / 1000);
+                            countdownHtml = `
+                                <div class="mt-3 text-center">
+                                    <span class="countdown-timer">
+                                        <i class="fas fa-hourglass-half mr-1"></i>Sisa waktu: ${menit}:${detik.toString().padStart(2, '0')}
+                                    </span>
+                                </div>
+                            `;
+                        }
                     }
+                    
+                    let paymentInfo = '';
+                    if(order.status === 'menunggu-pembayaran') {
+                        paymentInfo = `
+                            <div class="mt-4 p-3 bg-blue-50 rounded-lg realtime-update">
+                                <p class="font-semibold text-blue-800 mb-2">🏦 INSTRUKSI PEMBAYARAN</p>
+                                <p class="text-sm">Transfer ke rekening:</p>
+                                <p class="font-mono font-bold">BCA 1234567890</p>
+                                <p class="text-sm">a.n. Jamu Herbal Alami</p>
+                                <p class="text-sm mt-2">Total: <span class="font-bold">Rp ${order.total.toLocaleString()}</span></p>
+                                <p class="text-xs text-red-600 mt-2">*Pesanan akan hangus dalam 10 menit jika tidak dibayar</p>
+                            </div>
+                        `;
+                    }
+                    
+                    let confirmInfo = '';
+                    if(order.konfirmasiPembayaran) {
+                        confirmInfo = `
+                            <div class="mt-3 p-3 bg-green-50 rounded-lg">
+                                <p class="font-semibold text-green-700">✓ PEMBAYARAN TERKONFIRMASI</p>
+                                <p class="text-xs mt-1">Dari: ${order.konfirmasiPembayaran.pengirim} (${order.konfirmasiPembayaran.bank})</p>
+                                <p class="text-xs">Tanggal: ${order.konfirmasiPembayaran.tanggal}</p>
+                            </div>
+                        `;
+                    }
+                    
+                    let expiredInfo = '';
+                    if(order.status === 'kadaluarsa') {
+                        expiredInfo = `
+                            <div class="mt-3 p-3 warning-expired">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                Pesanan ini telah kadaluarsa karena tidak dikonfirmasi dalam 10 menit.
+                            </div>
+                        `;
+                    }
+                    
+                    let reviewButton = '';
+                    if(order.status === 'selesai' && !order.dapatUlasan) {
+                        reviewButton = `
+                            <button onclick="bukaReviewModal('${orderId}', '${order.produkId}', '${order.produkNama.replace(/'/g, "\\'")}')" 
+                                    class="mt-4 w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">
+                                <i class="fas fa-star mr-2"></i>Beri Ulasan
+                            </button>
+                        `;
+                    }
+                    
+                    resultDiv.innerHTML = `
+                        <div class="bg-white p-4 rounded-lg border-l-4 ${statusClass.split(' ')[0]}">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <p class="text-xs text-gray-500">ID PESANAN</p>
+                                    <p class="font-mono font-bold">${order.kode}</p>
+                                </div>
+                                <span class="status-badge ${statusClass}">${statusText}</span>
+                            </div>
+                            
+                            ${countdownHtml}
+                            
+                            <div class="grid grid-cols-2 gap-3 mb-3 text-sm">
+                                <div>
+                                    <p class="text-gray-500">Nama</p>
+                                    <p class="font-semibold">${order.nama}</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">WhatsApp</p>
+                                    <p class="font-semibold">${order.wa}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <p class="text-gray-500 text-sm">Alamat</p>
+                                <p class="text-sm">${order.alamat}</p>
+                            </div>
+                            
+                            <div class="border-t pt-3">
+                                <p class="font-semibold">Detail Produk:</p>
+                                <p class="text-sm">${order.produkNama} x ${order.jumlah}</p>
+                                <p class="text-sm font-bold text-green-600 mt-1">Total: Rp ${order.total.toLocaleString()}</p>
+                            </div>
+                            
+                            ${paymentInfo}
+                            ${confirmInfo}
+                            ${expiredInfo}
+                            ${reviewButton}
+                            
+                            <p class="text-xs text-gray-400 mt-3">
+                                <i class="far fa-clock mr-1"></i>${new Date(order.waktu).toLocaleString('id-ID')}
+                            </p>
+                        </div>
+                    `;
+                    resultDiv.classList.remove('hidden');
+                    
+                    realtimeDiv.innerHTML = `
+                        <div class="bg-green-50 p-3 rounded-lg text-center text-sm">
+                            <i class="fas fa-sync-alt fa-spin mr-2"></i>Status akan update otomatis
+                        </div>
+                    `;
+                    realtimeDiv.classList.remove('hidden');
                 });
             });
         }
 
         // ========== MODAL ORDER ==========
-        {
+        function bukaOrderModal(produkId, produkNama, produkHarga) {
             document.getElementById('orderProductInfo').innerHTML = `
                 <p class="font-semibold">${produkNama}</p>
-                <p class="text-sm text-gray-600">Harga: Rp ${produkHarga.toLocaleString()}</p>
+                <p class="text-sm text-gray-600">Harga: Rp ${Number(produkHarga).toLocaleString()}</p>
             `;
             document.getElementById('orderProdukId').value = produkId;
             document.getElementById('orderProdukNama').value = produkNama;
             document.getElementById('orderProdukHarga').value = produkHarga;
             document.getElementById('orderSession').value = userSession;
             document.getElementById('orderQty').value = 1;
-            document.getElementById('orderTotal').textContent = `Rp ${produkHarga.toLocaleString()}`;
+            document.getElementById('orderTotal').textContent = `Rp ${Number(produkHarga).toLocaleString()}`;
             document.getElementById('orderModal').style.display = 'flex';
         }
 
+        function tutupOrderModal() {
+            document.getElementById('orderModal').style.display = 'none';
+        }
 
         document.getElementById('orderQty')?.addEventListener('input', function() {
             const harga = parseInt(document.getElementById('orderProdukHarga').value);
@@ -670,7 +1318,8 @@
         });
 
         // ========== SUBMIT ORDER ==========
-        
+        function submitOrder(event) {
+            event.preventDefault();
             
             const produkId = document.getElementById('orderProdukId').value;
             const produkNama = document.getElementById('orderProdukNama').value;
@@ -691,22 +1340,14 @@
                 return;
             }
             
-            // Cek anti spam
-            db.ref('pesanan').orderByChild('session').equalTo(session).once('value', (snap) => {
-                let recentOrder = false;
-                const now = Date.now();
-                snap.forEach(child => {
-                    if(now - child.val().waktu < 5 * 60 * 1000) {
-                        recentOrder = true;
-                    }
-                });
-                
-                if(recentOrder) {
-                    showToast('Anda sudah melakukan order baru-baru ini. Tunggu 5 menit!', 'error');
+            // Cek spam dulu
+            cekSpam(session).then(isSpam => {
+                if(isSpam) {
+                    showToast('Terlalu banyak pesanan! Tunggu 30 menit.', 'error');
                     return;
                 }
                 
-                // Generate kode unik
+                                // Generate kode unik
                 const kodePesanan = 'INV-' + Date.now().toString().slice(-8) + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
                 
                 // Simpan pesanan dengan status MENUNGGU PEMBAYARAN
@@ -727,32 +1368,39 @@
                     riwayatStatus: [{
                         status: 'menunggu-pembayaran',
                         waktu: Date.now(),
-                        catatan: 'Pesanan dibuat, menunggu konfirmasi pembayaran'
+                        catatan: 'Pesanan dibuat, menunggu konfirmasi pembayaran (batas 10 menit)'
                     }]
                 }).then(() => {
                     showToast(`✅ Pesanan berhasil! ID: ${kodePesanan}`, 'success');
                     tutupOrderModal();
                     
-                    // Format pesan WA dengan instruksi pembayaran
-                    const pesanWA = `🆕 *PESANAN BARU - MENUNGGU PEMBAYARAN!*\n\n` +
-                        `*ID Pesanan:* ${kodePesanan}\n` +
-                        `*Nama:* ${nama}\n` +
-                        `*No. WA:* ${wa}\n` +
-                        `*Alamat:* ${alamat}\n\n` +
-                        `*Detail Pesanan:*\n` +
-                        `📦 Produk: ${produkNama}\n` +
-                        `🔢 Jumlah: ${qty} pcs\n` +
-                        `💰 Harga: Rp ${harga.toLocaleString()}\n` +
-                        `💵 Total: Rp ${(harga * qty).toLocaleString()}\n\n` +
-                        `⏳ Status: MENUNGGU PEMBAYARAN\n\n` +
-                        `_Silakan transfer ke rekening BCA 1234567890 a.n. Jamu Herbal Alami_\n` +
-                        `_Konfirmasi pembayaran melalui WA ini dengan mengirim bukti transfer_\n\n` +
-                        `📱 *Cara Konfirmasi:*\n` +
-                        `1. Transfer sesuai total\n` +
-                        `2. Screenshot bukti transfer\n` +
-                        `3. Kirim ke nomor ini dengan menyertakan ID Pesanan`;
-                    
-                    window.open(`https://wa.me/${OWNER_WA}?text=${encodeURIComponent(pesanWA)}`, '_blank');
+                    // Ambil data rekening untuk pesan WA
+                    db.ref('pengaturan/rekening').once('value', (snap) => {
+                        const rekening = snap.val() || { bank: 'BCA', nomor: '1234567890', nama: 'Jamu Herbal Alami' };
+                        
+                        const pesanWA = `🆕 *PESANAN BARU!*\n\n` +
+                            `*ID Pesanan:* ${kodePesanan}\n` +
+                            `*Nama:* ${nama}\n` +
+                            `*No. WA:* ${wa}\n` +
+                            `*Alamat:* ${alamat}\n\n` +
+                            `*Detail Pesanan:*\n` +
+                            `📦 Produk: ${produkNama}\n` +
+                            `🔢 Jumlah: ${qty} pcs\n` +
+                            `💰 Harga: Rp ${harga.toLocaleString()}\n` +
+                            `💵 Total: Rp ${(harga * qty).toLocaleString()}\n\n` +
+                            `⏳ Status: MENUNGGU PEMBAYARAN\n` +
+                            `⏰ *Pesanan akan hangus dalam 10 menit jika tidak dikonfirmasi!*\n\n` +
+                            `🏦 *REKENING TUJUAN:*\n` +
+                            `Bank: ${rekening.bank}\n` +
+                            `No. Rek: ${rekening.nomor}\n` +
+                            `a.n. ${rekening.nama}\n\n` +
+                            `📱 *Cara Konfirmasi:*\n` +
+                            `1. Transfer sesuai total\n` +
+                            `2. Login ke panel admin\n` +
+                            `3. Masukkan ID pesanan ini di menu konfirmasi`;
+                        
+                        window.open(`https://wa.me/${OWNER_WA}?text=${encodeURIComponent(pesanWA)}`, '_blank');
+                    });
                     
                     // Reset form
                     document.getElementById('orderNama').value = '';
@@ -764,26 +1412,22 @@
             });
         }
 
-        // ========== CEK PESANAN ==========
-        function cekPesanan() {
-            const idPesanan = document.getElementById('cekIdPesanan').value.trim();
+        // ========== KONFIRMASI DARI FLOATING ==========
+        function konfirmasiDariFloating() {
+            const idPesanan = document.getElementById('floatingConfirmId').value.trim();
+            const resultDiv = document.getElementById('floatingConfirmResult');
+            
             if(!idPesanan) {
-                showToast('Masukkan ID pesanan!', 'error');
+                resultDiv.innerHTML = '<p class="text-red-600">❌ Masukkan ID pesanan!</p>';
+                resultDiv.classList.remove('hidden');
                 return;
             }
             
             db.ref('pesanan').orderByChild('kode').equalTo(idPesanan).once('value', (snapshot) => {
                 const data = snapshot.val();
-                const resultDiv = document.getElementById('cekPesananResult');
                 
                 if(!data) {
-                    resultDiv.innerHTML = `
-                        <div class="bg-red-50 p-4 rounded-lg text-center">
-                            <i class="fas fa-times-circle text-red-500 text-3xl mb-2"></i>
-                            <p class="text-red-600 font-semibold">❌ ID Pesanan tidak ditemukan</p>
-                            <p class="text-sm text-gray-500 mt-2">Pastikan ID pesanan benar</p>
-                        </div>
-                    `;
+                    resultDiv.innerHTML = '<p class="text-red-600">❌ ID Pesanan tidak ditemukan!</p>';
                     resultDiv.classList.remove('hidden');
                     return;
                 }
@@ -791,143 +1435,41 @@
                 const orderId = Object.keys(data)[0];
                 const order = data[orderId];
                 
-                const statusClass = {
-                    'menunggu-pembayaran': 'status-menunggu-pembayaran',
-                    'proses': 'status-proses',
-                    'dikirim': 'status-dikirim',
-                    'selesai': 'status-selesai',
-                    'ditolak': 'status-ditolak'
-                }[order.status] || 'status-pending';
-                
-                const statusText = {
-                    'menunggu-pembayaran': '💰 Menunggu Pembayaran',
-                    'proses': '⚙️ Sedang Diproses',
-                    'dikirim': '📦 Dalam Pengiriman',
-                    'selesai': '✅ Pesanan Selesai',
-                    'ditolak': '❌ Pesanan Ditolak'
-                }[order.status] || '⏳ ' + order.status;
-                
-                // Tampilkan info rekening kalau status menunggu pembayaran
-                let paymentInfo = '';
-                if(order.status === 'menunggu-pembayaran') {
-                    paymentInfo = `
-                        <div class="mt-4 p-3 bg-blue-50 rounded-lg">
-                            <p class="font-semibold text-blue-800 mb-2">🏦 INSTRUKSI PEMBAYARAN</p>
-                            <p class="text-sm">Transfer ke rekening:</p>
-                            <p class="font-mono font-bold">BCA 1234567890</p>
-                            <p class="text-sm">a.n. Jamu Herbal Alami</p>
-                            <p class="text-sm mt-2">Total: <span class="font-bold">Rp ${order.total.toLocaleString()}</span></p>
-                            <p class="text-xs text-gray-600 mt-2">*Konfirmasi via WhatsApp setelah transfer</p>
-                        </div>
-                    `;
-                }
-                
-                let reviewButton = '';
-                if(order.status === 'selesai' && !order.dapatUlasan) {
-                    reviewButton = `
-                        <button onclick="bukaReviewModal('${orderId}', '${order.produkId}', '${order.produkNama.replace(/'/g, "\\'")}')" 
-                                class="mt-4 w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">
-                            <i class="fas fa-star mr-2"></i>Beri Ulasan
-                        </button>
-                    `;
-                }
-                
-                resultDiv.innerHTML = `
-                    <div class="bg-white p-4 rounded-lg border-l-4 ${statusClass.split(' ')[0]}">
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <p class="text-xs text-gray-500">ID PESANAN</p>
-                                <p class="font-mono font-bold">${order.kode}</p>
-                            </div>
-                            <span class="status-badge ${statusClass}">${statusText}</span>
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-3 mb-3 text-sm">
-                            <div>
-                                <p class="text-gray-500">Nama</p>
-                                <p class="font-semibold">${order.nama}</p>
-                            </div>
-                            <div>
-                                <p class="text-gray-500">WhatsApp</p>
-                                <p class="font-semibold">${order.wa}</p>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <p class="text-gray-500 text-sm">Alamat</p>
-                            <p class="text-sm">${order.alamat}</p>
-                        </div>
-                        
-                        <div class="border-t pt-3">
-                            <p class="font-semibold">Detail Produk:</p>
-                            <p class="text-sm">${order.produkNama} x ${order.jumlah}</p>
-                            <p class="text-sm font-bold text-green-600 mt-1">Total: Rp ${order.total.toLocaleString()}</p>
-                        </div>
-                        
-                        ${paymentInfo}
-                        ${reviewButton}
-                        
-                        <p class="text-xs text-gray-400 mt-3">
-                            <i class="far fa-clock mr-1"></i>${new Date(order.waktu).toLocaleString('id-ID')}
-                        </p>
-                    </div>
-                `;
-                resultDiv.classList.remove('hidden');
-            });
-        }
-
-        // ========== KONFIRMASI PEMBAYARAN INSTAN ==========
-        function konfirmasiPembayaranInstant() {
-            const idPesanan = document.getElementById('instantConfirmId').value.trim();
-            const resultDiv = document.getElementById('instantConfirmResult');
-            
-            if(!idPesanan) {
-                resultDiv.innerHTML = '<p class="text-red-600 text-sm">❌ Masukkan ID pesanan!</p>';
-                resultDiv.classList.remove('hidden');
-                return;
-            }
-            
-            // Cari pesanan berdasarkan ID
-            db.ref('pesanan').orderByChild('kode').equalTo(idPesanan).once('value', (snapshot) => {
-                const data = snapshot.val();
-                
-                if(!data) {
-                    resultDiv.innerHTML = '<p class="text-red-600 text-sm">❌ ID Pesanan tidak ditemukan!</p>';
-                    resultDiv.classList.remove('hidden');
-                    return;
-                }
-                
-                const orderId = Object.keys(data)[0];
-                const order = data[orderId];
-                
-                // Cek status
                 if(order.status !== 'menunggu-pembayaran') {
-                    resultDiv.innerHTML = `<p class="text-red-600 text-sm">❌ Status pesanan bukan "Menunggu Pembayaran" (${order.status})</p>`;
+                    resultDiv.innerHTML = `<p class="text-red-600">❌ Status bukan "Menunggu Pembayaran" (${order.status})</p>`;
                     resultDiv.classList.remove('hidden');
                     return;
                 }
                 
-                // Update status jadi PROSES
+                // Cek apakah masih dalam batas waktu
+                const waktuOrder = order.waktu || 0;
+                const waktuKadaluarsa = waktuOrder + EXPIRY_TIME;
+                
+                if(Date.now() > waktuKadaluarsa) {
+                    resultDiv.innerHTML = `<p class="text-red-600">❌ Pesanan sudah kadaluarsa (lebih dari 10 menit)</p>`;
+                    resultDiv.classList.remove('hidden');
+                    return;
+                }
+                
                 const riwayatBaru = order.riwayatStatus || [];
                 riwayatBaru.push({
                     status: 'proses',
                     waktu: Date.now(),
-                    catatan: 'Pembayaran dikonfirmasi via INSTAN CONFIRM'
+                    catatan: 'Pembayaran dikonfirmasi via FLOATING CONFIRM'
                 });
                 
                 db.ref('pesanan/' + orderId).update({
                     status: 'proses',
                     riwayatStatus: riwayatBaru,
                     konfirmasiPembayaran: {
-                        metode: 'Instant Confirm',
+                        metode: 'Floating Confirm',
                         waktuKonfirmasi: Date.now(),
                         dikonfirmasiOleh: 'Admin'
                     }
                 }).then(() => {
-                    resultDiv.innerHTML = '<p class="text-green-600 text-sm font-bold">✅ PEMBAYARAN DIKONFIRMASI! Status sekarang: DIPROSES</p>';
+                    resultDiv.innerHTML = '<p class="text-green-600 font-bold">✅ BERHASIL! Status: DIPROSES</p>';
                     resultDiv.classList.remove('hidden');
                     
-                    // Kirim notifikasi WA ke pembeli
                     const pesanWA = `✅ *PEMBAYARAN DIKONFIRMASI!*\n\n` +
                         `Halo ${order.nama},\n` +
                         `Pembayaran untuk pesanan *${order.kode}* sudah kami terima dan konfirmasi.\n\n` +
@@ -935,72 +1477,115 @@
                         `Kami akan segera memproses pesanan Anda.\n\n` +
                         `Terima kasih telah berbelanja di Jamu Herbal Alami 🌿`;
                     
-                    window.open(`https://wa.me/${order.wa.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(pesanWA)}`, '_blank');
+                    window.open(`https://wa.me/${formatWA(order.wa)}?text=${encodeURIComponent(pesanWA)}`, '_blank');
                     
-                    // Reset input
-                    document.getElementById('instantConfirmId').value = '';
-                    
-                    // Refresh data
-                    loadAdminPesanan();
+                    document.getElementById('floatingConfirmId').value = '';
                     
                     setTimeout(() => {
                         resultDiv.classList.add('hidden');
-                    }, 5000);
+                    }, 3000);
                 });
             });
         }
 
-        // ========== MODAL KONFIRMASI DETAIL ==========
-        function bukaKonfirmasiDetailModal(orderId, kode, total) {
-            document.getElementById('konfirmasiDetailOrderId').value = orderId;
-            document.getElementById('konfirmasiDetailKode').value = kode;
-            document.getElementById('konfirmasiDetailTotal').value = total;
+        // ========== CARI PESANAN UNTUK KONFIRMASI ==========
+        function cariPesananUntukKonfirmasi() {
+            const idPesanan = document.getElementById('adminConfirmId').value.trim();
             
-            document.getElementById('konfirmasiDetailInfo').innerHTML = `
-                <p class="font-semibold">Konfirmasi Pembayaran</p>
-                <p class="text-sm">ID Pesanan: <span class="font-mono">${kode}</span></p>
-                <p class="text-sm">Total: <span class="font-bold">Rp ${total.toLocaleString()}</span></p>
-            `;
+            if(!idPesanan) {
+                showToast('Masukkan ID pesanan!', 'error');
+                return;
+            }
             
-            document.getElementById('detailJumlahTransfer').value = total;
-            
-            // Set default date ke hari ini
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('detailTanggalTransfer').value = today;
-            
-            document.getElementById('konfirmasiDetailModal').style.display = 'flex';
+            db.ref('pesanan').orderByChild('kode').equalTo(idPesanan).once('value', (snapshot) => {
+                const data = snapshot.val();
+                
+                if(!data) {
+                    showToast('ID Pesanan tidak ditemukan!', 'error');
+                    return;
+                }
+                
+                const orderId = Object.keys(data)[0];
+                const order = data[orderId];
+                
+                if(order.status !== 'menunggu-pembayaran') {
+                    showToast(`Pesanan sudah dikonfirmasi (${order.status})`, 'error');
+                    return;
+                }
+                
+                // Cek apakah masih dalam batas waktu
+                const waktuOrder = order.waktu || 0;
+                const waktuKadaluarsa = waktuOrder + EXPIRY_TIME;
+                
+                if(Date.now() > waktuKadaluarsa) {
+                    showToast('❌ Pesanan sudah kadaluarsa (lebih dari 10 menit)', 'error');
+                    return;
+                }
+                
+                document.getElementById('konfirmasiOrderId').value = orderId;
+                document.getElementById('konfirmasiKode').value = order.kode;
+                document.getElementById('konfirmasiJumlah').value = order.total;
+                
+                document.getElementById('konfirmasiInfo').innerHTML = `
+                    <p class="font-semibold">Konfirmasi Pembayaran</p>
+                    <p class="text-sm">ID: <span class="font-mono">${order.kode}</span></p>
+                    <p class="text-sm">Nama: ${order.nama}</p>
+                    <p class="text-sm">Total: <span class="font-bold">Rp ${order.total.toLocaleString()}</span></p>
+                    <p class="text-xs text-green-600 mt-1">✓ Masih dalam batas waktu 10 menit</p>
+                `;
+                
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('konfirmasiTanggal').value = today;
+                
+                document.getElementById('konfirmasiModal').style.display = 'flex';
+            });
         }
 
-        function tutupKonfirmasiDetailModal() {
-            document.getElementById('konfirmasiDetailModal').style.display = 'none';
-            document.getElementById('konfirmasiDetailForm').reset();
+        function tutupKonfirmasiModal() {
+            document.getElementById('konfirmasiModal').style.display = 'none';
+            document.getElementById('konfirmasiForm').reset();
         }
 
-        function prosesKonfirmasiDetail(event) {
+        function prosesKonfirmasi(event) {
             event.preventDefault();
             
-            const orderId = document.getElementById('konfirmasiDetailOrderId').value;
-            const kode = document.getElementById('konfirmasiDetailKode').value;
-            const jumlahTransfer = parseInt(document.getElementById('detailJumlahTransfer').value);
-            const bankAsal = document.getElementById('detailBankAsal').value;
-            const namaPengirim = document.getElementById('detailNamaPengirim').value.trim();
-            const tanggalTransfer = document.getElementById('detailTanggalTransfer').value;
-            const buktiFile = document.getElementById('detailBuktiTransfer').files[0];
+            const orderId = document.getElementById('konfirmasiOrderId').value;
+            const kode = document.getElementById('konfirmasiKode').value;
+            const jumlah = parseInt(document.getElementById('konfirmasiJumlah').value);
+            const bank = document.getElementById('konfirmasiBank').value;
+            const pengirim = document.getElementById('konfirmasiPengirim').value.trim();
+            const tanggal = document.getElementById('konfirmasiTanggal').value;
+            const buktiFile = document.getElementById('konfirmasiBukti').files[0];
             
-            if(!bankAsal || !namaPengirim || !tanggalTransfer) {
+            if(!bank || !pengirim || !tanggal) {
                 showToast('Semua field harus diisi!', 'error');
                 return;
             }
             
-            // Ambil data order
             db.ref('pesanan/' + orderId).once('value', (snap) => {
                 const order = snap.val();
                 
+                // Cek lagi apakah masih dalam batas waktu
+                const waktuOrder = order.waktu || 0;
+                const waktuKadaluarsa = waktuOrder + EXPIRY_TIME;
+                
+                if(Date.now() > waktuKadaluarsa) {
+                    showToast('❌ Pesanan sudah kadaluarsa!', 'error');
+                    tutupKonfirmasiModal();
+                    return;
+                }
+                
+                if(order.status !== 'menunggu-pembayaran') {
+                    showToast(`Status pesanan sudah berubah menjadi ${order.status}`, 'error');
+                    tutupKonfirmasiModal();
+                    return;
+                }
+                
                 const konfirmasiData = {
-                    jumlahTransfer: jumlahTransfer,
-                    bankAsal: bankAsal,
-                    namaPengirim: namaPengirim,
-                    tanggalTransfer: tanggalTransfer,
+                    jumlah: jumlah,
+                    bank: bank,
+                    pengirim: pengirim,
+                    tanggal: tanggal,
                     waktuKonfirmasi: Date.now(),
                     dikonfirmasiOleh: 'Admin'
                 };
@@ -1023,12 +1608,11 @@
         }
 
         function updatePesananSetelahKonfirmasi(orderId, konfirmasiData, order) {
-            // Update status pesanan jadi PROSES
             const riwayatBaru = order.riwayatStatus || [];
             riwayatBaru.push({
                 status: 'proses',
                 waktu: Date.now(),
-                catatan: `Pembayaran dikonfirmasi - Transfer dari ${konfirmasiData.namaPengirim} (${konfirmasiData.bankAsal}) Rp ${konfirmasiData.jumlahTransfer.toLocaleString()}`
+                catatan: `Pembayaran dikonfirmasi - ${konfirmasiData.pengirim} (${konfirmasiData.bank}) Rp ${konfirmasiData.jumlah.toLocaleString()}`
             });
             
             return db.ref('pesanan/' + orderId).update({
@@ -1037,8 +1621,9 @@
                 konfirmasiPembayaran: konfirmasiData,
                 waktuKonfirmasi: Date.now()
             }).then(() => {
-                showToast('✅ Pembayaran dikonfirmasi! Pesanan sekarang DIPROSES', 'success');
-                tutupKonfirmasiDetailModal();
+                showToast('✅ Pembayaran dikonfirmasi! Status: DIPROSES', 'success');
+                tutupKonfirmasiModal();
+                document.getElementById('adminConfirmId').value = '';
                 
                 // Kirim notifikasi WA ke pembeli
                 const pesanWA = `✅ *PEMBAYARAN DIKONFIRMASI!*\n\n` +
@@ -1048,10 +1633,10 @@
                     `Kami akan segera memproses pesanan Anda.\n\n` +
                     `Terima kasih telah berbelanja di Jamu Herbal Alami 🌿`;
                 
-                window.open(`https://wa.me/${order.wa.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(pesanWA)}`, '_blank');
+                window.open(`https://wa.me/${formatWA(order.wa)}?text=${encodeURIComponent(pesanWA)}`, '_blank');
                 
                 // Refresh data
-                loadAdminPesanan();
+                filterPesanan();
             });
         }
 
@@ -1197,6 +1782,7 @@
         function logoutAdmin() {
             tutupAdminPanel();
             document.getElementById('hiddenAdminButton').classList.add('hidden');
+            document.getElementById('floatingConfirm').classList.remove('show');
             showToast('👋 Logout berhasil');
         }
 
@@ -1210,11 +1796,13 @@
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.add('hidden');
             });
-            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('hidden');
+            const tabId = 'tab' + tab.charAt(0).toUpperCase() + tab.slice(1);
+            const tabElement = document.getElementById(tabId);
+            if(tabElement) tabElement.classList.remove('hidden');
         }
 
         function loadAdminData() {
-            // Statistik
+            // Statistik realtime
             db.ref('produk').once('value', snap => {
                 const produk = snap.val();
                 document.getElementById('statProduk').textContent = produk ? Object.keys(produk).length : 0;
@@ -1224,7 +1812,6 @@
                 const pesanan = snap.val();
                 document.getElementById('statPesanan').textContent = pesanan ? Object.keys(pesanan).length : 0;
                 
-                // Hitung total terjual
                 let totalTerjual = 0;
                 Object.keys(pesanan || {}).forEach(key => {
                     if(pesanan[key].status === 'selesai') {
@@ -1250,18 +1837,24 @@
                 const container = document.getElementById('adminProdukList');
                 
                 if(!data) {
-                    container.innerHTML = '<p class="text-gray-500">Belum ada produk</p>';
+                    container.innerHTML = '<p class="text-gray-500">Belum ada produk. Tambahkan produk pertama Anda!</p>';
                     return;
                 }
                 
                 let html = '';
                 Object.keys(data).forEach(key => {
                     const p = data[key];
+                    
+                    let hargaTampil = '💰 Hubungi WA';
+                    if(p.harga && !isNaN(p.harga)) {
+                        hargaTampil = 'Rp ' + Number(p.harga).toLocaleString();
+                    }
+                    
                     html += `
                         <div class="bg-gray-50 p-3 rounded-lg flex justify-between items-center">
                             <div>
                                 <p class="font-semibold">${p.nama}</p>
-                                <p class="text-sm text-gray-600">${p.harga === 'Hubungi WA' ? '💰 Hubungi WA' : 'Rp ' + p.harga.toLocaleString()} | Terjual: ${p.terjual || 0}</p>
+                                <p class="text-sm text-gray-600">${hargaTampil} | Terjual: ${p.terjual || 0}</p>
                             </div>
                             <div>
                                 <button onclick="editProduk('${key}')" class="text-blue-600 hover:text-blue-800 mr-2">
@@ -1305,7 +1898,7 @@
                 filtered = filtered.filter(o => 
                     o.nama.toLowerCase().includes(search) || 
                     o.kode.toLowerCase().includes(search) ||
-                    o.wa.includes(search)
+                    (o.wa && o.wa.includes(search))
                 );
             }
             
@@ -1318,46 +1911,65 @@
                     'proses': 'status-proses',
                     'dikirim': 'status-dikirim',
                     'selesai': 'status-selesai',
-                    'ditolak': 'status-ditolak'
-                }[order.status] || 'status-pending';
+                    'ditolak': 'status-ditolak',
+                    'kadaluarsa': 'status-kadaluarsa'
+                }[order.status] || 'status-menunggu-pembayaran';
                 
                 const statusText = {
-                    'menunggu-pembayaran': '💰 Menunggu Pembayaran',
+                    'menunggu-pembayaran': '💰 Menunggu Bayar',
                     'proses': '⚙️ Diproses',
                     'dikirim': '📦 Dikirim',
                     'selesai': '✅ Selesai',
-                    'ditolak': '❌ Ditolak'
+                    'ditolak': '❌ Ditolak',
+                    'kadaluarsa': '⏰ Kadaluarsa'
                 }[order.status] || order.status;
                 
-                // Tombol konfirmasi khusus untuk status menunggu-pembayaran
-                const confirmButton = order.status === 'menunggu-pembayaran' ? 
-                    `<button onclick="bukaKonfirmasiDetailModal('${order.id}', '${order.kode}', ${order.total})" class="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700 mr-2">
-                        <i class="fas fa-check mr-1"></i>Konfirmasi Detail
-                    </button>` : '';
+                const confirmedClass = order.konfirmasiPembayaran ? 'confirmed' : '';
+                const expiredClass = order.status === 'kadaluarsa' ? 'expired' : '';
                 
-                // Tampilkan info konfirmasi kalau ada
+                // Hitung sisa waktu untuk yang masih menunggu
+                let countdownHtml = '';
+                if(order.status === 'menunggu-pembayaran') {
+                    const waktuOrder = order.waktu || 0;
+                    const waktuKadaluarsa = waktuOrder + EXPIRY_TIME;
+                    const sisaWaktu = waktuKadaluarsa - Date.now();
+                    
+                    if(sisaWaktu > 0) {
+                        const menit = Math.floor(sisaWaktu / 60000);
+                        const detik = Math.floor((sisaWaktu % 60000) / 1000);
+                        countdownHtml = `
+                            <span class="countdown-timer ml-2">
+                                <i class="fas fa-hourglass-half mr-1"></i>${menit}:${detik.toString().padStart(2, '0')}
+                            </span>
+                        `;
+                    } else {
+                        countdownHtml = `<span class="text-red-600 text-xs ml-2">⏰ Kadaluarsa</span>`;
+                    }
+                }
+                
                 let confirmInfo = '';
                 if(order.konfirmasiPembayaran) {
                     confirmInfo = `
                         <div class="mt-2 text-xs bg-green-50 p-2 rounded">
-                            <p class="font-semibold text-green-700">✓ Dikonfirmasi: ${new Date(order.konfirmasiPembayaran.waktuKonfirmasi).toLocaleString('id-ID')}</p>
-                            <p>Pengirim: ${order.konfirmasiPembayaran.namaPengirim || '-'} (${order.konfirmasiPembayaran.bankAsal || '-'})</p>
+                            <p class="font-semibold text-green-700">✓ DIKONFIRMASI: ${new Date(order.konfirmasiPembayaran.waktuKonfirmasi).toLocaleString('id-ID')}</p>
+                            <p>Pengirim: ${order.konfirmasiPembayaran.pengirim || '-'} (${order.konfirmasiPembayaran.bank || '-'})</p>
                         </div>
                     `;
                 }
                 
                 html += `
-                    <div class="bg-white p-4 rounded-lg shadow order-card" style="border-left-color: ${
+                    <div class="order-card ${confirmedClass} ${expiredClass}" style="border-left-color: ${
                         order.status === 'menunggu-pembayaran' ? '#f59e0b' :
-                                                order.status === 'proses' ? '#3b82f6' : 
+                        order.status === 'proses' ? '#3b82f6' : 
                         order.status === 'dikirim' ? '#8b5cf6' : 
-                        order.status === 'selesai' ? '#10b981' : '#ef4444'
+                        order.status === 'selesai' ? '#10b981' : 
+                        order.status === 'kadaluarsa' ? '#9ca3af' : '#ef4444'
                     }">
                         <div class="flex justify-between items-start mb-2">
                             <div>
-                                <p class="font-mono text-sm font-bold">${order.kode}</p>
+                                <p class="font-mono text-sm font-bold">${order.kode} ${countdownHtml}</p>
                                 <p class="font-semibold">${order.nama}</p>
-                                <p class="text-xs text-gray-500">${order.wa}</p>
+                                <p class="text-xs text-gray-500">${order.wa || '-'}</p>
                             </div>
                             <span class="status-badge ${statusClass}">${statusText}</span>
                         </div>
@@ -1368,17 +1980,15 @@
                         ${confirmInfo}
                         
                         <div class="flex gap-2 mt-2 items-center flex-wrap">
-                            ${confirmButton}
-                            
-                            <select onchange="ubahStatusPesanan('${order.id}', this.value)" class="text-sm border rounded p-1">
-                                <option value="menunggu-pembayaran" ${order.status === 'menunggu-pembayaran' ? 'selected' : ''}>💰 Menunggu Bayar</option>
-                                <option value="proses" ${order.status === 'proses' ? 'selected' : ''}>⚙️ Diproses</option>
-                                <option value="dikirim" ${order.status === 'dikirim' ? 'selected' : ''}>📦 Dikirim</option>
+                            <select onchange="ubahStatusPesanan('${order.id}', this.value)" class="text-sm border rounded p-1" ${order.status === 'kadaluarsa' ? 'disabled' : ''}>
+                                <option value="menunggu-pembayaran" ${order.status === 'menunggu-pembayaran' ? 'selected' : ''}>💰 Menunggu</option>
+                                <option value="proses" ${order.status === 'proses' ? 'selected' : ''}>⚙️ Proses</option>
+                                <option value="dikirim" ${order.status === 'dikirim' ? 'selected' : ''}>📦 Kirim</option>
                                 <option value="selesai" ${order.status === 'selesai' ? 'selected' : ''}>✅ Selesai</option>
-                                <option value="ditolak" ${order.status === 'ditolak' ? 'selected' : ''}>❌ Ditolak</option>
+                                <option value="ditolak" ${order.status === 'ditolak' ? 'selected' : ''}>❌ Tolak</option>
                             </select>
                             
-                            <button onclick="lihatRiwayat('${order.id}')" class="text-blue-600 hover:text-blue-800 text-sm" title="Lihat Riwayat">
+                            <button onclick="lihatRiwayat('${order.id}')" class="text-blue-600 hover:text-blue-800 text-sm" title="Riwayat">
                                 <i class="fas fa-history"></i>
                             </button>
                             
@@ -1411,27 +2021,22 @@
                     status: status,
                     riwayatStatus: riwayatBaru
                 }).then(() => {
-                    showToast(`✅ Status pesanan diubah ke ${status}`);
+                    showToast(`✅ Status diubah ke ${status}`);
                     
-                    // Kalau status selesai, tambah jumlah terjual
                     if(status === 'selesai') {
                         db.ref('pesanan/' + id).once('value', snap => {
                             const order = snap.val();
                             db.ref('produk/' + order.produkId + '/terjual').transaction(current => (current || 0) + order.jumlah);
                         });
                         
-                        // Kirim notifikasi WA ke pembeli
                         const pesanWA = `✅ *PESANAN SELESAI!*\n\n` +
                             `Halo ${order.nama},\n` +
                             `Pesanan *${order.kode}* telah selesai.\n\n` +
                             `Terima kasih telah berbelanja di Jamu Herbal Alami 🌿\n` +
                             `Jangan lupa kasih ulasan ya!`;
                         
-                        window.open(`https://wa.me/${order.wa.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(pesanWA)}`, '_blank');
+                        window.open(`https://wa.me/${formatWA(order.wa)}?text=${encodeURIComponent(pesanWA)}`, '_blank');
                     }
-                    
-                    // Refresh data
-                    loadAdminPesanan();
                 });
             });
         }
@@ -1440,7 +2045,6 @@
             if(confirm('Yakin mau hapus pesanan ini?')) {
                 db.ref('pesanan/' + id).remove().then(() => {
                     showToast('✅ Pesanan dihapus');
-                    loadAdminPesanan();
                 });
             }
         }
@@ -1457,7 +2061,8 @@
                             'proses': '⚙️ Diproses',
                             'dikirim': '📦 Dikirim',
                             'selesai': '✅ Selesai',
-                            'ditolak': '❌ Ditolak'
+                            'ditolak': '❌ Ditolak',
+                            'kadaluarsa': '⏰ Kadaluarsa'
                         }[r.status] || r.status;
                         
                         riwayatHtml += `
@@ -1474,14 +2079,13 @@
                 
                 riwayatHtml += '</div>';
                 
-                // Tampilkan dalam modal sederhana
                 const modal = document.createElement('div');
                 modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
                 modal.innerHTML = `
                     <div class="bg-white rounded-lg p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-bold">📋 Riwayat Pesanan ${order.kode}</h3>
-                            <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                            <button onclick="this.remove()" class="text-gray-500 text-2xl">&times;</button>
                         </div>
                         ${riwayatHtml}
                         <button onclick="this.closest('.fixed').remove()" class="w-full mt-4 bg-gray-200 py-2 rounded-lg">Tutup</button>
@@ -1517,7 +2121,7 @@
                                 <p class="text-xs text-gray-500 mt-1">${t.produk}</p>
                                 <p class="text-xs text-gray-400">${new Date(t.waktu).toLocaleString('id-ID')}</p>
                             </div>
-                            <button onclick="hapusTestimoni('${key}')" class="text-red-600 hover:text-red-800">
+                            <button onclick="hapusTestimoni('${key}')" class="text-red-600">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -1543,20 +2147,18 @@
             document.getElementById('produkDeskripsi').value = '';
             document.getElementById('produkHarga').value = '';
             document.getElementById('produkFoto').value = '';
-            document.getElementById('produkUpload').value = '';
             document.getElementById('produkModal').style.display = 'flex';
         }
 
-        function editProduk(id) {
+                function editProduk(id) {
             db.ref('produk/' + id).once('value', snap => {
                 const p = snap.val();
                 document.getElementById('produkModalTitle').textContent = 'Edit Produk';
                 document.getElementById('produkId').value = id;
                 document.getElementById('produkNama').value = p.nama;
                 document.getElementById('produkDeskripsi').value = p.deskripsi;
-                document.getElementById('produkHarga').value = p.harga || 'Hubungi WA';
+                document.getElementById('produkHarga').value = p.harga || '';
                 document.getElementById('produkFoto').value = p.foto || '';
-                document.getElementById('produkUpload').value = '';
                 document.getElementById('produkModal').style.display = 'flex';
             });
         }
@@ -1571,35 +2173,30 @@
             const id = document.getElementById('produkId').value;
             const nama = document.getElementById('produkNama').value;
             const deskripsi = document.getElementById('produkDeskripsi').value;
-            const hargaInput = document.getElementById('produkHarga').value;
-const harga = hargaInput === 'Hubungi WA' ? 'Hubungi WA' : parseInt(hargaInput);
+            const hargaInput = document.getElementById('produkHarga').value.trim();
             const foto = document.getElementById('produkFoto').value;
-            const file = document.getElementById('produkUpload').files[0];
+            
+            let harga = null;
+            if(hargaInput && !isNaN(hargaInput) && hargaInput !== '') {
+                harga = parseInt(hargaInput);
+            }
             
             const produkData = {
                 nama: nama,
                 deskripsi: deskripsi,
-                harga: harga,
                 terjual: 0,
                 ulasanCount: 0
             };
             
-            if(foto) produkData.foto = foto;
-            
-            if(file) {
-                // Upload file dulu
-                const storageRef = storage.ref('produk/' + Date.now() + '_' + file.name);
-                storageRef.put(file).then(snapshot => {
-                    return snapshot.ref.getDownloadURL();
-                }).then(downloadURL => {
-                    produkData.foto = downloadURL;
-                    return simpanProdukKeDB(id, produkData);
-                }).catch(error => {
-                    showToast('Gagal upload: ' + error.message, 'error');
-                });
-            } else {
-                simpanProdukKeDB(id, produkData);
+            if(harga !== null) {
+                produkData.harga = harga;
             }
+            
+            if(foto) {
+                produkData.foto = foto;
+            }
+            
+            simpanProdukKeDB(id, produkData);
         }
         
         function simpanProdukKeDB(id, data) {
@@ -1624,9 +2221,37 @@ const harga = hargaInput === 'Hubungi WA' ? 'Hubungi WA' : parseInt(hargaInput);
             }
         }
 
-        function simpanPengaturan() {
-            const nomor = document.getElementById('editNomor').value;
-            db.ref('pengaturan/nomor').set(nomor).then(() => {
+        // ========== SETTINGS ==========
+        function simpanRekening() {
+            const bank = document.getElementById('editBankName').value.trim();
+            const nomor = document.getElementById('editBankNumber').value.trim();
+            const nama = document.getElementById('editBankAccountName').value.trim();
+            
+            if(!bank || !nomor || !nama) {
+                showToast('Semua field rekening harus diisi!', 'error');
+                return;
+            }
+            
+            db.ref('pengaturan/rekening').set({
+                bank: bank,
+                nomor: nomor,
+                nama: nama
+            }).then(() => {
+                showToast('✅ Rekening diperbarui');
+            });
+        }
+
+        function simpanWANumber() {
+            let waNumber = document.getElementById('editWANumber').value.trim();
+            
+            if(!waNumber) {
+                showToast('Nomor WhatsApp harus diisi!', 'error');
+                return;
+            }
+            
+            waNumber = waNumber.replace(/[^0-9]/g, '');
+            
+            db.ref('pengaturan/waNumber').set(waNumber).then(() => {
                 showToast('✅ Nomor WhatsApp diperbarui');
             });
         }
@@ -1636,22 +2261,23 @@ const harga = hargaInput === 'Hubungi WA' ? 'Hubungi WA' : parseInt(hargaInput);
             db.ref('pesanan').once('value', snap => {
                 const orders = snap.val();
                 if(!orders) {
-                    showToast('Tidak ada data untuk diexport', 'error');
+                    showToast('Tidak ada data', 'error');
                     return;
                 }
                 
-                let csv = 'Kode,Nama,WhatsApp,Produk,Jumlah,Total,Status,Waktu\n';
+                let csv = 'Kode,Nama,WA,Produk,Jumlah,Total,Status,Konfirmasi,Waktu\n';
                 
                 Object.keys(orders).forEach(key => {
                     const o = orders[key];
-                    csv += `"${o.kode}","${o.nama}","${o.wa}","${o.produkNama}",${o.jumlah},${o.total},"${o.status}","${new Date(o.waktu).toLocaleString('id-ID')}"\n`;
+                    const konfirmasi = o.konfirmasiPembayaran ? 'Ya' : 'Tidak';
+                    csv += `"${o.kode}","${o.nama}","${o.wa}","${o.produkNama}",${o.jumlah},${o.total},"${o.status}","${konfirmasi}","${new Date(o.waktu).toLocaleString('id-ID')}"\n`;
                 });
                 
                 const blob = new Blob([csv], { type: 'text/csv' });
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'laporan-pesanan-' + new Date().toISOString().slice(0,10) + '.csv';
+                a.download = 'pesanan-' + new Date().toISOString().slice(0,10) + '.csv';
                 a.click();
                 
                 showToast('✅ Laporan diexport');
@@ -1660,55 +2286,22 @@ const harga = hargaInput === 'Hubungi WA' ? 'Hubungi WA' : parseInt(hargaInput);
 
         // ========== INIT ==========
         window.onload = function() {
+            loadPengaturan();
             loadProduk();
             loadTestimoni();
-            loadNomor();
+            startExpiredChecker(); // Mulai pengecekan expired otomatis
+            console.log('🌿 Sistem siap! Auto-expired 10 menit aktif.');
             
-            // Auto cek kalau ada parameter ID di URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const orderId = urlParams.get('order');
-            if(orderId) {
-                document.getElementById('cekIdPesanan').value = orderId;
-                cekPesanan();
-            }
-            
-            console.log('🌿 Jamu Herbal Alami - Siap digunakan!');
+            // Debug: cek koneksi Firebase
+            db.ref('.info/connected').on('value', (snap) => {
+                if(snap.val() === true) {
+                    console.log('✅ Terkoneksi ke Firebase');
+                } else {
+                    console.log('❌ Gagal konek ke Firebase');
+                }
+            });
         };
     </script>
 
-    <!-- TOMBOL CEPAT KONFIRMASI DI HALAMAN UTAMA (UNTUK ADMIN) -->
-    <div id="quickConfirmFloating" class="fixed bottom-6 left-24 hidden z-50 admin-button-appear">
-        <button onclick="document.getElementById('instantConfirmId').focus(); document.getElementById('adminPanelModal').style.display='flex'; switchTab('pesanan');" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 hover:bg-blue-700">
-            <i class="fas fa-money-bill-wave"></i> Konfirmasi Bayar
-        </button>
-    </div>
-
-    <script>
-        // Tampilkan tombol quick confirm kalau admin panel aktif
-        document.getElementById('hiddenClickArea').addEventListener('click', function() {
-            clickCount++;
-            if(clickCount >= CLICKS_NEEDED) {
-                document.getElementById('hiddenAdminButton').classList.remove('hidden');
-                document.getElementById('quickConfirmFloating').classList.remove('hidden');
-                clickCount = 0;
-                showToast('🔓 Admin panel tersedia!', 'success');
-            }
-        });
-        
-        
-        
-        // ========== CHAT WA LANGSUNG ==========
-function chatWA(produkNama) {
-    const pesan = `Halo kak, saya mau order ${produkNama}`;
-    window.open(`https://wa.me/6285187980564?text=${encodeURIComponent(pesan)}`, '_blank');
-}
-
-function chatWA(produkNama) {
-    const pesan = `Halo kak, saya mau order *${produkNama}*.\n\nMohon info cara pembayaran dan ketersediaan stok ya. Terima kasih 🌿`;
-    window.open(`https://wa.me/6285187980564?text=${encodeURIComponent(pesan)}`, '_blank');
-}
-
-    </script>
-
 </body>
-                    </html>
+    </html>
